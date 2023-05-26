@@ -1,0 +1,65 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python package
+
+on: # workflow_dispatch
+ push:
+   branches: [ "main", "**" ]
+ pull_request:
+   branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+       python-version: ["3.8", "3.9"]
+        
+    steps:
+    - uses: actions/checkout@v3
+###### Alex: to be used in future version once permissions issue is resolved
+#     - name: black
+#       uses: lgeiger/black-action@master
+#       with:
+#           args: .      
+#     - name: Apply black formatting if reviewdog found formatting errors
+#       if: "${{ failure() }}"
+#       run: |
+#          black .
+#     - name: Commit black formatting results
+#       if: "${{ failure() }}"
+#       uses: stefanzweifel/git-auto-commit-action@v4
+#       with:
+#          commit_message: ":art: Format Python code with psf/black push"
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipreqs black addheader pytest-cov pip-licenses
+    - name: black check
+      run:  |
+          black .
+    - name: pip install   
+      run: |
+        pip install . 
+        
+    - name: Run tests 
+      run: |
+         pytest -rs tests 
+    - name: Run test covarage report
+      run: |
+        pytest  --cov=qokit --cov-fail-under=75
+    - name: License check
+      run: |
+        pip-licenses --format=markdown --order=license
+        
+    - name: SPDX check
+      run: |
+       addheader -t header.txt .
+       grep -L -f header.txt */*.py

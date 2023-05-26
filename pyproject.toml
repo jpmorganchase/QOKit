@@ -1,0 +1,50 @@
+[project]
+name = "qokit"
+description="Quantum Optimization Toolkit"
+readme = "README.md"
+authors = [ 
+   {name = "JP Morgan Chase & Co"},
+   {email = "OmniQ_Support@jpmchase.com"}
+   ]
+license = {file = "LICENSE"}
+classifiers=[
+    "Development Status :: Pre-Alpha",
+    "License :: OSI Approved :: Apache-2.0",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+]
+version = "0.1.0"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 160
+target-version = ['py38', 'py39']
+force-exclude = '''
+(
+  /(
+    | .git       
+    | .github       
+    | jupyter
+    | qokit/assets
+  )/
+    | scripts/*.sh
+    | scripts/*.md
+    | ^.txt
+    | ^.txt
+    | ^.sh
+    | ^.md
+)
+'''
+[tool.setuptools]
+py-modules = []
+[tool.coverage.run]
+omit = [
+    "qokit/classical_methods/utils.py",
+    "qokit/fur/nbcuda/fur.py"
+    ]
+[tool.setuptools.package-data]
+qokit = ["*.json", "*.scv", "*.zip"]
