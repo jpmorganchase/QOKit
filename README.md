@@ -1,6 +1,3 @@
-# QOKit
-QOKit
-
 # Quantum Optimization of Hard Problems
 
 A joint project between Global Technology Applied Research of JPMorgan Chase, Argonne National Laboratory and Quantinuum 
@@ -40,10 +37,11 @@ Please do not push directly to `main`. To contribute to `code/`, create a separa
 
 ### Disclaimer
 
-All information contained in this GitHub repository is deemed Proprietary Information and is therefore subject to the terms of the Non-Disclosure Agreement (ìNDAî) dated 14 November 2022, as amended. You should be aware that the information contained in this repository is subject to strict confidentiality requirements. If you have any questions relating to the terms of the NDA or the use of this repository, please contact <quantum.computing@jpmchase.com>. In particular, you should seek advice before granting access to any new participant, or sharing any content outside of this repository
+All information contained in this GitHub repository is deemed Proprietary Information and is therefore subject to the terms of the Non-Disclosure Agreement (‚ÄúNDA‚Äù) dated 14 November 2022, as amended. You should be aware that the information contained in this repository is subject to strict confidentiality requirements. If you have any questions relating to the terms of the NDA or the use of this repository, please contact <quantum.computing@jpmchase.com>. In particular, you should seek advice before granting access to any new participant, or sharing any content outside of this repository
 
 ### License
 This project uses the [Apache License 2.0](LICENSE).
 
 ### Copyright
 JP Morgan Chase & Co
+
