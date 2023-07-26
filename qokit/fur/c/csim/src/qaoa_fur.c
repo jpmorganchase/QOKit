@@ -6,7 +6,7 @@
 
 /**
  * apply a QAOA with the X mixer defined by
- * U(beta) = sum_{j} exp(-i*beta*X_j/2)
+ * U(beta) = sum_{j} exp(-i*beta*X_j)
  * where X_j is the Pauli-X operator applied on the jth qubit
  * @param sv_real array of length n containing real parts of the statevector
  * @param sv_imag array of length n containing imaginary parts of the statevector
@@ -22,14 +22,14 @@ void apply_qaoa_furx(double* sv_real, double* sv_imag, double* const gammas, dou
     for (size_t i=0; i<n_layers; i++)
     {
         apply_diagonal(sv_real, sv_imag, -0.5*gammas[i], hc_diag, n_states);
-        furx_all(sv_real, sv_imag, 0.5*betas[i], n_qubits, n_states);
+        furx_all(sv_real, sv_imag, betas[i], n_qubits, n_states);
     }
 }
 
 
 /**
  * apply a QAOA with the XY-ring mixer defined by
- * U(beta) = sum_{j} exp(-i*beta*(X_{j}X_{j+1}+Y_{j}Y_{j+1})/4)
+ * U(beta) = sum_{j} exp(-i*beta*(X_{j}X_{j+1}+Y_{j}Y_{j+1})/2)
  * where X_j and Y_j are the Pauli-X and Pauli-Y operators applied on the jth qubit, respectively.
  * @param sv_real array of length n containing real parts of the statevector
  * @param sv_imag array of length n containing imaginary parts of the statevector
@@ -48,7 +48,7 @@ void apply_qaoa_furxy_ring(double* sv_real, double* sv_imag, double* const gamma
         apply_diagonal(sv_real, sv_imag, -0.5*gammas[i], hc_diag, n_states);
         for (size_t j=0; j<n_trotters; j++)
         {
-            furxy_ring(sv_real, sv_imag, 0.5*betas[i]/n_trotters, n_qubits, n_states);
+            furxy_ring(sv_real, sv_imag, betas[i]/n_trotters, n_qubits, n_states);
         }
     }
 }
@@ -56,7 +56,7 @@ void apply_qaoa_furxy_ring(double* sv_real, double* sv_imag, double* const gamma
 
 /**
  * apply a QAOA with the XY-complete mixer defined by
- * U(beta) = sum_{j,k} exp(-i*beta*(X_{j}X_{k}+Y_{j}Y_{k})/4)
+ * U(beta) = sum_{j,k} exp(-i*beta*(X_{j}X_{k}+Y_{j}Y_{k})/2)
  * where X_j and Y_j are the Pauli-X and Pauli-Y operators applied on the jth qubit, respectively.
  * @param sv_real array of length n containing real parts of the statevector
  * @param sv_imag array of length n containing imaginary parts of the statevector
@@ -75,7 +75,7 @@ void apply_qaoa_furxy_complete(double* sv_real, double* sv_imag, double* const g
         apply_diagonal(sv_real, sv_imag, -0.5*gammas[i], hc_diag, n_states);
         for (size_t j=0; j<n_trotters; j++)
         {
-            furxy_complete(sv_real, sv_imag, 0.5*betas[i]/n_trotters, n_qubits, n_states);
+            furxy_complete(sv_real, sv_imag, betas[i]/n_trotters, n_qubits, n_states);
         }
     }
 }

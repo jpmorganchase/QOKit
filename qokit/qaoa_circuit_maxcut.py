@@ -7,9 +7,7 @@ from typing import Sequence
 
 
 def append_zz_term(qc, q1, q2, gamma):
-    qc.cx(q1, q2)
-    qc.rz(-gamma / 2, q2)
-    qc.cx(q1, q2)
+    qc.rzz(-gamma / 2, q1, q2)
 
 
 def append_maxcut_cost_operator_circuit(qc, G, gamma):
@@ -21,9 +19,7 @@ def append_maxcut_cost_operator_circuit(qc, G, gamma):
 
 
 def append_x_term(qc, q1, beta):
-    qc.h(q1)
-    qc.rz(2 * beta, q1)
-    qc.h(q1)
+    qc.rx(2 * beta, q1)
 
 
 def append_mixer_operator_circuit(qc, G, beta):

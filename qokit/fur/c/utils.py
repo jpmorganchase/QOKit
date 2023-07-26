@@ -1,5 +1,5 @@
+from __future__ import annotations
 from dataclasses import dataclass
-import typing
 import numba
 import numpy as np
 
@@ -26,7 +26,7 @@ class ComplexArray:
         return norm_squared(self.real, self.imag)
 
 
-def get_complex_array(sv: typing.Union[ComplexArray, np.ndarray]) -> ComplexArray:
+def get_complex_array(sv: ComplexArray | np.ndarray) -> ComplexArray:
     """
     create a ComplexArray from a NumPy array or return the object as is
     if it's already a ComplexArray

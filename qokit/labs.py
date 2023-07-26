@@ -2,14 +2,13 @@
 # // SPDX-License-Identifier: Apache-2.0
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
+from __future__ import annotations
 import sys
-from typing import Sequence
+from collections.abc import Sequence, Iterable
 import numpy as np
-from collections.abc import Iterable
 from itertools import combinations
 from operator import mul
 from functools import reduce
-from typing import Optional
 
 # approximate optimal merit factor and energy for small Ns
 # from Table 1 of https://arxiv.org/abs/1512.02475
@@ -86,6 +85,33 @@ true_optimal_energy = {
 }
 
 
+def get_terms_offset(N: int):
+    """
+    Retrun `terms` and `offset` for QAOA LABS problem
+
+    Parameters
+    ----------
+    N : int
+        Problem size (number of spins)
+
+    Returns
+    -------
+    terms : Sequence of `(float, term)`, where `term` is a tuple of ints.
+        Each term corresponds to a summand in the cost Hamiltonian
+        and th float value is the coefficient of this term.
+        e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
+        the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
+
+    offset : int
+        energy offset required due to constant factors (identity terms)
+        not included in the Hamiltonian
+
+    """
+    term_indices, offset = get_energy_term_indices(N)
+    terms = [(len(t), t) for t in term_indices]
+    return terms, offset
+
+
 def get_energy_term_indices(N: int):
     """Return indices of Pauli Zs in the LABS problem definition
 
@@ -122,7 +148,7 @@ def get_energy_term_indices(N: int):
     return set(all_terms), offset
 
 
-def energy_vals(s: Sequence, N: Optional[int] = None) -> float:
+def energy_vals(s: Sequence, N: int | None = None) -> float:
     """Compute LABS energy values from a string of spins
 
     Parameters
@@ -149,7 +175,7 @@ def energy_vals(s: Sequence, N: Optional[int] = None) -> float:
     return E_s
 
 
-def energy_vals_from_bitstring(x, N: Optional[int] = None) -> float:
+def energy_vals_from_bitstring(x, N: int | None = None) -> float:
     """Convenience function
     Useful to get the LABS energy values for bitstrings which are {0,1}^N
 
@@ -170,7 +196,7 @@ def energy_vals_from_bitstring(x, N: Optional[int] = None) -> float:
     return energy_vals(1 - 2 * x, N=N)
 
 
-def energy_vals_general(s: Sequence, terms: Optional[Sequence] = None, offset: Optional[float] = None, check_parameters: bool = True) -> float:
+def energy_vals_general(s: Sequence, terms: Iterable | None = None, offset: float | None = None, check_parameters: bool = True) -> float:
     """Compute energy values from a string of spins
     Parameters
     ----------
@@ -201,7 +227,7 @@ def energy_vals_general(s: Sequence, terms: Optional[Sequence] = None, offset: O
     return E_s
 
 
-def energy_vals_from_bitstring_general(x, terms: Optional[Sequence] = None, offset: Optional[float] = None, check_parameters: bool = False) -> float:
+def energy_vals_from_bitstring_general(x, terms: Sequence | None = None, offset: float | None = None, check_parameters: bool = False) -> float:
     """Convenience func
     Useful to get the energy values for bitstrings which are {0,1}^N
     Parameters
@@ -223,7 +249,7 @@ def energy_vals_from_bitstring_general(x, terms: Optional[Sequence] = None, offs
     return energy_vals_general(1 - 2 * x, terms=terms, offset=offset, check_parameters=check_parameters)  # type: ignore
 
 
-def slow_merit_factor(s: Sequence, terms: Optional[Sequence] = None, offset: Optional[float] = None, check_parameters: bool = True) -> float:
+def slow_merit_factor(s: Sequence, terms: Iterable | None = None, offset: float | None = None, check_parameters: bool = True) -> float:
     """Compute merit factor from a string of spins
 
     Parameters
@@ -256,7 +282,7 @@ def slow_merit_factor(s: Sequence, terms: Optional[Sequence] = None, offset: Opt
     return N**2 / (2 * E_s)
 
 
-def merit_factor(s: Sequence, N: Optional[int] = None) -> float:
+def merit_factor(s: Sequence, N: int | None = None) -> float:
     """Compute merit factor from a string of spins
     Faster implementation that does not rely on terms computation
 
@@ -279,7 +305,7 @@ def merit_factor(s: Sequence, N: Optional[int] = None) -> float:
     return N**2 / (2 * E_s)
 
 
-def negative_merit_factor_from_bitstring(x, N: Optional[int] = None) -> float:
+def negative_merit_factor_from_bitstring(x, N: int | None = None) -> float:
     """Convenience function
     Useful for e.g. QAOA since convention is to minimize, and we want a maximum merit factor
 
@@ -343,7 +369,7 @@ def get_depth_optimized_terms(N: int) -> list:
     for pivot in range(N - 3, 0, -1):
         for t in range(1, int((N - pivot - 1) / 2) + 1):
             for k in range(t + 1, N - pivot - t + 1):
-                interactions = [(pivot, pivot + t, pivot + k, pivot + t + k)]
+                interactions: list[tuple[int, int, int, int] | tuple[int, int]] = [(pivot, pivot + t, pivot + k, pivot + t + k)]
                 if set(interactions[0]) in done:
                     continue
                 idx_used = list(interactions[0])
@@ -385,8 +411,7 @@ def get_depth_optimized_terms(N: int) -> list:
                                 interactions.append((a, f))
                 except IndexError:
                     pass
-                interactions = [set(np.array(list(x)) - 1) for x in interactions]
-                layers.append(interactions)
+                layers.append(set(j - 1 for j in i) for i in interactions)
 
     # add any missing ZZ terms not covered by the above. Typically isn't used at high N.
     for pivot in range(N - 2, 0, -1):
@@ -411,8 +436,7 @@ def get_depth_optimized_terms(N: int) -> list:
                             interactions.append((a, f))
             except IndexError:
                 pass
-            interactions = [set(np.array(list(x)) - 1) for x in interactions]
-            layers.append(interactions)
+            layers.append(set(j - 1 for j in i) for i in interactions)
 
     # linearize list of cost operator layers
     terms = []
@@ -453,7 +477,7 @@ def get_gate_optimized_terms_naive(N: int, number_of_gate_zones: int = 4):
     return terms
 
 
-def get_gate_optimized_terms_greedy(N: int, number_of_gate_zones: int = 4, seed: Optional[int] = None):
+def get_gate_optimized_terms_greedy(N: int, number_of_gate_zones: int = 4, seed: int | None = None):
     """
     Try to greedly cancel CNOTs for RZZZZ terms
     """

@@ -1,10 +1,10 @@
-import typing
+from __future__ import annotations
 import numpy as np
 from .utils import ComplexArray, get_complex_array
 from . import csim
 
 
-def furx(sv: typing.Union[ComplexArray, np.ndarray], theta: float, q: int) -> ComplexArray:
+def furx(sv: ComplexArray | np.ndarray, theta: float, q: int) -> ComplexArray:
     """
     apply to a statevector a single-qubit Pauli-X rotation defined by
     Rx(theta) = exp(-i*theta*X/2)
@@ -21,7 +21,7 @@ def furx(sv: typing.Union[ComplexArray, np.ndarray], theta: float, q: int) -> Co
     return sv
 
 
-def furxy(sv: typing.Union[ComplexArray, np.ndarray], theta: float, q1: int, q2: int) -> ComplexArray:
+def furxy(sv: ComplexArray | np.ndarray, theta: float, q1: int, q2: int) -> ComplexArray:
     """
     apply to a statevector a two-qubit XX+YY rotation defined by
     Rxy(theta) = exp(-i*theta*(XX+YY)/4)

@@ -1,16 +1,34 @@
+from distutils import extension
 from setuptools import setup, find_packages, Extension
-from sys import stderr, stdout, exit
 from setuptools.command.build_ext import build_ext
 import subprocess
+import os
 
 
-simulator = Extension("simulator", sources=["qokit/fur/c/csim/src/*.c"], include_dirs=["simulator"])
+environment_variable_name = "QOKIT_NO_C_ENV"
+QOKIT_PYTHON_ONLY = False
+QOKIT_NO_C_ENV = False  # used for tests only
+
+environment_variable_value = os.environ.get(environment_variable_name, None)
+
+if environment_variable_value is not None:
+    QOKIT_NO_C_ENV = True
+
+extensions = []
+if not QOKIT_PYTHON_ONLY:
+    extensions.append(Extension("simulator", sources=["qokit/fur/c/csim/src/*.c"], include_dirs=["simulator"]))
 
 
 class SimulatorBuild(build_ext):
     def run(self):
-        subprocess.call(["make", "-C", "qokit/fur/c/csim/src"])
-        super().run
+        try:
+            if not QOKIT_PYTHON_ONLY:
+                if QOKIT_NO_C_ENV:
+                    raise Exception("No C/C++ enviroment setup")
+                subprocess.call(["make", "-C", "qokit/fur/c/csim/src"])
+            super().run
+        except Exception as e:
+            print("No C/C++ enviroment setup to compile the C simulator. Installing Python Simulator")
 
 
 with open("README.md", "r") as f:
@@ -18,7 +36,7 @@ with open("README.md", "r") as f:
 
 
 setup(
-    ext_modules=[simulator],
+    ext_modules=extensions,
     cmdclass={"build_ext": SimulatorBuild},
     packages=find_packages(),
     install_requires=open("requirements.txt").readlines(),

@@ -5,3 +5,7 @@ Parameters in gurobi, for more detail [see](https://www.gurobi.com/documentation
 Parameter Cuts: Min: -1 Max: 3 Default: -1
 Parameter Presolve: Min: -1 Max: 2 Default: -1
 Parameter Heuristics : Min: 0, Max: 1, Default: 0.05 
+
+
+CPLEX: for n>=33 set a timeout of 3x the expected median time.
+Use default parameters.

@@ -26,6 +26,7 @@ def furx(
     q: int,
 ) -> None:
     from .lib import _furx
+
     n_states = check_arrays(sv_real, sv_imag)
     _furx(
         sv_real,
@@ -45,6 +46,7 @@ def apply_qaoa_furx(
     n_qubits: int,
 ) -> None:
     from .lib import _apply_qaoa_furx
+
     n_states = check_arrays(sv_real, sv_imag, hc_diag)
     n_layers = check_arrays(gammas, betas)
     check_num_qubits(n_qubits, n_states)
@@ -68,6 +70,7 @@ def furxy(
     q2: int,
 ) -> None:
     from .lib import _furxy
+
     n_states = check_arrays(sv_real, sv_imag)
     _furxy(
         sv_real,
@@ -89,6 +92,7 @@ def apply_qaoa_furxy_ring(
     n_trotters: int,
 ) -> None:
     from .lib import _apply_qaoa_furxy_ring
+
     n_states = check_arrays(sv_real, sv_imag, hc_diag)
     n_layers = check_arrays(gammas, betas)
     check_num_qubits(n_qubits, n_states)
@@ -115,6 +119,7 @@ def apply_qaoa_furxy_complete(
     n_trotters: int,
 ) -> None:
     from .lib import _apply_qaoa_furxy_complete
+
     n_states = check_arrays(sv_real, sv_imag, hc_diag)
     n_layers = check_arrays(gammas, betas)
     check_num_qubits(n_qubits, n_states)

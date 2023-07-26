@@ -1,4 +1,6 @@
-from typing import Optional, Sequence
+from __future__ import annotations
+from collections.abc import Sequence
+import typing
 import numpy as np
 from pathlib import Path
 
@@ -136,14 +138,12 @@ def get_random_guess_merit_factor(N: int) -> float:
 def get_qaoa_labs_objective(
     N: int,
     p: int,
-    terms: Optional[Sequence] = None,
-    offset: Optional[int] = None,
-    precomputed_merit_factors: Optional[np.ndarray] = None,
+    precomputed_merit_factors: np.ndarray | None = None,
     parameterization: str = "theta",
     objective: str = "expectation",
-    precomputed_optimal_bitstrings: Optional[np.ndarray] = None,
+    precomputed_optimal_bitstrings: np.ndarray | None = None,
     simulator: str = "auto",
-) -> object:
+) -> typing.Callable:
     """Return QAOA objective to be minimized
 
     Parameters
@@ -152,21 +152,11 @@ def get_qaoa_labs_objective(
         Number of qubits
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
-    terms : list of tuples
-        List of tuples, where each tuple defines a summand
-        and contains indices of the Pauli Zs in the product
-        e.g. if terms = [(0,1), (0,1,2,3), (1,2)]
-        the Hamiltonian is Z0Z1 + Z0Z1Z2Z3 + Z1Z2
-        returned by labs.py -> get_energy_term_indices
-    offset : int
-        energy offset required due to constant factors (identity terms)
-        not included in the Hamiltonian
-        returned by labs.py -> get_energy_term_indices
     precomputed_merit_factors : np.array
         precomputed merit factors to compute the QAOA expectation
     parameterization : str
-        If parameterization == 'theta', then f takes one parameter (beta and gamma concatenated)
-        If parameterization == 'gamma beta', then f takes two parameters (beta and gamma)
+        If parameterization == 'theta', then f takes one parameter (gamma and beta concatenated)
+        If parameterization == 'gamma beta', then f takes two parameters (gamma and beta)
         For below Fourier parameters, q=p
         If parameterization == 'freq', then f takes one parameter (fourier parameters u and v concatenated)
         If parameterization == 'u v', then f takes two parameters (fourier parameters u and v)
@@ -190,8 +180,7 @@ def get_qaoa_labs_objective(
     # TODO: needs to generate parameterized circuit and check that the precomputed stuff is loaded correctly
     # Otherwise pass directly to get_qaoa_objective
 
-    if terms is None or offset is None:
-        terms, offset = get_energy_term_indices(N)
+    terms_ix, offset = get_energy_term_indices(N)
 
     if precomputed_merit_factors is None:
         precomputed_merit_factors = get_precomputed_labs_merit_factors(N)
@@ -199,14 +188,7 @@ def get_qaoa_labs_objective(
     if objective in ["overlap", "expectation and overlap"] and precomputed_optimal_bitstrings is None:
         precomputed_optimal_bitstrings = get_precomputed_optimal_bitstrings(N)
 
-    if simulator == "qiskit":
-        # Prepare parameterized circuit
-        parameterized_circuit = get_parameterized_qaoa_circuit(N, terms, p)
-        precomputed_diagonal_hamiltonian = None
-    else:
-        # due to implementation quirk, need to pass precomputed *energies*, not precomputed *merit factors*
-        parameterized_circuit = None
-        precomputed_diagonal_hamiltonian = -(N**2) / (2 * precomputed_merit_factors) - offset
+    precomputed_diagonal_hamiltonian = -(N**2) / (2 * precomputed_merit_factors) - offset
 
     return get_qaoa_objective(
         N=N,
@@ -214,7 +196,6 @@ def get_qaoa_labs_objective(
         precomputed_diagonal_hamiltonian=precomputed_diagonal_hamiltonian,
         precomputed_objectives=precomputed_merit_factors,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
-        parameterized_circuit=parameterized_circuit,
         parameterization=parameterization,
         objective=objective,
         simulator=simulator,

@@ -3,13 +3,13 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 import ctypes
-from pathlib import Path
 from numpy.ctypeslib import ndpointer
 
+from .libpath import libpath
 
-code_dir = Path(__file__).parent
+
 try:
-    lib = ctypes.cdll.LoadLibrary(code_dir / "libcsim.so")
+    lib = ctypes.cdll.LoadLibrary(libpath)
 except OSError as e:
     raise ImportError("You must compile the C simulator before running the code. Please follow the instructions in README.md") from e
 

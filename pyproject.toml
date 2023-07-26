@@ -13,6 +13,8 @@ classifiers=[
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 ]
 version = "0.1.0"
 
@@ -22,7 +24,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 160
-target-version = ['py38', 'py39']
+target-version = ['py38', 'py39', 'py310', 'py311']
 force-exclude = '''
 (
   /(
@@ -44,7 +46,15 @@ py-modules = []
 [tool.coverage.run]
 omit = [
     "qokit/classical_methods/utils.py",
-    "qokit/fur/nbcuda/fur.py"
+    "qokit/fur/nbcuda/fur.py",
+    "qokit/fur/nbcuda/*",
+    "qokit/fur/mpi_nbcuda/*",
+    "qokit/fur/mpi_custatevec/*",
+    "qokit/fur/diagonal_precomputation/gpu_numba.py",
     ]
 [tool.setuptools.package-data]
 qokit = ["*.json", "*.scv", "*.zip"]
+
+[tool.pyright]
+reportIncompatibleMethodOverride = true
+reportPrivateUsage = true

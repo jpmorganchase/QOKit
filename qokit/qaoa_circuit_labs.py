@@ -3,7 +3,7 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 # QAOA circuit for some Z objective
-from typing import Sequence
+from collections.abc import Sequence
 from qiskit import QuantumCircuit
 from qiskit.circuit import ParameterVector
 
@@ -20,8 +20,9 @@ def append_z_prod_term(qc: QuantumCircuit, term: Sequence, gamma: float) -> None
             evolution time for interaction
 
     """
+    # term_weight, term = term
     term_weight = len(term)
-    assert all(term[i] < term[i + 1] for i in range(term_weight - 1))
+    assert all(term[i] < term[i + 1] for i in range(len(term) - 1))
     if term_weight == 4:
         # in labs, four-body terms appear two times more than two-body
         # there is also a global scaling factor of 2 for all terms (four and two), which is ignored here
@@ -48,7 +49,7 @@ def append_cost_operator_circuit(qc: QuantumCircuit, terms: Sequence, gamma: flo
         append_z_prod_term(qc, term, gamma)
 
 
-def append_x_term(qc: QuantumCircuit, q1: int, beta: float) -> None:
+def append_x_term(qc: QuantumCircuit, q1, beta: float) -> None:
     qc.h(q1)
     qc.rz(2 * beta, q1)
     qc.h(q1)
@@ -93,7 +94,7 @@ def get_qaoa_circuit(N: int, terms: Sequence, beta: Sequence, gamma: Sequence, s
         append_cost_operator_circuit(qc, terms, gamma[i])
         append_mixer_operator_circuit(qc, beta[i])
     if save_statevector:
-        qc.save_statevector()
+        qc.save_statevector()  # type: ignore
     return qc
 
 
@@ -142,10 +143,10 @@ def get_parameterized_qaoa_circuit(N: int, terms: Sequence, p: int, save_stateve
     qc.h(range(N))
     # second, apply p alternating operators
     for i in range(p):
-        append_cost_operator_circuit(qc, terms, gammas[i])
-        append_mixer_operator_circuit(qc, betas[i])
+        append_cost_operator_circuit(qc, terms, gammas[i])  # type: ignore
+        append_mixer_operator_circuit(qc, betas[i])  # type: ignore
     if save_statevector:
-        qc.save_statevector()
+        qc.save_statevector()  # type: ignore
     if return_parameter_vectors:
         return qc, betas, gammas
     else:
