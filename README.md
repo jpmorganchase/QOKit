@@ -1,6 +1,8 @@
-# Quantum Optimization of Hard Problems
+# Quantum Optimization Toolkit
 
 ![Tests](https://github.com/jpmorganchase/jpmc-argonne-quantum-optimization/actions/workflows/python-package.yml/badge.svg)
+
+This repository contains fast CPU and GPU simulators for benchmarking the Quantum Approximate Optimization Algorithm, as well as scripts for generating matching quantum circuits for execution on hardware. See the [examples](./examples) folder for a demo of this package.
 
 ### Install
 
@@ -23,11 +25,6 @@ If compilation fails, try installing just the Python version using `QOKIT_PYTHON
 
 Installation can be verified by running tests using `pytest`.
 
-### Usage
-
-Check out [examples](./examples) folder for a demo of this package.
-
-### MaxCut
+#### MaxCut
 
 For MaxCut, the datasets in `assets/maxcut_datasets/` must be inflated
-
