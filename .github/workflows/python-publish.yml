@@ -32,8 +32,8 @@ jobs:
         pip install build
     - name: Build package
       run: python -m build
-#     - name: Publish package
-#       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
-#       with:
-#         user: jpmc-oss
-#         password: ${{ secrets.PYPI_API_JPMC_OSS }}
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+      with:
+        user: jpmc-oss
+        password: ${{ secrets.PYPI_API_JPMC_OSS }}
