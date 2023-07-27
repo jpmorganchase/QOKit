@@ -1,3 +1,4 @@
+from __future__ import annotations
 import numpy as np
 import networkx as nx
 import warnings
@@ -7,17 +8,16 @@ from .maxcut import maxcut_obj, get_adjacency_matrix
 
 from .qaoa_circuit_maxcut import get_parameterized_qaoa_circuit
 from .qaoa_objective import get_qaoa_objective
-from typing import Optional
 
 
 def get_qaoa_maxcut_objective(
     N: int,
     p: int,
-    G: Optional[nx.Graph] = None,
-    precomputed_cuts: Optional[np.ndarray] = None,
+    G: nx.Graph | None = None,
+    precomputed_cuts: np.ndarray | None = None,
     parameterization: str = "theta",
     objective: str = "expectation",
-    precomputed_optimal_bitstrings: Optional[np.ndarray] = None,
+    precomputed_optimal_bitstrings: np.ndarray | None = None,
     simulator: str = "auto",
 ):
     """Return QAOA objective to be minimized
@@ -33,8 +33,8 @@ def get_qaoa_maxcut_objective(
     precomputed_cuts : np.array
         precomputed cuts to compute the QAOA expectation
     parameterization : str
-        If parameterization == 'theta', then f takes one parameter (beta and gamma concatenated)
-        If parameterization == 'gamma beta', then f takes two parameters (beta and gamma)
+        If parameterization == 'theta', then f takes one parameter (gamma and beta concatenated)
+        If parameterization == 'gamma beta', then f takes two parameters (gamma and beta)
         For below Fourier parameters, q=p
         If parameterization == 'freq', then f takes one parameter (fourier parameters u and v concatenated)
         If parameterization == 'u v', then f takes two parameters (fourier parameters u and v)
@@ -54,10 +54,12 @@ def get_qaoa_maxcut_objective(
         warnings.warn("If precomputed_cuts is passed, G is ignored")
 
     if precomputed_cuts is None:
-        assert G is not None
+        assert G is not None, "G must be passed if precomputed_cuts is None"
         precomputed_cuts = precompute_energies(maxcut_obj, N, w=get_adjacency_matrix(G))
 
     if simulator == "qiskit":
+        assert G is not None, "G must be passed if simulator == 'qiskit'"
+        precomputed_cuts = precompute_energies(maxcut_obj, N, w=get_adjacency_matrix(G))
         parameterized_circuit = get_parameterized_qaoa_circuit(G, p)
     else:
         parameterized_circuit = None

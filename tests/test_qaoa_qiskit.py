@@ -4,7 +4,6 @@
 ###############################################################################
 import numpy as np
 import sys
-import pytest
 import pandas as pd
 from qiskit.providers.aer import AerSimulator
 from pathlib import Path
@@ -33,14 +32,14 @@ def test_qaoa_parameterization():
     p = 4
 
     df = pd.read_json(
-        Path(test_qaoa_qiskit_folder, "../qokit/assets/best_known_QAOA_parameters_wrt_MF.json"),
+        Path(test_qaoa_qiskit_folder, "../qokit/assets/best_LABS_QAOA_parameters_wrt_MF.json"),
         orient="index",
     )
     row = df[(df["N"] == N) & (df["p"] == p)].squeeze()
 
-    terms, offset = get_energy_term_indices(N)
+    terms_ix, offset = get_energy_term_indices(N)
 
-    qc = get_qaoa_circuit(N, terms, row["beta"], row["gamma"])
+    qc = get_qaoa_circuit(N, terms_ix, row["beta"], row["gamma"])
     backend = AerSimulator(method="statevector")
     sv = np.asarray(backend.run(qc).result().get_statevector())
 
@@ -61,7 +60,7 @@ def test_qaoa_parameterization():
 
     precomputed_energies = precompute_energies(negative_merit_factor_from_bitstring, N)
     assert np.isclose(
-        get_qaoa_labs_objective(N, p, terms, offset, precomputed_energies)(np.hstack([row["gamma"], row["beta"]])),
+        get_qaoa_labs_objective(N, p, precomputed_energies)(np.hstack([row["gamma"], row["beta"]])),
         -row["merit factor"],
     )
 

@@ -3,7 +3,6 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 import numpy as np
-from pathlib import Path
 import pandas as pd
 import qiskit
 from itertools import product
@@ -38,11 +37,11 @@ def get_all_best_known():
         and columns optimized for overlap have ' opt4overlap' appended to them
     """
     df1 = pd.read_json(
-        files("qokit.assets").joinpath("best_known_QAOA_parameters_wrt_MF.json"),
+        files("qokit.assets").joinpath("best_LABS_QAOA_parameters_wrt_MF.json"),
         orient="index",
     ).drop("nseeds", axis=1)
     df2 = pd.read_json(
-        files("qokit.assets").joinpath("best_known_QAOA_parameters_wrt_overlap.json"),
+        files("qokit.assets").joinpath("best_LABS_QAOA_parameters_wrt_overlap.json"),
         orient="index",
     )
 
@@ -74,30 +73,24 @@ def brute_force(obj_f, num_variables: int, minimize: bool = False, function_take
     return best_cost_brute, xbest_brute
 
 
-def state_num2str(basis_state_as_num, nqubits):
-    return "{0:b}".format(basis_state_as_num).zfill(nqubits)
+def reverse_array_index_bit_order(arr):
+    arr = np.array(arr)
+    n = int(np.log2(len(arr)))  # Calculate the value of N
+    if n % 1:
+        raise ValueError("Input vector has to have length 2**N where N is integer")
 
-
-def state_str2num(basis_state_as_str):
-    return int(basis_state_as_str, 2)
-
-
-def state_reverse(basis_state_as_num, nqubits):
-    basis_state_as_str = state_num2str(basis_state_as_num, nqubits)
-    new_str = basis_state_as_str[::-1]
-    return state_str2num(new_str)
-
-
-def get_adjusted_state(state):
-    nqubits = np.log2(state.shape[0])
-    if nqubits % 1:
-        raise ValueError("Input vector is not a valid statevector for qubits.")
-    nqubits = int(nqubits)
-
-    adjusted_state = np.zeros(2**nqubits, dtype=complex)
-    for basis_state in range(2**nqubits):
-        adjusted_state[state_reverse(basis_state, nqubits)] = state[basis_state]
-    return adjusted_state
+    index_arr = np.arange(len(arr))
+    new_index_arr = np.zeros_like(index_arr)
+    while n > 0:
+        last_8 = np.unpackbits(index_arr.astype(np.uint8), axis=0, bitorder="little")
+        repacked_first_8 = np.packbits(last_8).astype(np.int64)
+        if n < 8:
+            new_index_arr += repacked_first_8 >> (8 - n)
+        else:
+            new_index_arr += repacked_first_8 << (n - 8)
+        index_arr = index_arr >> 8
+        n -= 8
+    return arr[new_index_arr]
 
 
 def state_to_ampl_counts(vec, eps: float = 1e-15):
@@ -278,38 +271,6 @@ def transpile_hseries(quantinuum_backend: QuantinuumBackend, circuit: Circuit, n
         "ZZMAX": ZZMax_count,
         "ZZPhase": ZZPhase_count,
     }
-
-
-def get_fixed_gamma_beta(d, p, return_AR=False):
-    """
-    Returns the parameters for QAOA for MaxCut on regular graphs from arXiv:2107.00677
-
-    Parameters
-    ----------
-    d : int
-        Degree of the graph
-    p : int
-        QAOA depth
-    return_AR : bool
-        return the guaranteed approximation ratio
-
-    Returns
-    -------
-    gamma, beta : (list, list)
-        Parameters as two separate lists in a tuple
-    AR : float
-        Only returned is flag return_AR is raised
-    """
-    df = pd.read_json(files("qokit.assets.maxcut_datasets").joinpath("fixed_angles_for_regular_graphs.json"), orient="index")
-
-    row = df[(df["d"] == d) & (df["p"] == p)]
-    if len(row) != 1:
-        raise ValueError(f"Failed to retrieve fixed angles for d={d}, p={p}")
-    row = row.squeeze()
-    if return_AR:
-        return row["gamma"], row["beta"], row["AR"]
-    else:
-        return row["gamma"], row["beta"]
 
 
 def objective_from_counts(counts, obj):

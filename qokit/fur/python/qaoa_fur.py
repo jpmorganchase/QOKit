@@ -1,9 +1,9 @@
-import typing
+from collections.abc import Sequence
 import numpy as np
 from .fur import furx_all, furxy_ring, furxy_complete
 
 
-def apply_qaoa_furx(sv: np.ndarray, gammas: typing.Sequence[float], betas: typing.Sequence[float], hc_diag: np.ndarray, n_qubits: int) -> None:
+def apply_qaoa_furx(sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], hc_diag: np.ndarray, n_qubits: int) -> None:
     """
     apply a QAOA with the X mixer defined by
     U(beta) = sum_{j} exp(-i*beta*X_j/2)
@@ -16,12 +16,10 @@ def apply_qaoa_furx(sv: np.ndarray, gammas: typing.Sequence[float], betas: typin
     """
     for gamma, beta in zip(gammas, betas):
         sv *= np.exp(-0.5j * gamma * hc_diag)
-        furx_all(sv, 0.5 * beta, n_qubits)
+        furx_all(sv, beta, n_qubits)
 
 
-def apply_qaoa_furxy_ring(
-    sv: np.ndarray, gammas: typing.Sequence[float], betas: typing.Sequence[float], hc_diag: np.ndarray, n_qubits: int, n_trotters: int = 1
-) -> None:
+def apply_qaoa_furxy_ring(sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], hc_diag: np.ndarray, n_qubits: int, n_trotters: int = 1) -> None:
     """
     apply a QAOA with the XY-ring mixer defined by
         U(beta) = sum_{j} exp(-i*beta*(X_{j}X_{j+1}+Y_{j}Y_{j+1})/4)
@@ -37,12 +35,10 @@ def apply_qaoa_furxy_ring(
     for gamma, beta in zip(gammas, betas):
         sv *= np.exp(-0.5j * gamma * hc_diag)
         for _ in range(n_trotters):
-            furxy_ring(sv, 0.5 * beta / n_trotters, n_qubits)
+            furxy_ring(sv, beta / n_trotters, n_qubits)
 
 
-def apply_qaoa_furxy_complete(
-    sv: np.ndarray, gammas: typing.Sequence[float], betas: typing.Sequence[float], hc_diag: np.ndarray, n_qubits: int, n_trotters: int = 1
-) -> None:
+def apply_qaoa_furxy_complete(sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], hc_diag: np.ndarray, n_qubits: int, n_trotters: int = 1) -> None:
     """
     apply a QAOA with the XY-complete mixer defined by
         U(beta) = sum_{j,k} exp(-i*beta*(X_{j}X_{k}+Y_{j}Y_{k})/4)
@@ -58,4 +54,4 @@ def apply_qaoa_furxy_complete(
     for gamma, beta in zip(gammas, betas):
         sv *= np.exp(-0.5j * gamma * hc_diag)
         for _ in range(n_trotters):
-            furxy_complete(sv, 0.5 * beta / n_trotters, n_qubits)
+            furxy_complete(sv, beta / n_trotters, n_qubits)
