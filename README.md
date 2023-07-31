@@ -13,13 +13,19 @@ source qokit/bin/activate
 pip install -U pip
 ```
 
-Install requires `pip >= 23`. It is recommended to update your pip using `pip install --upgrade pip` before install.
+Install requires `python>=3.9` and `pip >= 23`. It is recommended to update your pip using `pip install --upgrade pip` before install.
 
 ```
 git clone https://github.com/jpmorganchase/jpmc-argonne-quantum-optimization.git
 cd jpmc-argonne-quantum-optimization/
 pip install -e .
 ```
+
+Some optional parts of the package require additional dependencies. 
+- Using commercial IP solvers to solve optimizations problems: `pip install qokit[solvers]`
+- GPU simulation: `pip install qokit[GPU]`
+- Development: `pip install qokit[dev]`
+
 
 If compilation fails, try installing just the Python version using `QOKIT_PYTHON_ONLY=1 pip install -e .`.
 

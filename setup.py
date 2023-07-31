@@ -1,4 +1,3 @@
-from distutils import extension
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
 import subprocess
@@ -39,5 +38,4 @@ setup(
     ext_modules=extensions,
     cmdclass={"build_ext": SimulatorBuild},
     packages=find_packages(),
-    install_requires=open("requirements.txt").readlines(),
 )
