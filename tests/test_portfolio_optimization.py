@@ -13,9 +13,7 @@ import qokit
 import qokit
 import numpy as np
 import pytest
-import warnings
 from qiskit import execute, Aer
-import numba
 
 simulators_to_run = get_available_simulator_names("xyring")
 

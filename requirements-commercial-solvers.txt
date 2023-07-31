@@ -1,4 +1,0 @@
-# Requirements to generate lp files and solve with commercial solver
-# Please adapt packages' version with your version of Gurobi and/or CPLEX
-docplex==2.18.200
-gurobipy==9.1.2

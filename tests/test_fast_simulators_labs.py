@@ -3,12 +3,11 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 import pytest
+import typing
 import numpy as np
 from functools import partial
 from qiskit import QuantumCircuit
 from qiskit import Aer
-import numba.cuda
-import typing
 
 from qokit.qaoa_objective_labs import get_precomputed_labs_merit_factors
 from qokit.fur.lazy_import import MPI

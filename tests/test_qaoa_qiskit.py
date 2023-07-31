@@ -3,7 +3,6 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 import numpy as np
-import sys
 import pandas as pd
 from qiskit.providers.aer import AerSimulator
 from pathlib import Path

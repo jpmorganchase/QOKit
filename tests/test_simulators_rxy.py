@@ -7,7 +7,6 @@ import numpy as np
 from qiskit import QuantumCircuit, execute
 import qiskit.circuit.library
 from qiskit import Aer
-import numba.cuda
 
 from qokit.fur import QAOAFURXYRingSimulator, QAOAFURXYRingSimulatorC, QAOAFURXYRingSimulatorGPU
 from qokit.fur import QAOAFURXYCompleteSimulator, QAOAFURXYCompleteSimulatorC, QAOAFURXYCompleteSimulatorGPU
