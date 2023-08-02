@@ -1,3 +1,7 @@
+/***************************************
+* // SPDX-License-Identifier: Apache-2.0
+* // Copyright : JP Morgan Chase & Co
+****************************************/ 
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
