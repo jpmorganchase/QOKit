@@ -33,4 +33,4 @@ Installation can be verified by running tests using `pytest`.
 
 #### MaxCut
 
-For MaxCut, the datasets in `assets/maxcut_datasets/` must be inflated
+For MaxCut, the datasets in `qokit/assets/maxcut_datasets` must be inflated
