@@ -1,3 +1,7 @@
+###############################################################################
+# // SPDX-License-Identifier: Apache-2.0
+# // Copyright : JP Morgan Chase & Co
+###############################################################################
 from ..lazy_import import MPI
 from ..nbcuda.fur import furx as furx_local
 

@@ -1,3 +1,7 @@
+###############################################################################
+# // SPDX-License-Identifier: Apache-2.0
+# // Copyright : JP Morgan Chase & Co
+###############################################################################
 import qiskit
 import numpy as np
 from .portfolio_optimization import yield_all_indices_cosntrained, get_configuration_cost

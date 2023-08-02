@@ -1,3 +1,7 @@
+###############################################################################
+# // SPDX-License-Identifier: Apache-2.0
+# // Copyright : JP Morgan Chase & Co
+###############################################################################
 import qiskit
 from qiskit import QuantumRegister, QuantumCircuit, BasicAer, execute
 

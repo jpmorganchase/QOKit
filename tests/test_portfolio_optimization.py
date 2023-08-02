@@ -1,3 +1,7 @@
+###############################################################################
+# // SPDX-License-Identifier: Apache-2.0
+# // Copyright : JP Morgan Chase & Co
+###############################################################################
 from qokit.portfolio_optimization import get_problem, get_problem_H, get_problem_H_bf, po_obj_func
 from qokit.utils import precompute_energies, reverse_array_index_bit_order
 from qokit.qaoa_circuit_portfolio import (

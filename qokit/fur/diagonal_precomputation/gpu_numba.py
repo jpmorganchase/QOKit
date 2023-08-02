@@ -1,3 +1,7 @@
+###############################################################################
+# // SPDX-License-Identifier: Apache-2.0
+# // Copyright : JP Morgan Chase & Co
+###############################################################################
 # pyright: reportGeneralTypeIssues=false
 # pyright seems to be upset about numba code
 import numba.cuda

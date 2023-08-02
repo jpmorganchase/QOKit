@@ -1,3 +1,7 @@
+###############################################################################
+# // SPDX-License-Identifier: Apache-2.0
+# // Copyright : JP Morgan Chase & Co
+###############################################################################
 from collections.abc import Sequence
 import numpy as np
 from .fur import furx_all, furxy_ring, furxy_complete

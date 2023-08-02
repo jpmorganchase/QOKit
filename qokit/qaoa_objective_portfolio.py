@@ -1,3 +1,7 @@
+###############################################################################
+# // SPDX-License-Identifier: Apache-2.0
+# // Copyright : JP Morgan Chase & Co
+###############################################################################
 from __future__ import annotations
 import numpy as np
 from .utils import precompute_energies, reverse_array_index_bit_order
