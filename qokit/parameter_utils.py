@@ -142,23 +142,6 @@ def convert_to_gamma_beta(*args, parameterization: QAOAParameterization | str):
     return gamma, beta
 
 
-def set_parameterized_func(
-    parameterization: QAOAParameterization | str, probabilities_from_gamma_beta: Callable, compute_objective_from_probabilities: Callable
-):
-    """
-    parameterization: the approach to parametrize the QAOA parameters
-    probabilities_from_gamma_beta: callable function to estimate state vector from QAOA parameters
-    compute_objective_from_probabilities: callable function to computate objective from state vector
-    """
-
-    def f(*args):
-        gamma, beta = convert_to_gamma_beta(*args, parameterization=parameterization)
-        probabilities = probabilities_from_gamma_beta(gamma, beta)
-        return compute_objective_from_probabilities(probabilities)
-
-    return f
-
-
 def get_sk_gamma_beta(p, parameterization: QAOAParameterization | str = "gamma beta"):
     """
     Load the look-up table for initial points from

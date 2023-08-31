@@ -1,13 +1,9 @@
-###############################################################################
-# // SPDX-License-Identifier: Apache-2.0
-# // Copyright : JP Morgan Chase & Co
-###############################################################################
 from __future__ import annotations
 import numpy as np
 from .utils import precompute_energies, reverse_array_index_bit_order
-from .portfolio_optimization import get_configuration_cost_kw, po_obj_func
+from .portfolio_optimization import get_configuration_cost_kw, po_obj_func, portfolio_brute_force
 from qokit.qaoa_circuit_portfolio import generate_dicke_state_fast, get_parameterized_qaoa_circuit
-from .qaoa_objective import get_qaoa_xy_objective
+from .qaoa_objective import get_qaoa_objective
 
 
 def get_qaoa_portfolio_objective(
@@ -71,14 +67,16 @@ def get_qaoa_portfolio_objective(
     if mixer == "trotter_ring":
         pass
     else:
-        raise ValueError(f"Unknown mixer passed to get_qaoa_portfolio_objective: {ini}, allowed ['trotter_ring']")
+        raise ValueError(f"Unknown mixer passed to get_qaoa_portfolio_objective: {mixer}, allowed ['trotter_ring']")
 
-    return get_qaoa_xy_objective(
+    if objective in ["overlap", "expectation and overlap"] and precomputed_optimal_bitstrings is None:
+        bf_result = portfolio_brute_force(po_problem, return_bitstring=True)
+        precomputed_optimal_bitstrings = bf_result[1].reshape(1, -1)
+        assert precomputed_optimal_bitstrings.shape[1] == N  # only one optimal bitstring
+
+    return get_qaoa_objective(
         N=N,
         p=p,
-        sv0=sv0,
-        mixer=mixer,
-        T=T,
         precomputed_diagonal_hamiltonian=po_problem["scale"] * precomputed_energies,
         precomputed_objectives=precomputed_energies,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
@@ -86,4 +84,7 @@ def get_qaoa_portfolio_objective(
         parameterization=parameterization,
         objective=objective,
         simulator=simulator,
+        mixer="xy",
+        initial_state=sv0,
+        n_trotters=T,
     )

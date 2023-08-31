@@ -1,8 +1,4 @@
-###############################################################################
-# // SPDX-License-Identifier: Apache-2.0
-# // Copyright : JP Morgan Chase & Co
-###############################################################################
-from qokit.portfolio_optimization import get_problem, get_problem_H, get_problem_H_bf, po_obj_func
+from qokit.portfolio_optimization import get_problem, get_problem_H, get_problem_H_bf, po_obj_func, portfolio_brute_force, get_sk_ini
 from qokit.utils import precompute_energies, reverse_array_index_bit_order
 from qokit.qaoa_circuit_portfolio import (
     circuit_measurement_function,
@@ -18,6 +14,7 @@ import qokit
 import numpy as np
 import pytest
 from qiskit import execute, Aer
+from functools import reduce
 
 simulators_to_run = get_available_simulator_names("xyring")
 
@@ -131,3 +128,28 @@ def test_get_problem_H():
         H_problem = get_problem_H(po_problem)
         H_problem_bf = get_problem_H_bf(po_problem)
         assert np.allclose(H_problem, H_problem_bf)
+
+
+def test_portfolio_AR():
+    po_problem = get_problem(N=6, K=3, q=0.5, seed=1, pre="rule")
+    p = 1
+    qaoa_obj = get_qaoa_portfolio_objective(po_problem=po_problem, p=p, ini="dicke", mixer="trotter_ring", T=1, simulator="python")
+    best_portfolio = portfolio_brute_force(po_problem, return_bitstring=False)
+    x0 = get_sk_ini(p=p)
+    po_energy = qaoa_obj(x0).real
+    po_ar = (po_energy - best_portfolio[1]) / (best_portfolio[0] - best_portfolio[1])
+    # a problem with known AR > 0.7564
+    assert po_ar > 0.75
+
+
+def test_best_bitstring():
+    N = 6
+    po_problem = get_problem(N=N, K=3, q=0.5, seed=1, pre="rule")
+    bf_result = portfolio_brute_force(po_problem, return_bitstring=True)
+    precomputed_optimal_bitstrings = bf_result[1].reshape(1, -1)
+    assert precomputed_optimal_bitstrings.shape[1] == N
+    bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
+    assert len(bitstring_loc) == 1
+    po_obj = po_obj_func(po_problem)
+    precomputed_energies = reverse_array_index_bit_order(precompute_energies(po_obj, N)).real
+    assert np.isclose(precomputed_energies[bitstring_loc[0]], bf_result[0])

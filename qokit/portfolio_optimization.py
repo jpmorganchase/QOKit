@@ -1,14 +1,12 @@
-###############################################################################
-# // SPDX-License-Identifier: Apache-2.0
-# // Copyright : JP Morgan Chase & Co
-###############################################################################
 """
 Helper functions for the portfolio optimization problem
 """
+from __future__ import annotations
+from collections.abc import Sequence
 import numpy as np
 from functools import partial
 import itertools
-from typing import Optional
+from typing import Any
 from qokit.parameter_utils import get_sk_gamma_beta
 
 
@@ -57,7 +55,7 @@ def kbits(N, K):
         yield np.array(s)
 
 
-def portfolio_brute_force(po_problem: dict, return_bitstring=False) -> (float, float, float):
+def portfolio_brute_force(po_problem: dict, return_bitstring=False) -> tuple[float, float, float] | tuple[float, float, float, float]:
     N = po_problem["N"]
     K = po_problem["K"]
     min_constrained = float("inf")
@@ -82,7 +80,7 @@ def portfolio_brute_force(po_problem: dict, return_bitstring=False) -> (float, f
         return min_constrained, min_x, max_constrained, max_x, mean_constrained
 
 
-def get_data(N, seed=1, real=False) -> (float, float):
+def get_data(N, seed=1, real=False) -> tuple[float, float]:
     """
     load portofolio data from qiskit-finance (Yahoo)
     https://github.com/Qiskit/qiskit-finance/blob/main/docs/tutorials/11_time_series.ipynb
@@ -151,7 +149,7 @@ def get_data(N, seed=1, real=False) -> (float, float):
     return means, cov
 
 
-def get_problem(N, K, q, seed=1, pre=False) -> dict:
+def get_problem(N, K, q, seed=1, pre=False) -> dict[str, Any]:
     """generate the portofolio optimziation problem dict"""
     po_problem = {}
     po_problem["N"] = N
@@ -284,7 +282,7 @@ def get_sk_ini(p: int):
     return X0
 
 
-def alignment_para_to_qokit_scale(gammas: Optional[list], betas: Optional[list]):
+def alignment_para_to_qokit_scale(gammas: Sequence[float] | None, betas: Sequence[float] | None):
     """Converts from format in alignment project
     into the scale used in qokit
     """
