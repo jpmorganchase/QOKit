@@ -9,13 +9,14 @@ from pathlib import Path
 from functools import partial
 from qiskit.providers.aer import AerSimulator
 
-from qokit.maxcut import maxcut_obj, get_adjacency_matrix
+from qokit.maxcut import maxcut_obj, get_adjacency_matrix, get_maxcut_terms
 
 from qokit.qaoa_objective_maxcut import get_qaoa_maxcut_objective
 
 from qokit.qaoa_circuit_maxcut import get_qaoa_circuit, get_parameterized_qaoa_circuit
 from qokit.utils import brute_force, precompute_energies
 from qokit.parameter_utils import get_sk_gamma_beta, get_fixed_gamma_beta
+import qokit
 
 test_maxcut_folder = Path(__file__).parent
 
@@ -79,6 +80,18 @@ def test_maxcut_weighted_qaoa_obj():
         assert np.allclose(sv, sv_param)
         assert np.isclose(precomputed_cuts.dot(np.abs(sv) ** 2), row["Expected cut of QAOA"])
 
+def test_maxcut_precompute():
+    N = 4
+    G = nx.random_regular_graph(3, N)
+    print(G.edges())
+    for (u,v,w) in G.edges(data=True):
+        w['weight'] = np.random.rand()
+    precomputed_cuts = precompute_energies(maxcut_obj, N, w=get_adjacency_matrix(G))
+    simclass = qokit.fur.choose_simulator('gpu')
+    terms = get_maxcut_terms(G)
+    sim = simclass(N, terms=terms)
+    cuts = sim.get_cost_diagonal()
+    assert np.allclose(precomputed_cuts, cuts, atol=1e-7)
 
 def test_sk_ini_maxcut():
     N = 10

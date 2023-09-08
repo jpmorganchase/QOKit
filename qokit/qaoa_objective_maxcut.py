@@ -8,7 +8,7 @@ import networkx as nx
 import warnings
 
 from .utils import precompute_energies
-from .maxcut import maxcut_obj, get_adjacency_matrix
+from .maxcut import maxcut_obj, get_adjacency_matrix, get_maxcut_terms
 
 from .qaoa_circuit_maxcut import get_parameterized_qaoa_circuit
 from .qaoa_objective import get_qaoa_objective
@@ -53,13 +53,14 @@ def get_qaoa_maxcut_objective(
     f : callable
         Function returning the negative of expected value of QAOA with parameters theta
     """
+    terms = None
 
     if precomputed_cuts is not None and G is not None:
         warnings.warn("If precomputed_cuts is passed, G is ignored")
 
     if precomputed_cuts is None:
         assert G is not None, "G must be passed if precomputed_cuts is None"
-        precomputed_cuts = precompute_energies(maxcut_obj, N, w=get_adjacency_matrix(G))
+        terms = get_maxcut_terms(G)
 
     if simulator == "qiskit":
         assert G is not None, "G must be passed if simulator == 'qiskit'"
@@ -73,6 +74,7 @@ def get_qaoa_maxcut_objective(
         p=p,
         precomputed_diagonal_hamiltonian=precomputed_cuts,
         precomputed_objectives=precomputed_cuts,
+        terms=terms,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
         parameterized_circuit=parameterized_circuit,
         parameterization=parameterization,
