@@ -80,18 +80,20 @@ def test_maxcut_weighted_qaoa_obj():
         assert np.allclose(sv, sv_param)
         assert np.isclose(precomputed_cuts.dot(np.abs(sv) ** 2), row["Expected cut of QAOA"])
 
+
 def test_maxcut_precompute():
     N = 4
     G = nx.random_regular_graph(3, N)
     print(G.edges())
-    for (u,v,w) in G.edges(data=True):
-        w['weight'] = np.random.rand()
+    for u, v, w in G.edges(data=True):
+        w["weight"] = np.random.rand()
     precomputed_cuts = precompute_energies(maxcut_obj, N, w=get_adjacency_matrix(G))
-    simclass = qokit.fur.choose_simulator('gpu')
+    simclass = qokit.fur.choose_simulator("gpu")
     terms = get_maxcut_terms(G)
     sim = simclass(N, terms=terms)
     cuts = sim.get_cost_diagonal()
     assert np.allclose(precomputed_cuts, cuts, atol=1e-7)
+
 
 def test_sk_ini_maxcut():
     N = 10
