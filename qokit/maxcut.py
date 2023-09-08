@@ -21,6 +21,7 @@ def maxcut_obj(x: np.ndarray, w: np.ndarray) -> float:
     X = np.outer(x, (1 - x))
     return np.sum(w * X)  # type: ignore
 
+
 def get_maxcut_terms(G: nx.Graph) -> TermsType:
     """Get terms corresponding to cost function value
 
@@ -34,18 +35,16 @@ def get_maxcut_terms(G: nx.Graph) -> TermsType:
         terms to be used in the simulation
     """
     if nx.is_weighted(G):
-        terms = [(
-            -float(G[u][v]["weight"])/2,
-            (int(u), int(v))
-        ) for u, v, *_ in G.edges()]
+        terms = [(-float(G[u][v]["weight"]) / 2, (int(u), int(v))) for u, v, *_ in G.edges()]
         total_w = sum([float(G[u][v]["weight"]) for u, v, *_ in G.edges()])
 
     else:
-        terms =  [(-1/2, (int(e[0]), int(e[1]))) for e in G.edges()]
+        terms = [(-1 / 2, (int(e[0]), int(e[1]))) for e in G.edges()]
         total_w = int(G.number_of_edges())
     N = G.number_of_nodes()
-    terms.append((+total_w/2, tuple()))
+    terms.append((+total_w / 2, tuple()))
     return terms
+
 
 def get_adjacency_matrix(G: nx.Graph) -> np.ndarray:
     """Get adjacency matrix to be used in maxcut_obj
