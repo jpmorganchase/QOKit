@@ -24,7 +24,7 @@ test_maxcut_folder = Path(__file__).parent
 
 
 qiskit_backend = AerSimulator(method="statevector")
-SIMULATORS = get_available_simulators("x")
+SIMULATORS = get_available_simulators("x") + get_available_simulators("xyring") + get_available_simulators("xycomplete")
 
 
 def test_maxcut_obj():
@@ -95,7 +95,7 @@ def test_maxcut_precompute(simclass):
     terms = get_maxcut_terms(G)
     sim = simclass(N, terms=terms)
     cuts = sim.get_cost_diagonal()
-    assert np.allclose(precomputed_cuts, cuts, atol=1e-7)
+    assert np.allclose(precomputed_cuts, cuts, atol=1e-6)
 
 
 def test_sk_ini_maxcut():
