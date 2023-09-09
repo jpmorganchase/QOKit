@@ -344,8 +344,9 @@ def get_term_indices(N: int) -> list:
     """
     return list(get_energy_term_indices(N)[0])
 
+
 def get_terms(N: int) -> TermsType:
-    """Return terms definition of the LABS problem 
+    """Return terms definition of the LABS problem
 
     Parameters
     ----------
@@ -355,7 +356,7 @@ def get_terms(N: int) -> TermsType:
     Returns
     -------
     terms : TermsType
-        List of tuples (number, tuple) where the 
+        List of tuples (number, tuple) where the
         tuple determines the location of Z operators
         and the number is a scaling factor for the product.
 
