@@ -9,7 +9,7 @@ from qokit.labs import (
     true_optimal_mf,
     merit_factor,
     slow_merit_factor,
-    get_terms,
+    get_term_indices,
     get_depth_optimized_terms,
     get_gate_optimized_terms_naive,
     get_gate_optimized_terms_greedy,
@@ -37,19 +37,19 @@ def test_merit_factor():
 
 def test_depth_opt_terms_generation():
     for N in range(3, 16):
-        assert set(get_terms(N)) == set(get_depth_optimized_terms(N))
+        assert set(get_term_indices(N)) == set(get_depth_optimized_terms(N))
 
 
 def test_gate_optimized_terms_naive():
     for N in range(3, 16):
-        assert set(get_terms(N)) == set(get_gate_optimized_terms_naive(N, number_of_gate_zones=4))
-        assert set(get_terms(N)) == set(get_gate_optimized_terms_naive(N, number_of_gate_zones=None))
+        assert set(get_term_indices(N)) == set(get_gate_optimized_terms_naive(N, number_of_gate_zones=4))
+        assert set(get_term_indices(N)) == set(get_gate_optimized_terms_naive(N, number_of_gate_zones=None))
 
 
 def test_gate_optimized_terms_greedy():
     for N in range(3, 16):
-        assert set(get_terms(N)) == set(get_gate_optimized_terms_greedy(N, number_of_gate_zones=4))
-        assert set(get_terms(N)) == set(get_gate_optimized_terms_greedy(N, number_of_gate_zones=None))
+        assert set(get_term_indices(N)) == set(get_gate_optimized_terms_greedy(N, number_of_gate_zones=4))
+        assert set(get_term_indices(N)) == set(get_gate_optimized_terms_greedy(N, number_of_gate_zones=None))
 
 
 def test_energy_vals():

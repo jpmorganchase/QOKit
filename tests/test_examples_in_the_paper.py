@@ -2,6 +2,7 @@
 # imports are inside the tests to make sure no additional dependencies are necessary
 
 # dummy parameters
+import pytest
 gamma = [0.0, 0.78539816, 1.57079633, 2.35619449, 3.14159265]
 beta = [3.14159265, 2.35619449, 1.57079633, 0.78539816, 0.0]
 
@@ -32,6 +33,7 @@ def test_listing_2():
     E = sim.get_expectation(result)
 
 
+@pytest.mark.skip(reason='cusvmpi is not yet merged')
 def test_listing_3():
     import qokit
 
