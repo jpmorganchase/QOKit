@@ -29,7 +29,18 @@ SIMULATORS = {
 }
 
 
-def get_available_simulator_names(type="x"):
+def get_available_simulator_names(type: str = "x") -> list:
+    """
+    Return names of available simulators
+
+    Parameters
+    ----------
+        type: type of QAOA mixer to simulate
+
+    Returns
+    -------
+        List of available simulators
+    """
     family = SIMULATORS.get(type, None)
     if family is None:
         raise ValueError(f"Unknown simulator type: {type}")
@@ -45,7 +56,18 @@ def get_available_simulator_names(type="x"):
     return available
 
 
-def get_available_simulators(type="x"):
+def get_available_simulators(type: str = "x") -> list:
+    """
+    Return (uninitialized) classes of available simulators
+
+    Parameters
+    ----------
+        type: type of QAOA mixer to simulate
+
+    Returns
+    -------
+        List of available simulators
+    """
     available_names = get_available_simulator_names(type=type)
     return [SIMULATORS[type][s] for s in available_names]
 
