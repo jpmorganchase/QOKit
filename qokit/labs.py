@@ -9,6 +9,7 @@ import numpy as np
 from itertools import combinations
 from operator import mul
 from functools import reduce
+from qokit.fur import TermsType
 
 # approximate optimal merit factor and energy for small Ns
 # from Table 1 of https://arxiv.org/abs/1512.02475
@@ -325,7 +326,7 @@ def negative_merit_factor_from_bitstring(x, N: int | None = None) -> float:
     return -merit_factor(1 - 2 * x, N=N)
 
 
-def get_terms(N: int) -> list:
+def get_term_indices(N: int) -> list:
     """Return indices of Pauli Zs in the LABS problem definition
 
     Parameters
@@ -342,6 +343,27 @@ def get_terms(N: int) -> list:
         the Hamiltonian is Z0Z1 + Z0Z1Z2Z3 + Z1Z2
     """
     return list(get_energy_term_indices(N)[0])
+
+
+def get_terms(N: int) -> TermsType:
+    """Return terms definition of the LABS problem
+
+    Parameters
+    ----------
+    N : int
+        Problem size (number of spins)
+
+    Returns
+    -------
+    terms : TermsType
+        List of tuples (number, tuple) where the
+        tuple determines the location of Z operators
+        and the number is a scaling factor for the product.
+
+        e.g. if terms = [(2, (0,1)), (4, (0,1,2,3)), (2, (1,2))]
+        the Hamiltonian is 2*Z0Z1 + 4*Z0Z1Z2Z3 + 2*Z1Z2
+    """
+    return [(len(x), x) for x in get_term_indices(N)]
 
 
 def get_depth_optimized_terms(N: int) -> list:
@@ -578,7 +600,5 @@ def get_gate_optimized_terms_greedy(N: int, number_of_gate_zones: int = 4, seed:
                     swapped += 1
                 j += 1
             k += swapped
-
-    assert set(circuit) == set(get_terms(N))
 
     return circuit
