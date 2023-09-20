@@ -521,7 +521,7 @@ def get_gate_optimized_terms_greedy(N: int, number_of_gate_zones: int = 4, seed:
 
     circuit = []
 
-    seed = seed if seed else np.random.randint(sys.maxsize)
+    seed = seed if seed else np.random.randint(np.iinfo(np.int32).max)
     print(f"seed: {seed}")
     rng = np.random.default_rng(seed)
 
