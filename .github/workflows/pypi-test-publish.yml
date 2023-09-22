@@ -26,4 +26,5 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.PYPI_TEST_API_JPMC_OSS }}
+          repository-url: https://test.pypi.org/legacy/
           print_hash: true
