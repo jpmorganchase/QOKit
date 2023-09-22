@@ -33,19 +33,19 @@ jobs:
         pip install build
     - name: Build package
       run: python -m build
-    # - name: Publish package
-    #   uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
-    #   with:
-    #     user: __token__
-    #     password: ${{ secrets.PYPI_API_JPMC_OSS }}
-    #     print_hash: true
-    - name: Publish package to test
-      uses: alex124585
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
         user: __token__
-        password:  pypi-AgENdGVzdC5weXBpLm9yZwIkMjEyMTk2NGQtZmFiOS00MzhmLThiYzUtOTI3ZGU0MWUyNmM2AAIqWzMsImU4ZjllNjUzLTA1YzItNDZjMy1iNWYwLWQ5ZTU4ZjEzMmZmMyJdAAAGIP12Klr5Tsm3E2R2jkJ6BOnGpUWXFQTOYL5AUoxV8OaD
-        # password: ${{ secrets.PYPI_API_JPMC_OSS }}
+        password: ${{ secrets.PYPI_TEST_API_JPMC_OSS }}
         print_hash: true
-      run: | 
-        python -m twine upload --repository testpypi dist/*
+    # - name: Publish package to test
+    #   uses: alex124585
+    #   with:
+    #     user: __token__
+    #     password:  pypi-AgENdGVzdC5weXBpLm9yZwIkMjEyMTk2NGQtZmFiOS00MzhmLThiYzUtOTI3ZGU0MWUyNmM2AAIqWzMsImU4ZjllNjUzLTA1YzItNDZjMy1iNWYwLWQ5ZTU4ZjEzMmZmMyJdAAAGIP12Klr5Tsm3E2R2jkJ6BOnGpUWXFQTOYL5AUoxV8OaD
+    #     # password: ${{ secrets.PYPI_API_JPMC_OSS }}
+    #     print_hash: true
+    #   run: | 
+    #     python -m twine upload --repository testpypi dist/*
 
