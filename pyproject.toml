@@ -9,7 +9,7 @@ authors = [
 license = {file = "LICENSE"}
 classifiers=[
     "Development Status :: 2 - Pre-Alpha",
-    "License :: OSI Approved :: Apache Software Licens",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
