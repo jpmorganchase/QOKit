@@ -2,12 +2,12 @@ name: Test run v1
 
 on:
   workflow_dispatch:
-  pull_request:
+#  pull_request:
   
 
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Show environment v1
         run: env | grep ^GITHUB
