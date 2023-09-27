@@ -41,7 +41,7 @@ with open("README.md", "r") as f:
 
 
 
-try:
+""" try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
     class MyWheel(_bdist_wheel):
 
@@ -72,11 +72,22 @@ except ImportError:
             return False
 
         def has_ext_modules(self):
-            return True
+            return True """
+
+try:
+    from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+    class bdist_wheel(_bdist_wheel):
+        def finalize_options(self):
+            _bdist_wheel.finalize_options(self)
+            self.root_is_pure = False
+except ImportError:
+    bdist_wheel = None
+
+
 
 setup(
     ext_modules=extensions,
-    cmdclass={"build_ext": SimulatorBuild},
+    cmdclass={"build_ext": SimulatorBuild, "bdist_wheel": bdist_wheel},
     packages=find_packages(),
-    distclass=MyDistribution
+#    distclass=MyDistribution
 ) 
