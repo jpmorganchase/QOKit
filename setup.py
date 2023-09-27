@@ -2,7 +2,7 @@
 # // SPDX-License-Identifier: Apache-2.0
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
-""" from setuptools import setup, find_packages, Extension
+from setuptools import setup, find_packages, Extension, Distribution
 from setuptools.command.build_ext import build_ext
 import subprocess
 import os
@@ -38,13 +38,8 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 
-setup(
-    ext_modules=extensions,
-    cmdclass={"build_ext": SimulatorBuild},
-    packages=find_packages(),
-) """
 
-from setuptools import setup, Distribution
+
 
 try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
@@ -80,5 +75,8 @@ except ImportError:
             return True
 
 setup(
+    ext_modules=extensions,
+    cmdclass={"build_ext": SimulatorBuild},
+    packages=find_packages(),
     distclass=MyDistribution
-)
+) 
