@@ -19,7 +19,7 @@ if environment_variable_value is not None:
 
 extensions = []
 if not QOKIT_PYTHON_ONLY:
-    extensions.append(Extension("simulator", sources=["./qokit/fur/c/csim/src/diagonal.c","./qokit/fur/c/csim/src/fur.c","./qokit/fur/c/csim/src/qaoa_fur.c"], include_dirs=["simulator"]))
+    extensions.append(Extension("simulator", sources=["./qokit/fur/c/csim/src/diagonal.c","./qokit/fur/c/csim/src/fur.c","./qokit/fur/c/csim/src/qaoa_fur.c"], include_dirs=["./qokit/fur/c/csim/src/"]))
 
 
 class SimulatorBuild(build_ext):
