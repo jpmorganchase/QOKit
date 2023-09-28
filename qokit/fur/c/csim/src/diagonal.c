@@ -4,7 +4,7 @@
 ****************************************/ 
 #include <stdlib.h>
 #include <math.h>
-#include <omp.h>
+// #include <omp.h>
 
 #include <diagonal.h>
 
