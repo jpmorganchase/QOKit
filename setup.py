@@ -45,6 +45,6 @@ with open("README.md", "r") as f:
 
 setup(
     ext_modules=extensions,
-    cmdclass={"build_ext": SimulatorBuild} if sys.platform == 'win32' else None,
+    cmdclass={"build_ext": SimulatorBuild} if sys.platform == 'win32' else {},
     packages=find_packages(),
 ) 
