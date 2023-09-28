@@ -18,7 +18,7 @@ environment_variable_value = os.environ.get(environment_variable_name, None)
 if environment_variable_value is not None:
     QOKIT_NO_C_ENV = True
 
-path = "qokit\\fur\\c\\csim\\src\\"
+path = "./qokit/fur/c/csim/src/"
 
 sources=[os.path.join(path, "diagonal.c"),os.path.join(path, "fur.c"),os.path.join(path, "qaoa_fur.c")]
 
@@ -45,6 +45,6 @@ with open("README.md", "r") as f:
 
 setup(
     ext_modules=extensions,
-    cmdclass={"build_ext": SimulatorBuild},
+    cmdclass={"build_ext": SimulatorBuild} if sys.platform == 'win32' else {},
     packages=find_packages(),
 ) 
