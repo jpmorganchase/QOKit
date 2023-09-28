@@ -6,6 +6,7 @@ from setuptools import setup, find_packages, Extension, Distribution
 from setuptools.command.build_ext import build_ext
 import subprocess
 import os
+import sys
 
 
 environment_variable_name = "QOKIT_NO_C_ENV"
