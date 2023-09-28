@@ -17,9 +17,13 @@ environment_variable_value = os.environ.get(environment_variable_name, None)
 if environment_variable_value is not None:
     QOKIT_NO_C_ENV = True
 
+path = "./qokit/fur/c/csim/src/"
+
+sources=[os.path.join(path, "diagonal.c"),os.path.join(path, "fur.c"),os.path.join(path, "qaoa_fur.c")]
+
 extensions = []
 if not QOKIT_PYTHON_ONLY:
-    extensions.append(Extension("simulator", sources=["./qokit/fur/c/csim/src/diagonal.c","./qokit/fur/c/csim/src/fur.c","./qokit/fur/c/csim/src/qaoa_fur.c"], include_dirs=["./qokit/fur/c/csim/src/"]))
+    extensions.append(Extension("simulator", sources=sources, include_dirs=[os.path.join(path,"")]))
 
 
 class SimulatorBuild(build_ext):
