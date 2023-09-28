@@ -45,6 +45,6 @@ with open("README.md", "r") as f:
 
 setup(
     ext_modules=extensions,
-    #cmdclass={"build_ext": SimulatorBuild},
+    cmdclass={"build_ext": SimulatorBuild},
     packages=find_packages(),
 ) 
