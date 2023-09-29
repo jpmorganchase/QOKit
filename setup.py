@@ -20,11 +20,13 @@ if environment_variable_value is not None:
 
 path = "./qokit/fur/c/csim/src/"
 
-sources=[os.path.join(path, "diagonal.c"),os.path.join(path, "fur.c"),os.path.join(path, "qaoa_fur.c")]
+sources = [os.path.join(path, "diagonal.c"), os.path.join(path, "fur.c"), os.path.join(path, "qaoa_fur.c")]
 
 extensions = []
 if not QOKIT_PYTHON_ONLY:
-    extensions.append(Extension("simulator", sources=sources, include_dirs=[os.path.join(path,"")], extra_compile_args=['/d2FH4-'] if sys.platform == 'win32' else []))
+    extensions.append(
+        Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"] if sys.platform == "win32" else [])
+    )
 
 
 class SimulatorBuild(build_ext):
@@ -45,6 +47,6 @@ with open("README.md", "r") as f:
 
 setup(
     ext_modules=extensions,
-    cmdclass={"build_ext": SimulatorBuild} if sys.platform == 'win32' else {},
+    cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {},
     packages=find_packages(),
-) 
+)
