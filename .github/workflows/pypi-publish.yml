@@ -98,4 +98,4 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1      
         with:
           user: __token__
-          password: ${{ secrets.PYPI_TEST_API_JPMC_OSS }}
+          password: ${{ secrets.PYPI_API_JPMC_OSS }}
