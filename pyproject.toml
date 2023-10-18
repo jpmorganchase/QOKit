@@ -67,7 +67,6 @@ line-length = 160
 target-version = ['py38', 'py39', 'py310', 'py311']
 force-exclude = '''
 (
-  (
     | qokit/assets/archives
     | ^.txt
     | ^.sh
