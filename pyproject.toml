@@ -67,15 +67,8 @@ line-length = 160
 target-version = ['py38', 'py39', 'py310', 'py311']
 force-exclude = '''
 (
-  /(
-    | .git       
-    | .github       
-    | jupyter
-    | qokit/assets
-  )/
-    | scripts/*.sh
-    | scripts/*.md
-    | ^.txt
+  (
+    | qokit/assets/archives
     | ^.txt
     | ^.sh
     | ^.md
