@@ -49,5 +49,5 @@ setup(
     ext_modules=extensions,
     cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {},
     packages=find_namespace_packages(),
-    data_files=glob.glob("assets/**/*", recursive=True),
+    data_files=[("assets", ["assets/*.json"])],
 ),
