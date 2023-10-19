@@ -83,7 +83,7 @@ omit = [
     "qokit/fur/diagonal_precomputation/gpu_numba.py",
     ]
 [tool.setuptools.package-data]
-qokit = ["*.json", "*.scv", "*.zip"]
+
 [tool.setuptools.dynamic]
 
 [tool.pyright]
