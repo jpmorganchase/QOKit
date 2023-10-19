@@ -49,5 +49,5 @@ setup(
     ext_modules=extensions,
     cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {},
     packages=find_namespace_packages(),
-    data_files=glob.glob("qokit/assets/*.json"),
-)
+    data_files=glob.glob("dir/**/*", recursive=True),
+),
