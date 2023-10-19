@@ -45,8 +45,4 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 
-setup(
-    ext_modules=extensions,
-    cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {},
-    packages=find_packages(),
-)
+setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {}, packages=find_packages(), include_package_data=True)
