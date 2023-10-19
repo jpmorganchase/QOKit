@@ -71,7 +71,7 @@ force-exclude = '''
 )
 '''
 [tool.setuptools]
-package-dir = {"" = "qokit"}
+
 
 [tool.coverage.run]
 omit = [
