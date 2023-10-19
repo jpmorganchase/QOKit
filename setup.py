@@ -2,7 +2,7 @@
 # // SPDX-License-Identifier: Apache-2.0
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
-from setuptools import setup, find_packages, Extension, find_namespace_packages
+from setuptools import setup, find_packages, Extension, find_namespace_packages, glob
 from setuptools.command.build_ext import build_ext
 import subprocess
 import os
@@ -45,4 +45,9 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 
-setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {}, packages=find_namespace_packages())
+setup(
+    ext_modules=extensions,
+    cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {},
+    packages=find_namespace_packages(),
+    data_files=glob.glob("qokit/assets/**"),
+)
