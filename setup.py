@@ -45,9 +45,4 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 
-setup(
-    ext_modules=extensions,
-    cmdclass={"build_ext": SimulatorBuild},
-    packages=find_namespace_packages(),
-    include_package_data=True
-)
+setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild}, packages=find_namespace_packages(), include_package_data=True)
