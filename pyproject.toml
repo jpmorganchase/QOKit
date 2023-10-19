@@ -57,8 +57,7 @@ solvers = [
 ]
 
 [build-system]
-requires = ["setuptools>=45",
-"wheel"]
+requires = ["setuptools>=45","wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
@@ -73,6 +72,10 @@ force-exclude = '''
 '''
 [tool.setuptools]
 py-modules = []
+
+[tool.setuptools.packages.find]
+include = ['assets*']
+exclude = ['tests*']
 [tool.coverage.run]
 omit = [
     "qokit/classical_methods/utils.py",
