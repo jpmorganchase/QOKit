@@ -71,11 +71,8 @@ force-exclude = '''
 )
 '''
 [tool.setuptools]
-py-modules = []
+package-dir = {"" = "qokit"}
 
-[tool.setuptools.packages.find]
-include = ['assets*']
-exclude = ['tests*']
 [tool.coverage.run]
 omit = [
     "qokit/classical_methods/utils.py",
