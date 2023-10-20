@@ -70,7 +70,6 @@ force-exclude = '''
     | .git       
     | .github       
     | jupyter
-    | qokit/assets
   )/
     | scripts/*.sh
     | scripts/*.md
