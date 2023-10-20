@@ -96,7 +96,7 @@ where = ["."]
 
 
 [tool.setuptools.package-data]
-"*" = ["*.json", ".npy"]
+"*" = ["*.json", "*.npy"]
 
 
 [tool.setuptools.exclude-package-data]
