@@ -96,8 +96,10 @@ omit = [
 where = ["qokit"]    
 
 [tool.setuptools.package-data]
-assets = ["*.json", "*.scv", "*.zip"]
+assets = ["*.json"]
 "assets.maxcut_datasets" = ["*.json"]
+"assets.precomputed_bitstrings" = ["*.json"]
+"assets.precomputed_merit_factors = ["*.json"]
 [tool.setuptools.dynamic]
 
 [tool.pyright]
