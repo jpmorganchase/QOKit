@@ -96,8 +96,7 @@ where = ["."]
 
 
 [tool.setuptools.package-data]
-qokit = ["*.json"]
-
+"*" = ["*.json"]
 
 [tool.setuptools.dynamic]
 
