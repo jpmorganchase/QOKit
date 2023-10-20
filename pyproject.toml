@@ -57,7 +57,8 @@ solvers = [
 ]
 
 [build-system]
-requires = ["setuptools>=45","wheel"]
+requires = ["setuptools>=45",
+"wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
@@ -65,14 +66,22 @@ line-length = 160
 target-version = ['py38', 'py39', 'py310', 'py311']
 force-exclude = '''
 (
+  /(
+    | .git       
+    | .github       
+    | jupyter
+    | qokit/assets
+  )/
+    | scripts/*.sh
+    | scripts/*.md
+    | ^.txt
     | ^.txt
     | ^.sh
     | ^.md
 )
 '''
 [tool.setuptools]
-
-
+py-modules = []
 [tool.coverage.run]
 omit = [
     "qokit/classical_methods/utils.py",
@@ -82,9 +91,8 @@ omit = [
     "qokit/fur/mpi_custatevec/*",
     "qokit/fur/diagonal_precomputation/gpu_numba.py",
     ]
-[tool.setuptools.packages.find]
-where = ["qokit"]
-
+[tool.setuptools.package-data]
+qokit = ["*.json", "*.scv", "*.zip"]
 [tool.setuptools.dynamic]
 
 [tool.pyright]
