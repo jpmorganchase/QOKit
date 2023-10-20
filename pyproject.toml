@@ -82,7 +82,6 @@ force-exclude = '''
 [tool.setuptools]
 py-modules = []
 
-
 [tool.coverage.run]
 omit = [
     "qokit/classical_methods/utils.py",
@@ -92,8 +91,7 @@ omit = [
     "qokit/fur/mpi_custatevec/*",
     "qokit/fur/diagonal_precomputation/gpu_numba.py",
     ]
-[tool.setuptools.packages.find]
-where = ["qokit"]    
+   
 
 [tool.setuptools.package-data]
 assets = ["*.json"]
