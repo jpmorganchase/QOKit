@@ -95,9 +95,6 @@ omit = [
 where = ["."]    
 
 
-[tool.setuptools.package-data]
-qokit.assets = ["*.json"]
-"qokit.assets.maxcut_datasets" = ["*.json"]
 
 [tool.setuptools.dynamic]
 
