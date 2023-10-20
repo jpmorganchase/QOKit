@@ -92,8 +92,8 @@ omit = [
     "qokit/fur/diagonal_precomputation/gpu_numba.py",
     ]
 [tool.setuptools.packages.find]
-where = ["."]
-exclude = ["*.tests"]    
+where = ["qokit.*"]
+#exclude = ["*.tests"]    
 
 
 [tool.setuptools.package-data]
