@@ -93,9 +93,10 @@ omit = [
     ]
 [tool.setuptools.packages.find]
 where = ["qokit"]    
-include = ["qokit*"]
+
 [tool.setuptools.package-data]
-assets = ["*.json", "*.npy"]
+assets = ["*.json"]
+"assets.maxcut_datasets" = ["*.json"]
 
 [tool.setuptools.dynamic]
 
