@@ -93,7 +93,7 @@ omit = [
     ]
 [tool.setuptools.packages.find]
 where = ["qokit"]    
-
+include = ["qokit*"]
 [tool.setuptools.package-data]
 assets = ["*.json", "*.npy"]
 
