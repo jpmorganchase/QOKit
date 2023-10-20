@@ -95,6 +95,9 @@ omit = [
 where = ["."]    
 
 
+[tool.setuptools.package-data]
+qokit = ["*.json"]
+
 
 [tool.setuptools.dynamic]
 
