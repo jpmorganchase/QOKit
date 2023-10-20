@@ -82,7 +82,8 @@ omit = [
     "qokit/fur/mpi_custatevec/*",
     "qokit/fur/diagonal_precomputation/gpu_numba.py",
     ]
-[tool.setuptools.package-data]
+[tool.setuptools.packages.find]
+where = ["qokit"]
 
 [tool.setuptools.dynamic]
 
