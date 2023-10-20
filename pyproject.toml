@@ -97,7 +97,6 @@ where = ["qokit"]
 
 [tool.setuptools.package-data]
 assets = ["*.json"]
-"assets.*" = ["*.json"]
 [tool.setuptools.dynamic]
 
 [tool.pyright]
