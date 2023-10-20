@@ -93,6 +93,8 @@ omit = [
     ]
 [tool.setuptools.packages.find]
 where = ["."]
+#exclude = ["tests*"]    
+
 
 [tool.setuptools.package-data]
 "*" = ["*.json", "*.npy"]
