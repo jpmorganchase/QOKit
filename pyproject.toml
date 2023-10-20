@@ -97,6 +97,7 @@ where = ["qokit"]
 
 [tool.setuptools.package-data]
 assets = ["*.json", "*.scv", "*.zip"]
+"assets.maxcut_datasets" = ["*.json"]
 [tool.setuptools.dynamic]
 
 [tool.pyright]
