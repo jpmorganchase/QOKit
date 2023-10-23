@@ -2,7 +2,7 @@
 # // SPDX-License-Identifier: Apache-2.0
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
-from setuptools import setup, find_packages, Extension, Distribution
+from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import subprocess
 import os
@@ -45,8 +45,4 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 
-setup(
-    ext_modules=extensions,
-    cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {},
-    packages=find_packages(),
-)
+setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {}),

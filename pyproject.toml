@@ -70,7 +70,6 @@ force-exclude = '''
     | .git       
     | .github       
     | jupyter
-    | qokit/assets
   )/
     | scripts/*.sh
     | scripts/*.md
@@ -82,6 +81,7 @@ force-exclude = '''
 '''
 [tool.setuptools]
 py-modules = []
+
 [tool.coverage.run]
 omit = [
     "qokit/classical_methods/utils.py",
@@ -91,8 +91,15 @@ omit = [
     "qokit/fur/mpi_custatevec/*",
     "qokit/fur/diagonal_precomputation/gpu_numba.py",
     ]
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["tests*"]    
+
+
 [tool.setuptools.package-data]
-qokit = ["*.json", "*.scv", "*.zip"]
+"*" = ["*.json", "*.npy"]
+
+
 [tool.setuptools.dynamic]
 
 [tool.pyright]
