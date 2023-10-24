@@ -11,6 +11,7 @@ import pandas as pd
 import random
 from docplex.mp.progress import ProgressListener, ProgressClock
 
+
 # copied from qokit.classical_methods.utils
 class BestBoundAborter(ProgressListener):
     """
@@ -36,7 +37,7 @@ class BestBoundAborter(ProgressListener):
                 print(f"_____ FOUND Feasible solution {self.last_obj} smaller than stopping condition {self.max_best_bound}")
                 self.abort()
 
-                
+
 # In theory [0, BIGINT]
 MAXINT = 2000000000
 
@@ -91,15 +92,15 @@ def run_LABS(n_range, TTS: bool = True, enable_logs: bool = True, nb_runs=1):
 if __name__ == "__main__":
     """
     python3 run_cplex.py TTS n_min n_max nb_runs
-    
+
     TTS is a flag controlling whether CPLEX should be stopped when optimal solution
     Alternatively, if TTO is passed, CPLEX is run until the gap is closed
-    
+
     n_min and n_max describe the sizes of the LABS instances. Corresponding LPs must exist in lp/ folder
-    
+
     nb_runs in the number of times to run CPLEX with different initializations
 
-    Examples: 
+    Examples:
         python run_cplex.py TTS 20 25 10
         python run_cplex.py TTO 20 25 10
     """
