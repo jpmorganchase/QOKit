@@ -101,8 +101,8 @@ if __name__ == "__main__":
     nb_runs in the number of times to run CPLEX with different initializations
 
     Examples:
-        python run_cplex.py TTS 20 25 10
-        python run_cplex.py TTO 20 25 10
+        python run_cplex.py TTS 10 20 10
+        python run_cplex.py TTO 10 20 10
     """
     if len(sys.argv) < 5:
         raise ValueError("python3 run_cplex TTS n_min n_max nb_runs")

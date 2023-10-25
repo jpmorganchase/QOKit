@@ -15,7 +15,7 @@ if __name__ == "__main__":
     CPLEX: boolean if lp files will be compatible with CPLEX or not
     n_min, n_max: intergers, will generate the lp files for n_min to n_max-1 (included)
 
-    Example: python generate_lp_files.py True 41 67
+    Example: python generate_lp_files.py True 10 20
     """
     if len(sys.argv) < 4:
         raise ValueError("python3 generate_lp_files CPLEX n_min n_max")
