@@ -190,6 +190,9 @@ def get_qaoa_objective(
     if precomputed_optimal_bitstrings is not None and objective != "expectation":
         bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
 
+    if precomputed_objectives is not None and precomputed_optimal_bitstrings is None:
+        bitstring_loc = np.argmax(precomputed_objectives)
+
     # -- Final function
     def f(*args):
         gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
@@ -205,6 +208,7 @@ def get_qaoa_objective(
             return expectation, 1 - overlap
 
     return f
+
 
 
 def get_qaoa_labs_overlap(N: int, p: int, **kwargs):
