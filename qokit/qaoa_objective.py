@@ -210,7 +210,6 @@ def get_qaoa_objective(
     return f
 
 
-
 def get_qaoa_labs_overlap(N: int, p: int, **kwargs):
     """To be deprecated. Use get_qaoa_labs_objective going forward.
     Please consult the docstring for get_qaoa_labs_objective for kwargs
