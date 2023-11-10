@@ -1,7 +1,6 @@
 # Quantum Optimization Toolkit
 
 ![Tests](https://github.com/jpmorganchase/QOKit/actions/workflows/qokit-package.yml/badge.svg)
-![arXiv](https://arxiv.org/abs/2210.08695)
 
 This repository contains fast CPU and GPU simulators for benchmarking the Quantum Approximate Optimization Algorithm, as well as scripts for generating matching quantum circuits for execution on hardware. See the [examples](./examples) folder for a demo of this package.
 
