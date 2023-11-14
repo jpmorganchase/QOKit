@@ -55,7 +55,7 @@ def test_maxcut_qaoa_obj_fixed_angles():
             gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
             for simulator in ["auto", "qiskit"]:
                 f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
-                assert f(gamma, beta) / optimal_cut > AR
+                assert abs(f(gamma, beta) / optimal_cut) > AR
 
 
 def test_maxcut_weighted_qaoa_obj():
@@ -70,7 +70,7 @@ def test_maxcut_weighted_qaoa_obj():
     for _, row in df.iterrows():
         for simulator in ["auto", "qiskit"]:
             f = get_qaoa_maxcut_objective(row["G"].number_of_nodes(), row["p"], G=row["G"], parameterization="gamma beta", simulator=simulator)
-            assert np.isclose(f(row["gamma"], row["beta"]), row["Expected cut of QAOA"])
+            assert np.isclose(abs(f(row["gamma"], row["beta"])), row["Expected cut of QAOA"])
 
         # Qiskit non-parameterized circuit must be tested separately
         precomputed_cuts = precompute_energies(maxcut_obj, row["G"].number_of_nodes(), w=get_adjacency_matrix(row["G"]))

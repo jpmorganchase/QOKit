@@ -35,7 +35,8 @@ def get_qaoa_maxcut_objective(
     G : nx.Graph
         graph on which MaxCut will be solved
     precomputed_cuts : np.array
-        precomputed cuts to compute the QAOA expectation
+        precomputed cuts to compute the QAOA expectation, for maximization problem
+        send the precomputed cuts/energies as negative
     parameterization : str
         If parameterization == 'theta', then f takes one parameter (gamma and beta concatenated)
         If parameterization == 'gamma beta', then f takes two parameters (gamma and beta)
@@ -68,12 +69,13 @@ def get_qaoa_maxcut_objective(
         parameterized_circuit = get_parameterized_qaoa_circuit(G, p)
     else:
         parameterized_circuit = None
-
+    # Reverse the sign for computing maximizing problem
+    precomputed_costs = precomputed_cuts * -1 if precomputed_cuts is not None else None
     return get_qaoa_objective(
         N=N,
         p=p,
         precomputed_diagonal_hamiltonian=precomputed_cuts,
-        precomputed_objectives=precomputed_cuts,
+        precomputed_costs=precomputed_costs,
         terms=terms,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
         parameterized_circuit=parameterized_circuit,

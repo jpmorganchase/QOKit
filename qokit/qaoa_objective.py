@@ -9,14 +9,14 @@ from qiskit import Aer, execute
 from functools import reduce
 import numba.cuda
 
-from .fur import choose_simulator, choose_simulator_xyring, QAOAFastSimulatorBase
+from fur import choose_simulator, choose_simulator_xyring, QAOAFastSimulatorBase
 import typing
 
-from .parameter_utils import from_fourier_basis
+from parameter_utils import from_fourier_basis
 import qokit.parameter_utils
 from qokit.parameter_utils import QAOAParameterization
-from .qaoa_circuit_portfolio import measure_circuit
-from .utils import reverse_array_index_bit_order
+from qaoa_circuit_portfolio import measure_circuit
+from utils import reverse_array_index_bit_order
 
 
 def precompute_terms(terms, N):
@@ -117,7 +117,7 @@ def get_qaoa_objective(
     N: int,
     p: int | None = None,
     precomputed_diagonal_hamiltonian=None,
-    precomputed_objectives=None,
+    precomputed_costs=None,
     terms=None,
     precomputed_optimal_bitstrings=None,
     parameterization: str | QAOAParameterization = "theta",
@@ -166,7 +166,7 @@ def get_qaoa_objective(
 
     # -- Qiskit edge case
     if simulator == "qiskit":
-        g = _get_qiskit_objective(parameterized_circuit, precomputed_objectives, precomputed_optimal_bitstrings, objective, terms, parameterization, mixer)
+        g = _get_qiskit_objective(parameterized_circuit, precomputed_costs, precomputed_optimal_bitstrings, objective, terms, parameterization, mixer)
 
         def fq(*args):
             gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
@@ -183,28 +183,25 @@ def get_qaoa_objective(
         raise ValueError(f"Unknown mixer type passed to get_qaoa_objective: {mixer}, allowed ['x', 'xy']")
 
     sim = simulator_cls(N, terms=terms, costs=precomputed_diagonal_hamiltonian)
-    if precomputed_objectives is None:
-        precomputed_objectives = sim.get_cost_diagonal()
+    if precomputed_costs is None:
+        precomputed_costs = sim.get_cost_diagonal()
 
     bitstring_loc = None
     if precomputed_optimal_bitstrings is not None and objective != "expectation":
         bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
-
-    if precomputed_objectives is not None and precomputed_optimal_bitstrings is None:
-        bitstring_loc = np.argmax(precomputed_objectives)
 
     # -- Final function
     def f(*args):
         gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
         result = sim.simulate_qaoa(gamma, beta, initial_state, n_trotters=n_trotters)
         if objective == "expectation":
-            return sim.get_expectation(result, costs=precomputed_objectives, preserve_state=False)
+            return sim.get_expectation(result, costs=precomputed_costs, preserve_state=False)
         elif objective == "overlap":
-            overlap = sim.get_overlap(result, costs=precomputed_objectives, indices=bitstring_loc, preserve_state=False)
+            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=False)
             return 1 - overlap
         elif objective == "expectation and overlap":
-            overlap = sim.get_overlap(result, costs=precomputed_objectives, indices=bitstring_loc, preserve_state=True)
-            expectation = sim.get_expectation(result, costs=precomputed_objectives)
+            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=True)
+            expectation = sim.get_expectation(result, costs=precomputed_costs)
             return expectation, 1 - overlap
 
     return f
