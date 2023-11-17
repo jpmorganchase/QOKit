@@ -4,10 +4,10 @@
 ###############################################################################
 import qiskit
 import numpy as np
-from portfolio_optimization import yield_all_indices_cosntrained, get_configuration_cost
+from .portfolio_optimization import yield_all_indices_cosntrained, get_configuration_cost
 from qiskit import QuantumCircuit, execute, Aer, QuantumRegister
 from qiskit.circuit import ParameterVector
-from utils import reverse_array_index_bit_order, state_to_ampl_counts
+from .utils import reverse_array_index_bit_order, state_to_ampl_counts
 
 
 def generate_dicke_state_fast(N, K):

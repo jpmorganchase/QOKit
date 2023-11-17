@@ -9,14 +9,14 @@ from qiskit import Aer, execute
 from functools import reduce
 import numba.cuda
 
-from fur import choose_simulator, choose_simulator_xyring, QAOAFastSimulatorBase
+from .fur import choose_simulator, choose_simulator_xyring, QAOAFastSimulatorBase
 import typing
 
-from parameter_utils import from_fourier_basis
+from .parameter_utils import from_fourier_basis
 import qokit.parameter_utils
 from qokit.parameter_utils import QAOAParameterization
-from qaoa_circuit_portfolio import measure_circuit
-from utils import reverse_array_index_bit_order
+from .qaoa_circuit_portfolio import measure_circuit
+from .utils import reverse_array_index_bit_order
 
 
 def precompute_terms(terms, N):

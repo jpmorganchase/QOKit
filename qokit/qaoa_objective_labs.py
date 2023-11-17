@@ -8,16 +8,16 @@ import typing
 import numpy as np
 from pathlib import Path
 
-from labs import (
+from .labs import (
     get_energy_term_indices,
     negative_merit_factor_from_bitstring,
     true_optimal_energy,
     energy_vals_from_bitstring,
 )
 
-from utils import precompute_energies
-from qaoa_circuit_labs import get_parameterized_qaoa_circuit
-from qaoa_objective import get_qaoa_objective
+from .utils import precompute_energies
+from .qaoa_circuit_labs import get_parameterized_qaoa_circuit
+from .qaoa_objective import get_qaoa_objective
 
 qaoa_objective_labs_folder = Path(__file__).parent
 
