@@ -54,7 +54,7 @@ def test_maxcut_qaoa_obj_fixed_angles():
         for p in range(1, max_p + 1):
             gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
             gamma = -1 * np.asarray(gamma)
-            for simulator in ["auto","qiskit"]:
+            for simulator in ["auto", "qiskit"]:
                 f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
                 assert abs(f(gamma, beta) / optimal_cut) > AR
 
@@ -69,7 +69,7 @@ def test_maxcut_weighted_qaoa_obj():
     )
 
     for _, row in df.iterrows():
-        for simulator in ["auto","qiskit"]:
+        for simulator in ["auto", "qiskit"]:
             f = get_qaoa_maxcut_objective(row["G"].number_of_nodes(), row["p"], G=row["G"], parameterization="gamma beta", simulator=simulator)
             assert np.isclose(abs(f(-1 * np.asarray(row["gamma"]), row["beta"])), row["Expected cut of QAOA"])
 

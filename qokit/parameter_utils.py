@@ -11,7 +11,7 @@ import pandas as pd
 from importlib_resources import files
 from enum import Enum
 from typing import Callable
-from functools import lru_cache, cached_property,cache
+from functools import lru_cache, cached_property, cache
 from datetime import datetime
 
 
@@ -212,6 +212,7 @@ def get_sk_gamma_beta(p, parameterization: QAOAParameterization | str = "gamma b
     elif parameterization == QAOAParameterization.GAMMA_BETA:
         return 4 * gamma, beta
 
+
 @cache
 def _get_gamma_beta_from_file():
     """
@@ -224,8 +225,9 @@ def _get_gamma_beta_from_file():
     Returns
     -------
     df: Pandas Dataframe
-    """ 
+    """
     return pd.read_json(str(files("qokit.assets.maxcut_datasets").joinpath("fixed_angles_for_regular_graphs.json")), orient="index")
+
 
 def get_fixed_gamma_beta(d, p, return_AR=False):
     """
