@@ -53,7 +53,8 @@ def test_maxcut_qaoa_obj_fixed_angles():
 
         for p in range(1, max_p + 1):
             gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
-            for simulator in ["auto", "qiskit"]:
+            gamma = -1 * np.asarray(gamma)
+            for simulator in ["auto","qiskit"]:
                 f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
                 assert abs(f(gamma, beta) / optimal_cut) > AR
 
@@ -68,14 +69,14 @@ def test_maxcut_weighted_qaoa_obj():
     )
 
     for _, row in df.iterrows():
-        for simulator in ["auto", "qiskit"]:
+        for simulator in ["auto","qiskit"]:
             f = get_qaoa_maxcut_objective(row["G"].number_of_nodes(), row["p"], G=row["G"], parameterization="gamma beta", simulator=simulator)
-            assert np.isclose(abs(f(row["gamma"], row["beta"])), row["Expected cut of QAOA"])
+            assert np.isclose(abs(f(-1 * np.asarray(row["gamma"]), row["beta"])), row["Expected cut of QAOA"])
 
         # Qiskit non-parameterized circuit must be tested separately
         precomputed_cuts = precompute_energies(maxcut_obj, row["G"].number_of_nodes(), w=get_adjacency_matrix(row["G"]))
-        qc = get_qaoa_circuit(row["G"], row["beta"], row["gamma"])
-        qc_param = get_parameterized_qaoa_circuit(row["G"], row["p"]).bind_parameters(np.hstack([row["beta"], row["gamma"]]))
+        qc = get_qaoa_circuit(row["G"], row["beta"], -1 * np.asarray(row["gamma"]))
+        qc_param = get_parameterized_qaoa_circuit(row["G"], row["p"]).bind_parameters(np.hstack([row["beta"], -1 * np.asarray(row["gamma"])]))
 
         sv = np.asarray(qiskit_backend.run(qc).result().get_statevector())
         sv_param = np.asarray(qiskit_backend.run(qc_param).result().get_statevector())
@@ -92,6 +93,7 @@ def test_maxcut_precompute(simclass):
     for u, v, w in G.edges(data=True):
         w["weight"] = np.random.rand()
     precomputed_cuts = precompute_energies(maxcut_obj, N, w=get_adjacency_matrix(G))
+    precomputed_cuts = precomputed_cuts * -1
     terms = get_maxcut_terms(G)
     sim = simclass(N, terms=terms)
     cuts = sim.get_cost_diagonal()
@@ -105,14 +107,16 @@ def test_sk_ini_maxcut():
         obj = partial(maxcut_obj, w=get_adjacency_matrix(G))
         optimal_cut, x = brute_force(obj, N, function_takes="bits")
         precomputed_energies = precompute_energies(obj, N)
+        precomputed_energies = precomputed_energies * -1
         last_ar = 0
         for p in range(1, max_p + 1):
             gamma, beta = get_sk_gamma_beta(p)
+            gamma = -1 * np.asarray(gamma)
             for simulator in ["auto"]:
                 f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
                 cur_ar = f(gamma / np.sqrt(d), beta) / optimal_cut
             if p == 1:
-                assert cur_ar > np.mean(precomputed_energies) / optimal_cut
+                assert cur_ar < np.mean(precomputed_energies) / optimal_cut
             else:
-                assert cur_ar > last_ar
+                assert cur_ar < last_ar
                 last_ar = cur_ar
