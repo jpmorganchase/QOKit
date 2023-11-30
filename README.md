@@ -39,3 +39,21 @@ Installation can be verified by running tests using `pytest`.
 #### MaxCut
 
 For MaxCut, the datasets in `qokit/assets/maxcut_datasets` must be inflated
+
+### Requirement
+
+Make sure your Python environment is set up correctly, and you have the necessary permissions to install packages. Once Qiskit is installed, you should be able to run the provided code.
+Additionally, ensure that you have other required libraries such as numpy, scipy, and any other dependencies used in the code installed in your environment.
+
+Another method for organised work follow:
+
+To ensure that you have all the necessary dependencies installed, you can create a requirements.txt file and use it to install the dependencies.
+
+in the requirements.txt, type : 
+qiskit
+numpy
+scipy
+pytket
+Save this file in the same directory as your script. Then, open a terminal or command prompt, navigate to the script's directory, and run the following command: pip install -r requirements.txt
+
+

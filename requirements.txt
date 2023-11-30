@@ -1,0 +1,4 @@
+qiskit
+numpy
+scipy
+pytket
