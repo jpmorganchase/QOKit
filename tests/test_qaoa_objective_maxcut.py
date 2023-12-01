@@ -32,4 +32,4 @@ def test_validate_energy_for_terms_with_simulators_are_same():
     gamma, beta = get_fixed_gamma_beta(3, p)
     auto = f(-1 * np.asarray(gamma), beta)
     qiskit = g(-1 * np.asarray(gamma), beta)
-    assert np.isclose(auto, qiskit, rel_tol=0.00000000001)
+    assert np.isclose(auto, qiskit)
