@@ -69,7 +69,7 @@ def get_qaoa_maxcut_objective(
         parameterized_circuit = get_parameterized_qaoa_circuit(G, p)
     else:
         parameterized_circuit = None
-    # Reverse the sign for computing maximizing problem
+    # Reverse the sign as get_qaoa_objective assumes that the problem is minimization
     precomputed_costs = precomputed_cuts * -1 if precomputed_cuts is not None else None
     return get_qaoa_objective(
         N=N,
