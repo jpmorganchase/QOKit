@@ -208,10 +208,9 @@ def get_sk_gamma_beta(p, parameterization: QAOAParameterization | str = "gamma b
         raise ValueError(f"p={p} not supported, try lower p")
     parameterization = QAOAParameterization(parameterization)
     if parameterization == QAOAParameterization.THETA:
-        return np.concatenate((4 * gamma, beta), axis=0)
+        return np.concatenate((-1 * (4 * gamma), beta), axis=0)
     elif parameterization == QAOAParameterization.GAMMA_BETA:
-        # return -1 * (4 * gamma), beta
-        return 4 * gamma, beta
+        return -1 * (4 * gamma), beta
 
 
 @cache

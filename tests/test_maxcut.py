@@ -110,7 +110,6 @@ def test_sk_ini_maxcut():
         last_ar = 0
         for p in range(1, max_p + 1):
             gamma, beta = get_sk_gamma_beta(p)
-            gamma = -1 * np.asarray(gamma)
             for simulator in ["auto"]:
                 f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
                 cur_ar = f(gamma / np.sqrt(d), beta) / optimal_cut
