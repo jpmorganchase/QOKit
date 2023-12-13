@@ -30,6 +30,6 @@ def test_validate_energy_for_terms_with_simulators_are_same():
     g = get_qaoa_maxcut_objective(G.number_of_nodes(), 1, G=G, parameterization="gamma beta", simulator="qiskit")
     p = 1
     gamma, beta = get_fixed_gamma_beta(3, p)
-    auto = f(-1 * np.asarray(gamma), beta)
-    qiskit = g(-1 * np.asarray(gamma), beta)
+    auto = f(gamma, beta)
+    qiskit = g(gamma, beta)
     assert np.isclose(auto, qiskit)

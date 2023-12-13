@@ -50,10 +50,8 @@ def test_maxcut_qaoa_obj_fixed_angles():
 
         obj = partial(maxcut_obj, w=get_adjacency_matrix(G))
         optimal_cut, x = brute_force(obj, N, function_takes="bits")
-
         for p in range(1, max_p + 1):
             gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
-            gamma = -1 * np.asarray(gamma)
             for simulator in ["auto", "qiskit"]:
                 f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
                 assert abs(f(gamma, beta) / optimal_cut) > AR
@@ -67,17 +65,18 @@ def test_maxcut_weighted_qaoa_obj():
         lambda row: nx.node_link_graph(row["G_json"]),
         axis=1,
     )
+    # changing the sign of gamma got from file
+    df["gamma"] = df["gamma"].apply(lambda x: [-y for y in x])
 
     for _, row in df.iterrows():
         for simulator in ["auto", "qiskit"]:
             f = get_qaoa_maxcut_objective(row["G"].number_of_nodes(), row["p"], G=row["G"], parameterization="gamma beta", simulator=simulator)
-            assert np.isclose(abs(f(-1 * np.asarray(row["gamma"]), row["beta"])), row["Expected cut of QAOA"])
+            assert np.isclose(abs(f(row["gamma"], row["beta"])), row["Expected cut of QAOA"])
 
         # Qiskit non-parameterized circuit must be tested separately
         precomputed_cuts = precompute_energies(maxcut_obj, row["G"].number_of_nodes(), w=get_adjacency_matrix(row["G"]))
-        qc = get_qaoa_circuit(row["G"], row["beta"], -1 * np.asarray(row["gamma"]))
-        qc_param = get_parameterized_qaoa_circuit(row["G"], row["p"]).bind_parameters(np.hstack([row["beta"], -1 * np.asarray(row["gamma"])]))
-
+        qc = get_qaoa_circuit(row["G"], row["beta"], row["gamma"])
+        qc_param = get_parameterized_qaoa_circuit(row["G"], row["p"]).bind_parameters(np.hstack([row["beta"], row["gamma"]]))
         sv = np.asarray(qiskit_backend.run(qc).result().get_statevector())
         sv_param = np.asarray(qiskit_backend.run(qc_param).result().get_statevector())
 
