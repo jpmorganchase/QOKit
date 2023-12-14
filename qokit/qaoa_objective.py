@@ -117,7 +117,7 @@ def get_qaoa_objective(
     N: int,
     p: int | None = None,
     precomputed_diagonal_hamiltonian=None,
-    precomputed_objectives=None,
+    precomputed_costs=None,
     terms=None,
     precomputed_optimal_bitstrings=None,
     parameterization: str | QAOAParameterization = "theta",
@@ -166,7 +166,7 @@ def get_qaoa_objective(
 
     # -- Qiskit edge case
     if simulator == "qiskit":
-        g = _get_qiskit_objective(parameterized_circuit, precomputed_objectives, precomputed_optimal_bitstrings, objective, terms, parameterization, mixer)
+        g = _get_qiskit_objective(parameterized_circuit, precomputed_costs, precomputed_optimal_bitstrings, objective, terms, parameterization, mixer)
 
         def fq(*args):
             gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
@@ -183,8 +183,8 @@ def get_qaoa_objective(
         raise ValueError(f"Unknown mixer type passed to get_qaoa_objective: {mixer}, allowed ['x', 'xy']")
 
     sim = simulator_cls(N, terms=terms, costs=precomputed_diagonal_hamiltonian)
-    if precomputed_objectives is None:
-        precomputed_objectives = sim.get_cost_diagonal()
+    if precomputed_costs is None:
+        precomputed_costs = sim.get_cost_diagonal()
 
     bitstring_loc = None
     if precomputed_optimal_bitstrings is not None and objective != "expectation":
@@ -195,13 +195,13 @@ def get_qaoa_objective(
         gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
         result = sim.simulate_qaoa(gamma, beta, initial_state, n_trotters=n_trotters)
         if objective == "expectation":
-            return sim.get_expectation(result, costs=precomputed_objectives, preserve_state=False)
+            return sim.get_expectation(result, costs=precomputed_costs, preserve_state=False)
         elif objective == "overlap":
-            overlap = sim.get_overlap(result, costs=precomputed_objectives, indices=bitstring_loc, preserve_state=False)
+            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=False)
             return 1 - overlap
         elif objective == "expectation and overlap":
-            overlap = sim.get_overlap(result, costs=precomputed_objectives, indices=bitstring_loc, preserve_state=True)
-            expectation = sim.get_expectation(result, costs=precomputed_objectives)
+            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=True)
+            expectation = sim.get_expectation(result, costs=precomputed_costs)
             return expectation, 1 - overlap
 
     return f

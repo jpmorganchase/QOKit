@@ -11,6 +11,8 @@ import pandas as pd
 from importlib_resources import files
 from enum import Enum
 from typing import Callable
+from functools import lru_cache, cached_property, cache
+from datetime import datetime
 
 
 def from_fourier_basis(u, v):
@@ -206,9 +208,25 @@ def get_sk_gamma_beta(p, parameterization: QAOAParameterization | str = "gamma b
         raise ValueError(f"p={p} not supported, try lower p")
     parameterization = QAOAParameterization(parameterization)
     if parameterization == QAOAParameterization.THETA:
-        return np.concatenate((4 * gamma, beta), axis=0)
+        return np.concatenate((-1 * (4 * gamma), beta), axis=0)
     elif parameterization == QAOAParameterization.GAMMA_BETA:
-        return 4 * gamma, beta
+        return -1 * (4 * gamma), beta
+
+
+@cache
+def _get_gamma_beta_from_file():
+    """
+    Caches the dataframe after the first call to load JSon, subsequent calls will get from cache and save I/O
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    df: Pandas Dataframe
+    """
+    return pd.read_json(str(files("qokit.assets.maxcut_datasets").joinpath("fixed_angles_for_regular_graphs.json")), orient="index")
 
 
 def get_fixed_gamma_beta(d, p, return_AR=False):
@@ -231,16 +249,15 @@ def get_fixed_gamma_beta(d, p, return_AR=False):
     AR : float
         Only returned is flag return_AR is raised
     """
-    df = pd.read_json(str(files("qokit.assets.maxcut_datasets").joinpath("fixed_angles_for_regular_graphs.json")), orient="index")
-
+    df = _get_gamma_beta_from_file()
     row = df[(df["d"] == d) & (df["p"] == p)]
     if len(row) != 1:
         raise ValueError(f"Failed to retrieve fixed angles for d={d}, p={p}")
     row = row.squeeze()
     if return_AR:
-        return row["gamma"], row["beta"], row["AR"]
+        return -1 * np.asarray(row["gamma"]), row["beta"], row["AR"]
     else:
-        return row["gamma"], row["beta"]
+        return -1 * np.asarray(row["gamma"]), row["beta"]
 
 
 def get_best_known_parameters_for_LABS_wrt_overlap(N: int) -> pd.DataFrame:

@@ -142,7 +142,7 @@ def get_random_guess_merit_factor(N: int) -> float:
 def get_qaoa_labs_objective(
     N: int,
     p: int,
-    precomputed_merit_factors: np.ndarray | None = None,
+    precomputed_negative_merit_factors: np.ndarray | None = None,
     parameterization: str = "theta",
     objective: str = "expectation",
     precomputed_optimal_bitstrings: np.ndarray | None = None,
@@ -156,7 +156,7 @@ def get_qaoa_labs_objective(
         Number of qubits
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
-    precomputed_merit_factors : np.array
+    precomputed_negative_merit_factors : np.array
         precomputed merit factors to compute the QAOA expectation
     parameterization : str
         If parameterization == 'theta', then f takes one parameter (gamma and beta concatenated)
@@ -186,19 +186,19 @@ def get_qaoa_labs_objective(
 
     terms_ix, offset = get_energy_term_indices(N)
 
-    if precomputed_merit_factors is None:
-        precomputed_merit_factors = get_precomputed_labs_merit_factors(N)
+    if precomputed_negative_merit_factors is None:
+        precomputed_negative_merit_factors = get_precomputed_labs_merit_factors(N)
 
     if objective in ["overlap", "expectation and overlap"] and precomputed_optimal_bitstrings is None:
         precomputed_optimal_bitstrings = get_precomputed_optimal_bitstrings(N)
 
-    precomputed_diagonal_hamiltonian = -(N**2) / (2 * precomputed_merit_factors) - offset
+    precomputed_diagonal_hamiltonian = -(N**2) / (2 * precomputed_negative_merit_factors) - offset
 
     return get_qaoa_objective(
         N=N,
         p=p,
         precomputed_diagonal_hamiltonian=precomputed_diagonal_hamiltonian,
-        precomputed_objectives=precomputed_merit_factors,
+        precomputed_costs=precomputed_negative_merit_factors,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
         parameterization=parameterization,
         objective=objective,
