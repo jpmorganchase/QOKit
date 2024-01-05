@@ -55,6 +55,8 @@ def get_qaoa_maxcut_objective(
         Function returning the negative of expected value of QAOA with parameters theta
     """
     terms = None
+    if (precomputed_cuts is not None) or (precomputed_optimal_bitstrings is not None):
+        raise NotImplementedError("Passing precomputed cuts is currently not supported; fix in progress")
 
     if precomputed_cuts is not None and G is not None:
         warnings.warn("If precomputed_cuts is passed, G is ignored")
