@@ -49,12 +49,15 @@ def test_maxcut_qaoa_obj_fixed_angles():
         G = nx.random_regular_graph(d, N)
 
         obj = partial(maxcut_obj, w=get_adjacency_matrix(G))
+        precomputed_energies = precompute_energies(obj, N)
         optimal_cut, x = brute_force(obj, N, function_takes="bits")
         for p in range(1, max_p + 1):
             gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
             for simulator in ["auto", "qiskit"]:
-                f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
-                assert -f(gamma, beta) / optimal_cut > AR
+                f1 = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
+                f2 = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, parameterization="gamma beta", simulator=simulator)
+                assert -f1(gamma, beta) / optimal_cut > AR
+                assert -f2(gamma, beta) / optimal_cut > AR
 
 
 def test_maxcut_weighted_qaoa_obj():
