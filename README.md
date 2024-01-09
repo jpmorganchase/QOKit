@@ -39,3 +39,33 @@ Installation can be verified by running tests using `pytest`.
 #### MaxCut
 
 For MaxCut, the datasets in `qokit/assets/maxcut_datasets` must be inflated
+
+### Cite
+
+For the simulators and other software tools, please cite
+```
+@inproceedings{Lykov2023,
+  series = {SC-W 2023},
+  title = {Fast Simulation of High-Depth QAOA Circuits},
+  url = {http://dx.doi.org/10.1145/3624062.3624216},
+  DOI = {10.1145/3624062.3624216},
+  booktitle = {Proceedings of the SC ’23 Workshops of The International Conference on High Performance Computing,  Network,  Storage,  and Analysis},
+  publisher = {ACM},
+  author = {Lykov,  Danylo and Shaydulin,  Ruslan and Sun,  Yue and Alexeev,  Yuri and Pistoia,  Marco},
+  year = {2023},
+  month = nov,
+  collection = {SC-W 2023}
+}
+```
+
+For LABS data, please cite
+```
+@article{https://doi.org/10.48550/arxiv.2308.02342,
+  doi = {10.48550/ARXIV.2308.02342},
+  url = {https://arxiv.org/abs/2308.02342},
+  author = {Shaydulin,  Ruslan and Li,  Changhao and Chakrabarti,  Shouvanik and DeCross,  Matthew and Herman,  Dylan and Kumar,  Niraj and Larson,  Jeffrey and Lykov,  Danylo and Minssen,  Pierre and Sun,  Yue and Alexeev,  Yuri and Dreiling,  Joan M. and Gaebler,  John P. and Gatterman,  Thomas M. and Gerber,  Justin A. and Gilmore,  Kevin and Gresh,  Dan and Hewitt,  Nathan and Horst,  Chandler V. and Hu,  Shaohan and Johansen,  Jacob and Matheny,  Mitchell and Mengle,  Tanner and Mills,  Michael and Moses,  Steven A. and Neyenhuis,  Brian and Siegfried,  Peter and Yalovetzky,  Romina and Pistoia,  Marco},
+  keywords = {Quantum Physics (quant-ph),  Statistical Mechanics (cond-mat.stat-mech),  Emerging Technologies (cs.ET),  FOS: Physical sciences,  FOS: Physical sciences,  FOS: Computer and information sciences,  FOS: Computer and information sciences},
+  title = {Evidence of Scaling Advantage for the Quantum Approximate Optimization Algorithm on a Classically Intractable Problem},
+  howpublished = {Preprint at https://arxiv.org/abs/2308.02342},
+}
+```
