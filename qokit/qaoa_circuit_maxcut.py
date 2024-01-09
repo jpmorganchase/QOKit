@@ -11,7 +11,7 @@ from typing import Sequence
 
 
 def append_zz_term(qc, q1, q2, gamma):
-    qc.rzz(gamma / 2, q1, q2)
+    qc.rzz(-gamma / 2, q1, q2)
 
 
 def append_maxcut_cost_operator_circuit(qc, G, gamma):

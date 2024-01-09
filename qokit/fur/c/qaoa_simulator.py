@@ -52,12 +52,16 @@ class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
     def get_probabilities(self, result: ComplexArray, **kwargs) -> np.ndarray:
         return result.get_norm_squared()
 
-    def get_expectation(self, result: ComplexArray, costs: np.ndarray | None = None, **kwargs) -> float:
+    def get_expectation(self, result: ComplexArray, costs: np.ndarray | None = None, optimization_type="min", **kwargs) -> float:
         if costs is None:
             costs = self._hc_diag
+        if optimization_type == "max":
+            costs = -1 * np.asarray(costs)
         return np.dot(costs, self.get_probabilities(result, **kwargs))
 
-    def get_overlap(self, result: ComplexArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, **kwargs) -> float:
+    def get_overlap(
+        self, result: ComplexArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs
+    ) -> float:
         """
         Compute the overlap between the statevector and the ground state
 
@@ -74,6 +78,8 @@ class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
                 costs = self._hc_diag
             else:
                 costs = self._diag_from_costs(costs)
+            if optimization_type == "max":
+                costs = -1 * np.asarray(costs)
             minval = costs.min()
             indices = (costs == minval).nonzero()
         return probs[indices].sum()

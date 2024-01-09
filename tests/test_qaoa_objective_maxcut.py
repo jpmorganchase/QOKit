@@ -19,14 +19,14 @@ def test_validate_energy_for_terms_and_precomputedcuts_are_same():
     f_precomputedcuts = get_qaoa_maxcut_objective(G.number_of_nodes(), 1, precomputed_cuts=precomputed_cuts, parameterization="gamma beta")
     p = 1
     gamma, beta = get_fixed_gamma_beta(3, p)
-    energy_terms = f_terms(-1 * np.asarray(gamma), beta)
+    energy_terms = f_terms(gamma, beta)
     energy_precomputedcuts = f_precomputedcuts(gamma, beta)
     assert energy_terms == energy_precomputedcuts
 
 
 def test_validate_energy_for_terms_with_simulators_are_same():
     G = nx.random_regular_graph(3, 16)
-    f = f = get_qaoa_maxcut_objective(G.number_of_nodes(), 1, G=G, parameterization="gamma beta", simulator="auto")
+    f = get_qaoa_maxcut_objective(G.number_of_nodes(), 1, G=G, parameterization="gamma beta", simulator="auto")
     g = get_qaoa_maxcut_objective(G.number_of_nodes(), 1, G=G, parameterization="gamma beta", simulator="qiskit")
     p = 1
     gamma, beta = get_fixed_gamma_beta(3, p)

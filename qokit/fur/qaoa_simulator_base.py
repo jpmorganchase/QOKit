@@ -130,7 +130,7 @@ class QAOAFastSimulatorBase(ABC):
     # -- Output methods
 
     @abstractmethod
-    def get_expectation(self, result, costs: typing.Any = None, **kwargs) -> float:
+    def get_expectation(self, result, costs: typing.Any = None, optimization_type="min", **kwargs) -> float:
         """
         Return the expectation value of the cost Hamiltonian
 
@@ -143,7 +143,9 @@ class QAOAFastSimulatorBase(ABC):
         ...
 
     @abstractmethod
-    def get_overlap(self, result, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, **kwargs) -> float:
+    def get_overlap(
+        self, result, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs
+    ) -> float:
         """
         Return the overlap between the lowest energy state and the statevector
         Parameters

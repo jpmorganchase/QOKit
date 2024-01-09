@@ -39,6 +39,7 @@ def _get_qiskit_objective(
     terms=None,
     parameterization: str | QAOAParameterization = "theta",
     mixer: str = "x",
+    optimization_type="min",
 ):
     N = parameterized_circuit.num_qubits
     if objective == "expectation":
@@ -49,6 +50,8 @@ def _get_qiskit_objective(
                 precomputed_objectives, precomputed_diagonal_hamiltonian = precompute_terms(terms, N)
 
         def compute_objective_from_probabilities(probabilities):  # type: ignore
+            if optimization_type == "max":
+                return -1 * precomputed_objectives.dot(probabilities)
             return precomputed_objectives.dot(probabilities)
 
     elif objective == "overlap":
@@ -83,6 +86,8 @@ def _get_qiskit_objective(
             overlap = 0
             for i in range(len(bitstring_loc)):
                 overlap += probabilities[bitstring_loc[i]]
+            if optimization_type == "max":
+                (-1) * en, 1 - overlap
             return en, 1 - overlap
 
     else:
@@ -127,6 +132,7 @@ def get_qaoa_objective(
     mixer: str = "x",
     initial_state: np.ndarray | None = None,
     n_trotters: int = 1,
+    optimization_type="min",
 ) -> typing.Callable:
     """Return QAOA objective to be minimized
 
@@ -166,7 +172,16 @@ def get_qaoa_objective(
 
     # -- Qiskit edge case
     if simulator == "qiskit":
-        g = _get_qiskit_objective(parameterized_circuit, precomputed_costs, precomputed_optimal_bitstrings, objective, terms, parameterization, mixer)
+        g = _get_qiskit_objective(
+            parameterized_circuit,
+            precomputed_costs,
+            precomputed_optimal_bitstrings,
+            objective,
+            terms,
+            parameterization,
+            mixer,
+            optimization_type=optimization_type,
+        )
 
         def fq(*args):
             gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
@@ -193,15 +208,17 @@ def get_qaoa_objective(
     # -- Final function
     def f(*args):
         gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
+        # print(f"gamma:{gamma}, beta:{beta},initial_state:{initial_state}, n_trotters:{n_trotters}")
         result = sim.simulate_qaoa(gamma, beta, initial_state, n_trotters=n_trotters)
+        # print(f"result : {result}")
         if objective == "expectation":
-            return sim.get_expectation(result, costs=precomputed_costs, preserve_state=False)
+            return sim.get_expectation(result, costs=precomputed_costs, preserve_state=False, optimization_type=optimization_type)
         elif objective == "overlap":
-            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=False)
+            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=False, optimization_type=optimization_type)
             return 1 - overlap
         elif objective == "expectation and overlap":
-            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=True)
-            expectation = sim.get_expectation(result, costs=precomputed_costs)
+            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=True, optimization_type=optimization_type)
+            expectation = sim.get_expectation(result, costs=precomputed_costs, optimization_type=optimization_type)
             return expectation, 1 - overlap
 
     return f

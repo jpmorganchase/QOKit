@@ -208,9 +208,9 @@ def get_sk_gamma_beta(p, parameterization: QAOAParameterization | str = "gamma b
         raise ValueError(f"p={p} not supported, try lower p")
     parameterization = QAOAParameterization(parameterization)
     if parameterization == QAOAParameterization.THETA:
-        return np.concatenate((-1 * (4 * gamma), beta), axis=0)
+        return np.concatenate((4 * gamma, beta), axis=0)
     elif parameterization == QAOAParameterization.GAMMA_BETA:
-        return -1 * (4 * gamma), beta
+        return 4 * gamma, beta
 
 
 @cache
@@ -255,9 +255,9 @@ def get_fixed_gamma_beta(d, p, return_AR=False):
         raise ValueError(f"Failed to retrieve fixed angles for d={d}, p={p}")
     row = row.squeeze()
     if return_AR:
-        return -1 * np.asarray(row["gamma"]), row["beta"], row["AR"]
+        return row["gamma"], row["beta"], row["AR"]
     else:
-        return -1 * np.asarray(row["gamma"]), row["beta"]
+        return row["gamma"], row["beta"]
 
 
 def get_best_known_parameters_for_LABS_wrt_overlap(N: int) -> pd.DataFrame:

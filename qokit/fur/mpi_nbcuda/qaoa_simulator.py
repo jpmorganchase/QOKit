@@ -174,11 +174,13 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
         else:
             return result.copy_to_host()
 
-    def get_expectation(self, result: DeviceArray, costs: CostsType | None = None, **kwargs) -> float:
+    def get_expectation(self, result: DeviceArray, costs: CostsType | None = None, optimization_type="min", **kwargs) -> float:
         if costs is None:
             costs = self._hc_diag
         else:
             costs = self._diag_from_costs(costs)
+        if optimization_type == "max":
+            costs = costs = -1 * np.asarray(costs)
         preserve_state = kwargs.get("preserve_state", True)
         if preserve_state:
             result_orig = result
@@ -190,7 +192,9 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
         global_sum = self._comm.allreduce(local_sum, op=MPI.SUM)
         return global_sum
 
-    def get_overlap(self, result: DeviceArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, **kwargs) -> float:
+    def get_overlap(
+        self, result: DeviceArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs
+    ) -> float:
         """
         Get probability corresponding to indices or to ground state of costs
 
@@ -210,6 +214,8 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
             costs_host = self._hc_diag.copy_to_host()
         else:
             costs_host = np.asarray(costs)
+        if optimization_type == "max":
+            costs_host = -1 * np.asarray(costs_host)
 
         return self._get_optimum_overlap(probs, costs_host, broadcast=broadcast)
 
