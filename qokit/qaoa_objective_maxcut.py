@@ -13,6 +13,8 @@ from .maxcut import maxcut_obj, get_adjacency_matrix, get_maxcut_terms
 from .qaoa_circuit_maxcut import get_parameterized_qaoa_circuit
 from .qaoa_objective import get_qaoa_objective
 
+from .fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
+
 
 def get_qaoa_maxcut_objective(
     N: int,
@@ -63,6 +65,7 @@ def get_qaoa_maxcut_objective(
     if precomputed_cuts is None:
         assert G is not None, "G must be passed if precomputed_cuts is None"
         terms = get_maxcut_terms(G)
+        precomputed_cuts = precompute_vectorized_cpu_parallel(terms, 0.0,N)
 
     if simulator == "qiskit":
         assert G is not None, "G must be passed if simulator == 'qiskit'"
@@ -70,15 +73,12 @@ def get_qaoa_maxcut_objective(
         parameterized_circuit = get_parameterized_qaoa_circuit(G, p)
     else:
         parameterized_circuit = None
-    # Reverse the sign as get_qaoa_objective assumes that the problem is minimization
-    precomputed_costs = precomputed_cuts * 1 if precomputed_cuts is not None else None
-    # print("precomputed_costs", precomputed_costs)
 
     return get_qaoa_objective(
         N=N,
         p=p,
-        precomputed_diagonal_hamiltonian=precomputed_costs,
-        precomputed_costs=precomputed_costs,
+        precomputed_diagonal_hamiltonian=precomputed_cuts,
+        precomputed_costs=precomputed_cuts,
         terms=terms,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
         parameterized_circuit=parameterized_circuit,
