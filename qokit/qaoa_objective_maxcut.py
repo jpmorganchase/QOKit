@@ -65,7 +65,7 @@ def get_qaoa_maxcut_objective(
     if precomputed_cuts is None:
         assert G is not None, "G must be passed if precomputed_cuts is None"
         terms = get_maxcut_terms(G)
-        precomputed_cuts = precompute_vectorized_cpu_parallel(terms, 0.0,N)
+        precomputed_cuts = precompute_vectorized_cpu_parallel(terms, 0.0, N)
 
     if simulator == "qiskit":
         assert G is not None, "G must be passed if simulator == 'qiskit'"
