@@ -18,17 +18,7 @@ from qokit.parameter_utils import QAOAParameterization
 from .qaoa_circuit_portfolio import measure_circuit
 from .utils import reverse_array_index_bit_order
 
-
-def precompute_terms(terms, N):
-    from qokit.fur.mpi_nbcuda.qaoa_simulator import get_costs
-
-    if numba.cuda.is_available():
-        energies = get_costs(terms, N)
-        # TODO: expectation target may be different
-        return energies.copy_to_host(), energies
-    else:
-        # TODO implement CPU version
-        raise NotImplementedError("Terms precomputation is only available for GPU")
+from .fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
 
 
 def _get_qiskit_objective(
@@ -47,7 +37,8 @@ def _get_qiskit_objective(
             if terms is None:
                 raise ValueError(f"precomputed_objectives or terms are required when using the {objective} objective")
             else:
-                precomputed_objectives, precomputed_diagonal_hamiltonian = precompute_terms(terms, N)
+                #precomputed_objectives, precomputed_diagonal_hamiltonian = precompute_terms(terms, N)
+                precomputed_objectives = precompute_vectorized_cpu_parallel(terms,0.0, N)
 
         def compute_objective_from_probabilities(probabilities):  # type: ignore
             if optimization_type == "max":

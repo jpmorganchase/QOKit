@@ -13,7 +13,6 @@ from .maxcut import maxcut_obj, get_adjacency_matrix, get_maxcut_terms
 from .qaoa_circuit_maxcut import get_parameterized_qaoa_circuit
 from .qaoa_objective import get_qaoa_objective
 
-from .fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
 
 
 def get_qaoa_maxcut_objective(
@@ -65,7 +64,6 @@ def get_qaoa_maxcut_objective(
     if precomputed_cuts is None:
         assert G is not None, "G must be passed if precomputed_cuts is None"
         terms = get_maxcut_terms(G)
-        precomputed_cuts = precompute_vectorized_cpu_parallel(terms, 0.0, N)
 
     if simulator == "qiskit":
         assert G is not None, "G must be passed if simulator == 'qiskit'"
