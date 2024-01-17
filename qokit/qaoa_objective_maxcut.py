@@ -14,7 +14,6 @@ from .qaoa_circuit_maxcut import get_parameterized_qaoa_circuit
 from .qaoa_objective import get_qaoa_objective
 
 
-
 def get_qaoa_maxcut_objective(
     N: int,
     p: int,
