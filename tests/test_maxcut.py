@@ -54,7 +54,7 @@ def test_maxcut_qaoa_obj_fixed_angles():
             gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
             for simulator in ["auto", "qiskit"]:
                 f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
-                assert f(gamma, beta) / optimal_cut < AR
+                assert abs(f(gamma, beta)) / optimal_cut > AR
 
 
 def test_maxcut_qaoa_obj_fixed_angles_with_terms_and_precomputed_energies():
@@ -71,8 +71,8 @@ def test_maxcut_qaoa_obj_fixed_angles_with_terms_and_precomputed_energies():
                 f2 = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, parameterization="gamma beta", simulator=simulator)
                 e1 = f1(gamma, beta)
                 e2 = f2(gamma, beta)
-                assert e1 / optimal_cut < AR
-                assert e2 / optimal_cut < AR
+                assert abs(e1) / optimal_cut > AR
+                assert abs(e2) / optimal_cut > AR
                 assert np.isclose(e1, e2)
 
 
