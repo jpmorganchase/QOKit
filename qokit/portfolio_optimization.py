@@ -271,7 +271,6 @@ def get_sk_ini(p: int):
     """
     scaled the sk look-up table for the application of portfolio optimziation
     """
-    # gamma_scale, beta_scale = 0.5, 1
     gamma_scale, beta_scale = -0.5, 1
     gamma, beta = get_sk_gamma_beta(p, parameterization="gamma beta")
     scaled_gamma, scaled_beta = gamma_scale * gamma, beta_scale * beta
