@@ -29,6 +29,7 @@ def get_configuration_cost(po_problem, config):
     scale = po_problem["scale"]
     means = po_problem["means"] / scale
     cov = po_problem["cov"] / scale
+
     return po_problem["q"] * config.dot(cov).dot(config) - means.dot(config)
 
 
@@ -92,12 +93,7 @@ def get_data(N, seed=1, real=False) -> tuple[float, float]:
     for i in range(N):
         tickers.append("t" + str(i))
     if real is False:
-        data = RandomDataProvider(
-            tickers=tickers,
-            start=datetime.datetime(2016, 1, 1),
-            end=datetime.datetime(2016, 1, 30),
-            seed=seed,
-        )
+        data = RandomDataProvider(tickers=tickers, start=datetime.datetime(2016, 1, 1), end=datetime.datetime(2016, 1, 30), seed=seed)
     else:
         stock_symbols = [
             "AAPL",
