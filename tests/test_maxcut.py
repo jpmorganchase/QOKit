@@ -25,7 +25,8 @@ test_maxcut_folder = Path(__file__).parent
 
 qiskit_backend = AerSimulator(method="statevector")
 SIMULATORS = get_available_simulators("x") + get_available_simulators("xyring") + get_available_simulators("xycomplete")
-SIMULATOR_NAMES_X = get_available_simulator_names("x") + ["qiskit"]
+simulators_to_run_names = get_available_simulator_names("x") + ["qiskit"]
+simulators_to_run_names_no_qiskit = get_available_simulator_names("x")
 
 
 def test_maxcut_obj():
@@ -44,14 +45,15 @@ def test_maxcut_obj():
     assert np.isclose(maxcut_obj(x, w=get_adjacency_matrix(G)), maxcut_obj_simple(x, G))
 
 
-def test_maxcut_qaoa_obj_fixed_angles():
+@pytest.mark.parametrize("simulator", simulators_to_run_names)
+def test_maxcut_qaoa_obj_fixed_angles(simulator):
     N = 8
     for d, max_p in [(3, 11), (5, 4)]:
         G = nx.random_regular_graph(d, N)
 
         obj = partial(maxcut_obj, w=get_adjacency_matrix(G))
         optimal_cut, x = brute_force(obj, N, function_takes="bits")
-        for simulator in SIMULATOR_NAMES_X:
+        for simulator in simulators_to_run_names:
             last_overlap = 0
             for p in range(1, max_p + 1):
                 gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
@@ -63,16 +65,23 @@ def test_maxcut_qaoa_obj_fixed_angles():
                     # high values of overlap are unreliable
                     assert current_overlap > last_overlap
                 last_overlap = current_overlap
-        # test constistency across simulators
+
+
+def test_maxcut_qaoa_obj_fixed_angles_consistentcy_across_simulators():
+    N = 8
+    for d, p in [(3, 11), (5, 4)]:
+        G = nx.random_regular_graph(d, N)
+        gamma, beta = get_fixed_gamma_beta(d, p)
         for objective in ["expectation", "overlap"]:
             qaoa_objectives = [
                 get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator, objective=objective)(gamma, beta)
-                for simulator in SIMULATOR_NAMES_X
+                for simulator in simulators_to_run_names
             ]
             assert np.all(np.isclose(qaoa_objectives, qaoa_objectives[0]))
 
 
-def test_maxcut_qaoa_obj_fixed_angles_with_terms_and_precomputed_energies():
+@pytest.mark.parametrize("simulator", simulators_to_run_names_no_qiskit)
+def test_maxcut_qaoa_obj_fixed_angles_with_terms_and_precomputed_energies(simulator):
     N = 10
     for d, max_p in [(3, 11), (5, 4)]:
         G = nx.random_regular_graph(d, N)
@@ -81,17 +90,17 @@ def test_maxcut_qaoa_obj_fixed_angles_with_terms_and_precomputed_energies():
         optimal_cut, x = brute_force(obj, N, function_takes="bits")
         for p in range(1, max_p + 1):
             gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
-            for simulator in ["auto"]:
-                f1 = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
-                f2 = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, parameterization="gamma beta", simulator=simulator)
-                e1 = f1(gamma, beta)
-                e2 = f2(gamma, beta)
-                assert -1 * e1 / optimal_cut > AR
-                assert -1 * e2 / optimal_cut > AR
-                assert np.isclose(e1, e2)
+            f1 = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
+            f2 = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, parameterization="gamma beta", simulator=simulator)
+            e1 = f1(gamma, beta)
+            e2 = f2(gamma, beta)
+            assert -1 * e1 / optimal_cut > AR
+            assert -1 * e2 / optimal_cut > AR
+            assert np.isclose(e1, e2)
 
 
-def test_maxcut_weighted_qaoa_obj():
+@pytest.mark.parametrize("simulator", simulators_to_run_names)
+def test_maxcut_weighted_qaoa_obj(simulator):
     # The dataframe is a sample from '../qokit/assets/maxcut_datasets/weighted_Shaydulin_Lotshaw_2022.json'
     df = pd.read_json(Path(test_maxcut_folder, "sample_from_weighted_Shaydulin_Lotshaw_2022.json"), orient="index")
 
@@ -100,11 +109,20 @@ def test_maxcut_weighted_qaoa_obj():
         axis=1,
     )
     for _, row in df.iterrows():
-        for simulator in SIMULATOR_NAMES_X:
-            f = get_qaoa_maxcut_objective(row["G"].number_of_nodes(), row["p"], G=row["G"], parameterization="gamma beta", simulator=simulator)
-            assert np.isclose(-f(row["gamma"], row["beta"]), row["Expected cut of QAOA"])
+        f = get_qaoa_maxcut_objective(row["G"].number_of_nodes(), row["p"], G=row["G"], parameterization="gamma beta", simulator=simulator)
+        assert np.isclose(-f(row["gamma"], row["beta"]), row["Expected cut of QAOA"])
 
-        # Qiskit non-parameterized circuit must be tested separately
+
+def test_maxcut_weighted_qaoa_obj_qiskit_circuit():
+    # Qiskit non-parameterized circuit must be tested separately
+    # The dataframe is a sample from '../qokit/assets/maxcut_datasets/weighted_Shaydulin_Lotshaw_2022.json'
+    df = pd.read_json(Path(test_maxcut_folder, "sample_from_weighted_Shaydulin_Lotshaw_2022.json"), orient="index")
+
+    df["G"] = df.apply(
+        lambda row: nx.node_link_graph(row["G_json"]),
+        axis=1,
+    )
+    for _, row in df.iterrows():
         precomputed_cuts = precompute_energies(maxcut_obj, row["G"].number_of_nodes(), w=get_adjacency_matrix(row["G"]))
         qc = get_qaoa_circuit(row["G"], row["beta"], row["gamma"])
         qc_param = get_parameterized_qaoa_circuit(row["G"], row["p"]).bind_parameters(np.hstack([row["beta"], row["gamma"]]))
@@ -129,7 +147,8 @@ def test_maxcut_precompute(simclass):
     assert np.allclose(precomputed_cuts, cuts, atol=1e-6)
 
 
-def test_sk_ini_maxcut():
+@pytest.mark.parametrize("simulator", simulators_to_run_names)
+def test_sk_ini_maxcut(simulator):
     N = 10
     for d, max_p in [(3, 5), (5, 5)]:
         G = nx.random_regular_graph(d, N)
@@ -139,9 +158,8 @@ def test_sk_ini_maxcut():
         last_ar = 0
         for p in range(1, max_p + 1):
             gamma, beta = get_sk_gamma_beta(p)
-            for simulator in ["auto"]:
-                f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
-                cur_ar = -f(gamma / np.sqrt(d), beta) / optimal_cut
+            f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
+            cur_ar = -f(gamma / np.sqrt(d), beta) / optimal_cut
             if p == 1:
                 assert cur_ar > np.mean(precomputed_energies) / optimal_cut
             else:
