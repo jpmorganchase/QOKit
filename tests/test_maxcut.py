@@ -54,7 +54,7 @@ def test_maxcut_qaoa_obj_fixed_angles():
             gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
             for simulator in ["auto", "qiskit"]:
                 f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
-                assert abs(f(gamma, beta)) / optimal_cut > AR
+                assert -1 * f(gamma, beta) / optimal_cut > AR
 
 
 def test_maxcut_qaoa_obj_fixed_angles_with_terms_and_precomputed_energies():
@@ -71,8 +71,8 @@ def test_maxcut_qaoa_obj_fixed_angles_with_terms_and_precomputed_energies():
                 f2 = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, parameterization="gamma beta", simulator=simulator)
                 e1 = f1(gamma, beta)
                 e2 = f2(gamma, beta)
-                assert abs(e1) / optimal_cut > AR
-                assert abs(e2) / optimal_cut > AR
+                assert -1 * e1 / optimal_cut > AR
+                assert -1 * e2 / optimal_cut > AR
                 assert np.isclose(e1, e2)
 
 
@@ -87,7 +87,7 @@ def test_maxcut_weighted_qaoa_obj():
     for _, row in df.iterrows():
         for simulator in ["auto", "qiskit"]:
             f = get_qaoa_maxcut_objective(row["G"].number_of_nodes(), row["p"], G=row["G"], parameterization="gamma beta", simulator=simulator)
-            assert np.isclose(f(row["gamma"], row["beta"]), -row["Expected cut of QAOA"])
+            assert np.isclose(-f(row["gamma"], row["beta"]), row["Expected cut of QAOA"])
 
         # Qiskit non-parameterized circuit must be tested separately
         precomputed_cuts = precompute_energies(maxcut_obj, row["G"].number_of_nodes(), w=get_adjacency_matrix(row["G"]))
@@ -126,9 +126,9 @@ def test_sk_ini_maxcut():
             gamma, beta = get_sk_gamma_beta(p)
             for simulator in ["auto"]:
                 f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
-                cur_ar = f(gamma / np.sqrt(d), beta) / optimal_cut
+                cur_ar = -f(gamma / np.sqrt(d), beta) / optimal_cut
             if p == 1:
-                assert cur_ar < np.mean(precomputed_energies) / optimal_cut
+                assert cur_ar > np.mean(precomputed_energies) / optimal_cut
             else:
-                assert cur_ar < last_ar
+                assert cur_ar > last_ar
                 last_ar = cur_ar
