@@ -55,20 +55,6 @@ class TestBestParamsMatchValues:
 
 
 @pytest.mark.parametrize("simulator", simulators_to_run)
-def test_return_both_objectives(simulator):
-    N = 7
-    p = 4
-
-    theta = np.random.uniform(0, 1, 2 * p)
-
-    e1 = get_qaoa_labs_objective(N, p, objective="expectation", simulator=simulator)(theta)
-    o1 = get_qaoa_labs_objective(N, p, objective="overlap", simulator=simulator)(theta)
-    e2, o2 = get_qaoa_labs_objective(N, p, objective="expectation and overlap", simulator=simulator)(theta)
-    assert np.isclose(e1, e2)
-    assert np.isclose(o1, o2)
-
-
-@pytest.mark.parametrize("simulator", simulators_to_run)
 def test_best_known_LABS_parameters(simulator):
     N = 9
     p = 5

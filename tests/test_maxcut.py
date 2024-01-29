@@ -18,13 +18,14 @@ from qokit.qaoa_circuit_maxcut import get_qaoa_circuit, get_parameterized_qaoa_c
 from qokit.utils import brute_force, precompute_energies
 from qokit.parameter_utils import get_sk_gamma_beta, get_fixed_gamma_beta
 import qokit
-from qokit.fur import get_available_simulators
+from qokit.fur import get_available_simulators, get_available_simulator_names
 
 test_maxcut_folder = Path(__file__).parent
 
 
 qiskit_backend = AerSimulator(method="statevector")
 SIMULATORS = get_available_simulators("x") + get_available_simulators("xyring") + get_available_simulators("xycomplete")
+SIMULATOR_NAMES_X = get_available_simulator_names("x") + ["qiskit"]
 
 
 def test_maxcut_obj():
@@ -50,11 +51,25 @@ def test_maxcut_qaoa_obj_fixed_angles():
 
         obj = partial(maxcut_obj, w=get_adjacency_matrix(G))
         optimal_cut, x = brute_force(obj, N, function_takes="bits")
-        for p in range(1, max_p + 1):
-            gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
-            for simulator in ["auto", "qiskit"]:
-                f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
-                assert -1 * f(gamma, beta) / optimal_cut > AR
+        for simulator in SIMULATOR_NAMES_X:
+            last_overlap = 0
+            for p in range(1, max_p + 1):
+                gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
+                f_e = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator, objective="expectation")
+                f_o = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator, objective="overlap")
+                assert -1 * f_e(gamma, beta) / optimal_cut > AR
+                current_overlap = 1 - f_o(gamma, beta)
+                if current_overlap < 0.5:
+                    # high values of overlap are unreliable
+                    assert current_overlap > last_overlap
+                last_overlap = current_overlap
+        # test constistency across simulators
+        for objective in ["expectation", "overlap"]:
+            qaoa_objectives = [
+                get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator, objective=objective)(gamma, beta)
+                for simulator in SIMULATOR_NAMES_X
+            ]
+            assert np.all(np.isclose(qaoa_objectives, qaoa_objectives[0]))
 
 
 def test_maxcut_qaoa_obj_fixed_angles_with_terms_and_precomputed_energies():
@@ -85,7 +100,7 @@ def test_maxcut_weighted_qaoa_obj():
         axis=1,
     )
     for _, row in df.iterrows():
-        for simulator in ["auto", "qiskit"]:
+        for simulator in SIMULATOR_NAMES_X:
             f = get_qaoa_maxcut_objective(row["G"].number_of_nodes(), row["p"], G=row["G"], parameterization="gamma beta", simulator=simulator)
             assert np.isclose(-f(row["gamma"], row["beta"]), row["Expected cut of QAOA"])
 

@@ -46,10 +46,20 @@ def _get_qiskit_objective(
 
     elif objective == "overlap":
         if precomputed_optimal_bitstrings is None:
-            raise ValueError(f"precomputed_optimal_bitstrings are required when using the {objective} objective")
-
-        # extract locations of the optimal_bitstrings in 2**N
-        bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
+            if precomputed_objectives is None:
+                if terms is None:
+                    raise ValueError(f"precomputed_objectives or terms are required when using the {objective} objective")
+                else:
+                    precomputed_objectives = precompute_vectorized_cpu_parallel(terms, 0.0, N)
+            if optimization_type == "max":
+                precomputed_objectives = -1 * np.asarray(precomputed_objectives)
+            minval = precomputed_objectives.min()
+            bitstring_loc = (precomputed_objectives == minval).nonzero()
+            assert len(bitstring_loc) == 1
+            bitstring_loc = bitstring_loc[0]
+        else:
+            # extract locations of the optimal_bitstrings in 2**N
+            bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
 
         def compute_objective_from_probabilities(probabilities):  # type: ignore
             # compute overlap
@@ -58,30 +68,8 @@ def _get_qiskit_objective(
                 overlap += probabilities[bitstring_loc[i]]
             return 1 - overlap
 
-    elif objective == "expectation and overlap":
-        if precomputed_objectives is None:
-            raise ValueError(f"precomputed_objectives are required when using the {objective} objective")
-        if precomputed_optimal_bitstrings is None:
-            raise ValueError(f"precomputed_optimal_bitstrings are required when using the {objective} objective")
-
-        # extract locations of the optimal_bitstrings in 2**N
-        bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
-
-        def compute_objective_from_probabilities(probabilities):
-            # compute energy
-            if precomputed_objectives is None:
-                raise ValueError(f"precomputed_objectives are required when using the {objective} objective")
-            en = precomputed_objectives.dot(probabilities)
-            # compute overlap
-            overlap = 0
-            for i in range(len(bitstring_loc)):
-                overlap += probabilities[bitstring_loc[i]]
-            if optimization_type == "max":
-                (-1) * en, 1 - overlap
-            return en, 1 - overlap
-
     else:
-        raise ValueError(f"Unknown objective passed to get_qaoa_objective: {objective}, allowed ['expectation', 'overlap', 'expectation and overlap']")
+        raise ValueError(f"Unknown objective passed to get_qaoa_objective: {objective}, allowed ['expectation', 'overlap']")
 
     if mixer == "x":
         backend = Aer.get_backend("aer_simulator_statevector")
@@ -141,7 +129,6 @@ def get_qaoa_objective(
     objective : str
         If objective == 'expectation', then returns f(theta) = - < theta | C_{LABS} | theta > (minus for minimization)
         If objective == 'overlap', then returns f(theta) = 1 - Overlap |<theta|optimal_bitstring>|^2 (1-overlap for minimization)
-        If objective == 'expectation and overlap', then returns a tuple (expectation, overlap)
     simulator : str
         If simulator == 'auto', implementation is chosen automatically
             (either the fastest CPU simulator or a GPU simulator if CUDA is available)
@@ -206,10 +193,6 @@ def get_qaoa_objective(
         elif objective == "overlap":
             overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=False, optimization_type=optimization_type)
             return 1 - overlap
-        elif objective == "expectation and overlap":
-            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=True, optimization_type=optimization_type)
-            expectation = sim.get_expectation(result, costs=precomputed_costs, optimization_type=optimization_type)
-            return expectation, 1 - overlap
 
     return f
 

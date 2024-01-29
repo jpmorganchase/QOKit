@@ -69,7 +69,7 @@ def get_qaoa_portfolio_objective(
     else:
         raise ValueError(f"Unknown mixer passed to get_qaoa_portfolio_objective: {mixer}, allowed ['trotter_ring']")
 
-    if objective in ["overlap", "expectation and overlap"] and precomputed_optimal_bitstrings is None:
+    if objective == "overlap" and precomputed_optimal_bitstrings is None:
         bf_result = portfolio_brute_force(po_problem, return_bitstring=True)
         precomputed_optimal_bitstrings = bf_result[1].reshape(1, -1)
         assert precomputed_optimal_bitstrings.shape[1] == N  # only one optimal bitstring
