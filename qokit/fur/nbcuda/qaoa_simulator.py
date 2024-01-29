@@ -73,11 +73,13 @@ class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
         norm_squared(result)
         return result.copy_to_host().real
 
-    def get_expectation(self, result: DeviceArray, costs: DeviceArray | np.ndarray | None = None, **kwargs) -> float:
+    def get_expectation(self, result: DeviceArray, costs: DeviceArray | np.ndarray | None = None, optimization_type="min", **kwargs) -> float:
         if costs is None:
             costs = self._hc_diag
         else:
             costs = self._diag_from_costs(costs)
+        if optimization_type == "max":
+            costs = costs = -1 * np.asarray(costs)
         preserve_state = kwargs.get("preserve_state", True)
         if preserve_state:
             result_orig = result
@@ -87,7 +89,9 @@ class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
         multiply(result, costs)
         return sum_reduce(result).real  # type: ignore
 
-    def get_overlap(self, result: DeviceArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, **kwargs) -> float:
+    def get_overlap(
+        self, result: DeviceArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs
+    ) -> float:
         """
         Compute the overlap between the statevector and the ground state
 
@@ -114,6 +118,8 @@ class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
             else:
                 costs_t = self._diag_from_costs(costs)
 
+            if optimization_type == "max":
+                costs_t = -1 * np.asarray(costs_t)
             # pass without copy
             costs_t: cp.ndarray = cp.asarray(costs_t)
             minval = costs_t.min()

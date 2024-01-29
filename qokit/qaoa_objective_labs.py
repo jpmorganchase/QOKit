@@ -167,7 +167,6 @@ def get_qaoa_labs_objective(
     objective : str
         If objective == 'expectation', then returns f(theta) = - < theta | C_{LABS} | theta > (minus for minimization)
         If objective == 'overlap', then returns f(theta) = 1 - Overlap |<theta|optimal_bitstring>|^2 (1-overlap for minimization)
-        If objective == 'expectation and overlap', then returns a tuple (expectation, overlap)
     precomputed_optimal_bitstrings : np.ndarray
         precomputed optimal bit strings to compute the QAOA overlap
     simulator : str
@@ -189,10 +188,14 @@ def get_qaoa_labs_objective(
     if precomputed_negative_merit_factors is None:
         precomputed_negative_merit_factors = get_precomputed_labs_merit_factors(N)
 
-    if objective in ["overlap", "expectation and overlap"] and precomputed_optimal_bitstrings is None:
-        precomputed_optimal_bitstrings = get_precomputed_optimal_bitstrings(N)
-
-    precomputed_diagonal_hamiltonian = -(N**2) / (2 * precomputed_negative_merit_factors) - offset
+    if simulator == "qiskit":
+        assert p is not None, "p must be passed if simulator == 'qiskit'"
+        terms, _ = get_energy_term_indices(N)
+        parameterized_circuit = get_parameterized_qaoa_circuit(N, terms, p)
+        precomputed_diagonal_hamiltonian = None
+    else:
+        parameterized_circuit = None
+        precomputed_diagonal_hamiltonian = -(N**2) / (2 * precomputed_negative_merit_factors) - offset
 
     return get_qaoa_objective(
         N=N,
@@ -200,6 +203,7 @@ def get_qaoa_labs_objective(
         precomputed_diagonal_hamiltonian=precomputed_diagonal_hamiltonian,
         precomputed_costs=precomputed_negative_merit_factors,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
+        parameterized_circuit=parameterized_circuit,
         parameterization=parameterization,
         objective=objective,
         simulator=simulator,

@@ -18,17 +18,7 @@ from qokit.parameter_utils import QAOAParameterization
 from .qaoa_circuit_portfolio import measure_circuit
 from .utils import reverse_array_index_bit_order
 
-
-def precompute_terms(terms, N):
-    from qokit.fur.mpi_nbcuda.qaoa_simulator import get_costs
-
-    if numba.cuda.is_available():
-        energies = get_costs(terms, N)
-        # TODO: expectation target may be different
-        return energies.copy_to_host(), energies
-    else:
-        # TODO implement CPU version
-        raise NotImplementedError("Terms precomputation is only available for GPU")
+from .fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
 
 
 def _get_qiskit_objective(
@@ -39,6 +29,7 @@ def _get_qiskit_objective(
     terms=None,
     parameterization: str | QAOAParameterization = "theta",
     mixer: str = "x",
+    optimization_type="min",
 ):
     N = parameterized_circuit.num_qubits
     if objective == "expectation":
@@ -46,17 +37,29 @@ def _get_qiskit_objective(
             if terms is None:
                 raise ValueError(f"precomputed_objectives or terms are required when using the {objective} objective")
             else:
-                precomputed_objectives, precomputed_diagonal_hamiltonian = precompute_terms(terms, N)
+                precomputed_objectives = precompute_vectorized_cpu_parallel(terms, 0.0, N)
 
         def compute_objective_from_probabilities(probabilities):  # type: ignore
+            if optimization_type == "max":
+                return -1 * precomputed_objectives.dot(probabilities)
             return precomputed_objectives.dot(probabilities)
 
     elif objective == "overlap":
         if precomputed_optimal_bitstrings is None:
-            raise ValueError(f"precomputed_optimal_bitstrings are required when using the {objective} objective")
-
-        # extract locations of the optimal_bitstrings in 2**N
-        bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
+            if precomputed_objectives is None:
+                if terms is None:
+                    raise ValueError(f"precomputed_objectives or terms are required when using the {objective} objective")
+                else:
+                    precomputed_objectives = precompute_vectorized_cpu_parallel(terms, 0.0, N)
+            if optimization_type == "max":
+                precomputed_objectives = -1 * np.asarray(precomputed_objectives)
+            minval = precomputed_objectives.min()
+            bitstring_loc = (precomputed_objectives == minval).nonzero()
+            assert len(bitstring_loc) == 1
+            bitstring_loc = bitstring_loc[0]
+        else:
+            # extract locations of the optimal_bitstrings in 2**N
+            bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
 
         def compute_objective_from_probabilities(probabilities):  # type: ignore
             # compute overlap
@@ -65,28 +68,8 @@ def _get_qiskit_objective(
                 overlap += probabilities[bitstring_loc[i]]
             return 1 - overlap
 
-    elif objective == "expectation and overlap":
-        if precomputed_objectives is None:
-            raise ValueError(f"precomputed_objectives are required when using the {objective} objective")
-        if precomputed_optimal_bitstrings is None:
-            raise ValueError(f"precomputed_optimal_bitstrings are required when using the {objective} objective")
-
-        # extract locations of the optimal_bitstrings in 2**N
-        bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
-
-        def compute_objective_from_probabilities(probabilities):
-            # compute energy
-            if precomputed_objectives is None:
-                raise ValueError(f"precomputed_objectives are required when using the {objective} objective")
-            en = precomputed_objectives.dot(probabilities)
-            # compute overlap
-            overlap = 0
-            for i in range(len(bitstring_loc)):
-                overlap += probabilities[bitstring_loc[i]]
-            return en, 1 - overlap
-
     else:
-        raise ValueError(f"Unknown objective passed to get_qaoa_objective: {objective}, allowed ['expectation', 'overlap', 'expectation and overlap']")
+        raise ValueError(f"Unknown objective passed to get_qaoa_objective: {objective}, allowed ['expectation', 'overlap']")
 
     if mixer == "x":
         backend = Aer.get_backend("aer_simulator_statevector")
@@ -127,6 +110,7 @@ def get_qaoa_objective(
     mixer: str = "x",
     initial_state: np.ndarray | None = None,
     n_trotters: int = 1,
+    optimization_type="min",
 ) -> typing.Callable:
     """Return QAOA objective to be minimized
 
@@ -145,7 +129,6 @@ def get_qaoa_objective(
     objective : str
         If objective == 'expectation', then returns f(theta) = - < theta | C_{LABS} | theta > (minus for minimization)
         If objective == 'overlap', then returns f(theta) = 1 - Overlap |<theta|optimal_bitstring>|^2 (1-overlap for minimization)
-        If objective == 'expectation and overlap', then returns a tuple (expectation, overlap)
     simulator : str
         If simulator == 'auto', implementation is chosen automatically
             (either the fastest CPU simulator or a GPU simulator if CUDA is available)
@@ -166,7 +149,16 @@ def get_qaoa_objective(
 
     # -- Qiskit edge case
     if simulator == "qiskit":
-        g = _get_qiskit_objective(parameterized_circuit, precomputed_costs, precomputed_optimal_bitstrings, objective, terms, parameterization, mixer)
+        g = _get_qiskit_objective(
+            parameterized_circuit,
+            precomputed_costs,
+            precomputed_optimal_bitstrings,
+            objective,
+            terms,
+            parameterization,
+            mixer,
+            optimization_type=optimization_type,
+        )
 
         def fq(*args):
             gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
@@ -193,16 +185,14 @@ def get_qaoa_objective(
     # -- Final function
     def f(*args):
         gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
+        # print(f"gamma:{gamma}, beta:{beta},initial_state:{initial_state}, n_trotters:{n_trotters}")
         result = sim.simulate_qaoa(gamma, beta, initial_state, n_trotters=n_trotters)
+        # print(f"result : {result}")
         if objective == "expectation":
-            return sim.get_expectation(result, costs=precomputed_costs, preserve_state=False)
+            return sim.get_expectation(result, costs=precomputed_costs, preserve_state=False, optimization_type=optimization_type)
         elif objective == "overlap":
-            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=False)
+            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=False, optimization_type=optimization_type)
             return 1 - overlap
-        elif objective == "expectation and overlap":
-            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=True)
-            expectation = sim.get_expectation(result, costs=precomputed_costs)
-            return expectation, 1 - overlap
 
     return f
 

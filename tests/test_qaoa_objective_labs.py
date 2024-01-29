@@ -18,7 +18,7 @@ from qokit.parameter_utils import get_best_known_parameters_for_LABS_wrt_overlap
 
 test_objectives_folder = Path(__file__).parent
 
-simulators_to_run = get_available_simulator_names("x")
+simulators_to_run = get_available_simulator_names("x") + ["qiskit"]
 
 
 class TestBestParamsMatchValues:
@@ -52,20 +52,6 @@ class TestBestParamsMatchValues:
                 assert np.isclose(
                     f(x), convert_result(row[col_name])
                 ), f'Output values from simulator "{simulator}" and objective "{objective}" do not match with known values'
-
-
-@pytest.mark.parametrize("simulator", simulators_to_run)
-def test_return_both_objectives(simulator):
-    N = 7
-    p = 4
-
-    theta = np.random.uniform(0, 1, 2 * p)
-
-    e1 = get_qaoa_labs_objective(N, p, objective="expectation", simulator=simulator)(theta)
-    o1 = get_qaoa_labs_objective(N, p, objective="overlap", simulator=simulator)(theta)
-    e2, o2 = get_qaoa_labs_objective(N, p, objective="expectation and overlap", simulator=simulator)(theta)
-    assert np.isclose(e1, e2)
-    assert np.isclose(o1, o2)
 
 
 @pytest.mark.parametrize("simulator", simulators_to_run)

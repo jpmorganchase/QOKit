@@ -55,6 +55,7 @@ def get_qaoa_maxcut_objective(
         Function returning the negative of expected value of QAOA with parameters theta
     """
     terms = None
+    optimization_type = "max"
 
     if precomputed_cuts is not None and G is not None:
         warnings.warn("If precomputed_cuts is passed, G is ignored")
@@ -69,17 +70,17 @@ def get_qaoa_maxcut_objective(
         parameterized_circuit = get_parameterized_qaoa_circuit(G, p)
     else:
         parameterized_circuit = None
-    # Reverse the sign as get_qaoa_objective assumes that the problem is minimization
-    precomputed_costs = precomputed_cuts * -1 if precomputed_cuts is not None else None
+
     return get_qaoa_objective(
         N=N,
         p=p,
         precomputed_diagonal_hamiltonian=precomputed_cuts,
-        precomputed_costs=precomputed_costs,
+        precomputed_costs=precomputed_cuts,
         terms=terms,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
         parameterized_circuit=parameterized_circuit,
         parameterization=parameterization,
         objective=objective,
         simulator=simulator,
+        optimization_type=optimization_type,
     )

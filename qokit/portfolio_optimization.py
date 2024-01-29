@@ -1,6 +1,7 @@
 """
 Helper functions for the portfolio optimization problem
 """
+
 from __future__ import annotations
 from collections.abc import Sequence
 import numpy as np
@@ -29,6 +30,7 @@ def get_configuration_cost(po_problem, config):
     scale = po_problem["scale"]
     means = po_problem["means"] / scale
     cov = po_problem["cov"] / scale
+
     return po_problem["q"] * config.dot(cov).dot(config) - means.dot(config)
 
 
@@ -92,12 +94,7 @@ def get_data(N, seed=1, real=False) -> tuple[float, float]:
     for i in range(N):
         tickers.append("t" + str(i))
     if real is False:
-        data = RandomDataProvider(
-            tickers=tickers,
-            start=datetime.datetime(2016, 1, 1),
-            end=datetime.datetime(2016, 1, 30),
-            seed=seed,
-        )
+        data = RandomDataProvider(tickers=tickers, start=datetime.datetime(2016, 1, 1), end=datetime.datetime(2016, 1, 30), seed=seed)
     else:
         stock_symbols = [
             "AAPL",
@@ -275,7 +272,7 @@ def get_sk_ini(p: int):
     """
     scaled the sk look-up table for the application of portfolio optimziation
     """
-    gamma_scale, beta_scale = 0.5, 1
+    gamma_scale, beta_scale = -0.5, 1
     gamma, beta = get_sk_gamma_beta(p, parameterization="gamma beta")
     scaled_gamma, scaled_beta = gamma_scale * gamma, beta_scale * beta
     X0 = np.concatenate((scaled_gamma, scaled_beta), axis=0)
