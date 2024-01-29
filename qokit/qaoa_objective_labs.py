@@ -188,7 +188,14 @@ def get_qaoa_labs_objective(
     if precomputed_negative_merit_factors is None:
         precomputed_negative_merit_factors = get_precomputed_labs_merit_factors(N)
 
-    precomputed_diagonal_hamiltonian = -(N**2) / (2 * precomputed_negative_merit_factors) - offset
+    if simulator == "qiskit":
+        assert p is not None, "p must be passed if simulator == 'qiskit'"
+        terms, _ = get_energy_term_indices(N)
+        parameterized_circuit = get_parameterized_qaoa_circuit(N, terms, p)
+        precomputed_diagonal_hamiltonian = None
+    else:
+        parameterized_circuit = None
+        precomputed_diagonal_hamiltonian = -(N**2) / (2 * precomputed_negative_merit_factors) - offset
 
     return get_qaoa_objective(
         N=N,
@@ -196,6 +203,7 @@ def get_qaoa_labs_objective(
         precomputed_diagonal_hamiltonian=precomputed_diagonal_hamiltonian,
         precomputed_costs=precomputed_negative_merit_factors,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
+        parameterized_circuit=parameterized_circuit,
         parameterization=parameterization,
         objective=objective,
         simulator=simulator,

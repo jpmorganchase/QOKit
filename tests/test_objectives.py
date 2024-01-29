@@ -18,7 +18,7 @@ from qokit.parameter_utils import get_best_known_parameters_for_LABS_wrt_overlap
 
 test_objectives_folder = Path(__file__).parent
 
-simulators_to_run = get_available_simulator_names("x")
+simulators_to_run = get_available_simulator_names("x") + ["qiskit"]
 
 
 class TestBestParamsMatchValues:
