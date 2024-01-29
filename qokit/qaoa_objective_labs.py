@@ -44,10 +44,12 @@ class PrecomputedLABSHandler:
         else:
             # precompute
             if N > 10 and N <= 24:
-                raise RuntimeError(f"""
+                raise RuntimeError(
+                    f"""
 Failed to load from {fpath}, attempting to recompute for N={N},
 Precomputed energies should be loaded from disk instead. Run assets/load_assets_from_s3.sh to obtain precomputed energies
-                    """)
+                    """
+                )
             ens = precompute_energies(negative_merit_factor_from_bitstring, N)
         self.precomputed_merit_factors_dict[N] = ens
         return ens
