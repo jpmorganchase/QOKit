@@ -180,7 +180,7 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
         else:
             costs = self._diag_from_costs(costs)
         if optimization_type == "max":
-            costs = costs = -1 * np.asarray(costs)
+            costs = -1 * np.asarray(costs)
         preserve_state = kwargs.get("preserve_state", True)
         if preserve_state:
             result_orig = result
