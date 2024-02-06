@@ -56,7 +56,7 @@ def get_qaoa_circuit(G: nx.Graph, betas: Sequence, gammas: Sequence, save_statev
         Quantum circuit implementing QAOA
     """
     assert len(betas) == len(gammas)
-    p = len(betas)  # infering number of QAOA steps from the parameters passed
+    p = len(betas)  # inferring number of QAOA steps from the parameters passed
     N = G.number_of_nodes()
     if qr is not None:
         assert qr.size >= N
@@ -72,8 +72,8 @@ def get_qaoa_circuit(G: nx.Graph, betas: Sequence, gammas: Sequence, save_statev
     qc.h(range(N))
     # second, apply p alternating operators
     for i in range(p):
-        append_maxcut_cost_operator_circuit(qc, G, gammas[i])
-        append_mixer_operator_circuit(qc, G, betas[i])
+        append_mixer_operator_circuit(qc, G, betas[i])  # Mixer operator
+        append_maxcut_cost_operator_circuit(qc, G, gammas[i])  # MaxCut cost operator
     if save_statevector:
         qc.save_statevector()
     return qc
