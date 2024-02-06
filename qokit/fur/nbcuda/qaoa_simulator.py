@@ -118,9 +118,6 @@ class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
                 costs_t = self._hc_diag
             else:
                 costs_t = self._diag_from_costs(costs)
-
-            if optimization_type == "max":
-                costs_t = -1 * cp.asarray(costs_t)
             # pass without copy
             costs_t: cp.ndarray = cp.asarray(costs_t)
             if optimization_type == "max":
