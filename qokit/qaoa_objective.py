@@ -185,9 +185,7 @@ def get_qaoa_objective(
     # -- Final function
     def f(*args):
         gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
-        # print(f"gamma:{gamma}, beta:{beta},initial_state:{initial_state}, n_trotters:{n_trotters}")
         result = sim.simulate_qaoa(gamma, beta, initial_state, n_trotters=n_trotters)
-        # print(f"result : {result}")
         if objective == "expectation":
             return sim.get_expectation(result, costs=precomputed_costs, preserve_state=False, optimization_type=optimization_type)
         elif objective == "overlap":

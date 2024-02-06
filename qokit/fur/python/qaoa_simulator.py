@@ -93,9 +93,10 @@ class QAOAFastSimulatorPythonBase(QAOAFastSimulatorBase):
             else:
                 costs = self._diag_from_costs(costs)
             if optimization_type == "max":
-                costs = -1 * np.asarray(costs)
-            minval = costs.min()
-            indices = (costs == minval).nonzero()
+                val = costs.max()
+            else:
+                val = costs.min()
+            indices = (costs == val).nonzero()
         return probs[indices].sum()
 
 

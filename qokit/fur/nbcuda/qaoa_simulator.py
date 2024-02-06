@@ -78,8 +78,6 @@ class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
             costs = self._hc_diag
         else:
             costs = self._diag_from_costs(costs)
-        if optimization_type == "max":
-            costs = costs = -1 * np.asarray(costs)
         preserve_state = kwargs.get("preserve_state", True)
         if preserve_state:
             result_orig = result
@@ -87,7 +85,10 @@ class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
             copy(result, result_orig)
         norm_squared(result)
         multiply(result, costs)
-        return sum_reduce(result).real  # type: ignore
+        if optimization_type == "max":
+            return -1 * sum_reduce(result).real  # type: ignore
+        else:
+            return sum_reduce(result).real
 
     def get_overlap(
         self, result: DeviceArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs
@@ -117,13 +118,13 @@ class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
                 costs_t = self._hc_diag
             else:
                 costs_t = self._diag_from_costs(costs)
-
-            if optimization_type == "max":
-                costs_t = -1 * np.asarray(costs_t)
             # pass without copy
             costs_t: cp.ndarray = cp.asarray(costs_t)
-            minval = costs_t.min()
-            indices_sel = costs_t == minval
+            if optimization_type == "max":
+                val = costs_t.max()
+            else:
+                val = costs_t.min()
+            indices_sel = costs_t == val
         else:
             indices_sel = indices
         return probs[indices_sel].sum()

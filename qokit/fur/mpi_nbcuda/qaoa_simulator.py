@@ -179,8 +179,6 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
             costs = self._hc_diag
         else:
             costs = self._diag_from_costs(costs)
-        if optimization_type == "max":
-            costs = costs = -1 * np.asarray(costs)
         preserve_state = kwargs.get("preserve_state", True)
         if preserve_state:
             result_orig = result
@@ -190,7 +188,10 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
         multiply(result, costs)
         local_sum = sum_reduce(result).real  # type: ignore
         global_sum = self._comm.allreduce(local_sum, op=MPI.SUM)
-        return global_sum
+        if optimization_type == "max":
+            return -1 * global_sum
+        else:
+            return global_sum
 
     def get_overlap(
         self, result: DeviceArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs
@@ -216,7 +217,6 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
             costs_host = np.asarray(costs)
         if optimization_type == "max":
             costs_host = -1 * np.asarray(costs_host)
-
         return self._get_optimum_overlap(probs, costs_host, broadcast=broadcast)
 
 

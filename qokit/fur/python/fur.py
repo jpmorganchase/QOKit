@@ -36,7 +36,6 @@ def furx_all(x: np.ndarray, theta: float, n_qubits: int) -> np.ndarray:
     """
     for i in range(n_qubits):
         furx(x, theta, i)
-    # print(f"x:{x}")
     return x
 
 
