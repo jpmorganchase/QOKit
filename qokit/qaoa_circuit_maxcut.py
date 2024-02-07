@@ -31,16 +31,16 @@ def append_mixer_operator_circuit(qc, G, beta):
         append_x_term(qc, n, beta)
 
 
-def get_qaoa_circuit(G: nx.Graph, betas: Sequence, gammas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
+def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
     """Generates a circuit for weighted MaxCut on graph G.
     Parameters
     ----------
     G : networkx.Graph
         Graph to solve MaxCut on
-    beta : list-like
-        QAOA parameter beta
-    gamma : list-like
+    gammas : list-like
         QAOA parameter gamma
+    betas : list-like
+        QAOA parameter beta
     save_statevector : bool, default True
         Add save state instruction to the end of the circuit
     qr : qiskit.QuantumRegister, default None
@@ -72,8 +72,8 @@ def get_qaoa_circuit(G: nx.Graph, betas: Sequence, gammas: Sequence, save_statev
     qc.h(range(N))
     # second, apply p alternating operators
     for i in range(p):
-        append_mixer_operator_circuit(qc, G, betas[i])  # Mixer operator
-        append_maxcut_cost_operator_circuit(qc, G, gammas[i])  # MaxCut cost operator
+        append_maxcut_cost_operator_circuit(qc, G, gammas[i])
+        append_mixer_operator_circuit(qc, G, betas[i])
     if save_statevector:
         qc.save_statevector()
     return qc
@@ -134,6 +134,6 @@ def get_parameterized_qaoa_circuit(
     if save_statevector:
         qc.save_statevector()
     if return_parameter_vectors:
-        return qc, betas, gammas
+        return qc, gammas, betas
     else:
         return qc
