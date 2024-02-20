@@ -3,10 +3,12 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 from __future__ import annotations
-import typing
-import numpy as np
-from abc import ABC, abstractmethod
+
 import sys
+import typing
+from abc import ABC, abstractmethod
+
+import numpy as np
 
 # Terms are a list of tuples (coeff, [qubit indices])
 # Run this only for python> 3.9
@@ -139,6 +141,21 @@ class QAOAFastSimulatorBase(ABC):
             result: obtained from `sim.simulate_qaoa`
             costs: (optional) array containing values of the cost function at
                 each computational basis state. Accepted types depend on the implementation.
+            **kwargs : additional arguments for the simulator depending on the implementation
+        """
+        ...
+
+    @abstractmethod
+    def get_std(self, result, costs: typing.Any = None, **kwargs) -> float:
+        """
+        Return the standard deviation of the expectation of the cost Hamiltonian
+
+        Parameters
+        ----------
+            result: obtained from `sim.simulate_qaoa`
+            costs: (optional) array containing values of the cost function at
+                each computational basis state. Accepted types depend on the implementation.
+            **kwargs : additional arguments for the simulator depending on the implementation
         """
         ...
 
@@ -166,6 +183,7 @@ class QAOAFastSimulatorBase(ABC):
         Parameters
         ----------
             result: obtained from `sim.simulate_qaoa`
+            **kwargs : additional arguments for the simulator depending on the implementation
         """
         ...
 
@@ -177,5 +195,6 @@ class QAOAFastSimulatorBase(ABC):
         Parameters
         ----------
             result: obtained from `sim.simulate_qaoa`
+            **kwargs : additional arguments for the simulator depending on the implementation
         """
         ...

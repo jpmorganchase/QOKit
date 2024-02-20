@@ -3,20 +3,25 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 from __future__ import annotations
+
+import math
 import typing
 from collections.abc import Sequence
-import numpy as np
-import math
+
 import numba.cuda
+import numpy as np
 
 from qokit.fur.nbcuda.qaoa_simulator import DeviceArray
-from ..lazy_import import MPI
 
-from ..nbcuda.qaoa_simulator import QAOAFastSimulatorGPUBase, CostsType, TermsType, ParamType
-from ..nbcuda.utils import norm_squared, initialize_uniform, multiply, sum_reduce, copy
 from ..diagonal_precomputation import precompute_gpu
-from .qaoa_fur import apply_qaoa_furx  # , apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
+from ..lazy_import import MPI
+from ..nbcuda.qaoa_simulator import (CostsType, ParamType,
+                                     QAOAFastSimulatorGPUBase, TermsType)
+from ..nbcuda.utils import (copy, initialize_uniform, multiply, norm_squared,
+                            sum_reduce)
 from .compute_costs import compute_costs, zero_init
+from .qaoa_fur import \
+    apply_qaoa_furx  # , apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
 
 
 def mpi_available(allow_single_process=False):
@@ -192,6 +197,34 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
             return -1 * global_sum
         else:
             return global_sum
+
+    def get_std(self, result: DeviceArray, costs: CostsType | None = None, **kwargs) -> float:
+        if costs is None:
+            preserve_costs = kwargs.get("preserve_costs", True)
+            if preserve_costs:
+                costs = numba.cuda.device_array_like(self._hc_diag)
+                copy(costs, self._hc_diag)
+            else:
+                costs = self._hc_diag
+        else:
+            costs = self._diag_from_costs(costs)
+        preserve_state = kwargs.get("preserve_state", True)
+        if preserve_state:
+            result_orig = result
+            result = numba.cuda.device_array_like(result_orig)
+            copy(result, result_orig)
+        norm_squared(result)
+        probs = numba.cuda.device_array_like(result)
+        copy(probs, result)
+        multiply(probs, costs)
+        local_sum = sum_reduce(probs).real  # type: ignore
+        exp = self._comm.allreduce(local_sum, op=MPI.SUM)
+        del probs
+        norm_squared(costs)
+        multiply(result, costs)
+        local_sum = sum_reduce(result).real  # type: ignore
+        global_sum = self._comm.allreduce(local_sum, op=MPI.SUM)
+        return np.sqrt(max(global_sum - exp**2, 0))
 
     def get_overlap(
         self, result: DeviceArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs

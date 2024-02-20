@@ -3,11 +3,16 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 from __future__ import annotations
+
 from collections.abc import Sequence
+
 import numpy as np
-from ..qaoa_simulator_base import QAOAFastSimulatorBase, CostsType, TermsType, ParamType
+
 from ..diagonal_precomputation import precompute_vectorized_cpu_parallel
-from .qaoa_fur import apply_qaoa_furx, apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
+from ..qaoa_simulator_base import (CostsType, ParamType, QAOAFastSimulatorBase,
+                                   TermsType)
+from .qaoa_fur import (apply_qaoa_furx, apply_qaoa_furxy_complete,
+                       apply_qaoa_furxy_ring)
 
 
 def little_to_big_endian(arr):
@@ -72,6 +77,12 @@ class QAOAFastSimulatorPythonBase(QAOAFastSimulatorBase):
         if optimization_type == "max":
             return -1 * np.dot(costs, np.abs(result) ** 2)
         return np.dot(costs, np.abs(result) ** 2)
+
+    def get_std(self, result: np.ndarray, costs: np.ndarray | None = None, **kwargs) -> float:
+        if costs is None:
+            costs = self._hc_diag
+        probs = np.abs(result) ** 2
+        return np.sqrt(max(np.dot(costs**2, probs) - np.dot(costs, probs) ** 2, 0))
 
     def get_overlap(
         self, result: np.ndarray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs

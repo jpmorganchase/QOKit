@@ -3,14 +3,16 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 from __future__ import annotations
+
 from collections.abc import Sequence
+
 import numpy as np
 
-from ..qaoa_simulator_base import QAOAFastSimulatorBase, CostsType, TermsType, ParamType
 from ..diagonal_precomputation import precompute_vectorized_cpu_parallel
-
-from .gates import ComplexArray
+from ..qaoa_simulator_base import (CostsType, ParamType, QAOAFastSimulatorBase,
+                                   TermsType)
 from . import csim
+from .gates import ComplexArray
 
 
 class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
@@ -58,6 +60,12 @@ class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
         if optimization_type == "max":
             costs = -1 * np.asarray(costs)
         return np.dot(costs, self.get_probabilities(result, **kwargs))
+
+    def get_std(self, result: ComplexArray, costs: np.ndarray | None = None, **kwargs) -> float:
+        if costs is None:
+            costs = self._hc_diag
+        probs = self.get_probabilities(result)
+        return np.sqrt(max(np.dot(costs**2, probs) - np.dot(costs, probs) ** 2, 0))
 
     def get_overlap(
         self, result: ComplexArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs

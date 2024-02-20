@@ -3,18 +3,21 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 from __future__ import annotations
-from collections.abc import Sequence
-import numpy as np
-import numba.cuda
+
 import warnings
+from collections.abc import Sequence
+
+import numba.cuda
+import numpy as np
 
 from qokit.fur.qaoa_simulator_base import TermsType
 
-from ..qaoa_simulator_base import QAOAFastSimulatorBase, ParamType, CostsType, TermsType
-from .qaoa_fur import apply_qaoa_furx, apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
 from ..diagonal_precomputation import precompute_gpu
-from .utils import norm_squared, initialize_uniform, multiply, sum_reduce, copy
-
+from ..qaoa_simulator_base import (CostsType, ParamType, QAOAFastSimulatorBase,
+                                   TermsType)
+from .qaoa_fur import (apply_qaoa_furx, apply_qaoa_furxy_complete,
+                       apply_qaoa_furxy_ring)
+from .utils import copy, initialize_uniform, multiply, norm_squared, sum_reduce
 
 DeviceArray = numba.cuda.devicearray.DeviceNDArray
 
@@ -89,6 +92,31 @@ class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
             return -1 * sum_reduce(result).real  # type: ignore
         else:
             return sum_reduce(result).real
+
+    def get_std(self, result: DeviceArray, costs: DeviceArray | np.ndarray | None = None, **kwargs) -> float:
+        if costs is None:
+            costs = self._hc_diag
+        else:
+            costs = self._diag_from_costs(costs)
+        preserve_costs = kwargs.get("preserve_costs", True)
+        if preserve_costs:
+            costs_orig = costs
+            costs = numba.cuda.device_array_like(self._hc_diag)
+            copy(costs, costs_orig)
+        preserve_state = kwargs.get("preserve_state", True)
+        if preserve_state:
+            result_orig = result
+            result = numba.cuda.device_array_like(result_orig)
+            copy(result, result_orig)
+        norm_squared(result)
+        probs = numba.cuda.device_array_like(result)
+        copy(probs, result)
+        multiply(probs, costs)
+        exp = sum_reduce(probs).real  # type: ignore
+        del probs
+        norm_squared(costs)
+        multiply(result, costs)
+        return np.sqrt(max(sum_reduce(result).real - exp**2, 0))  # type: ignore
 
     def get_overlap(
         self, result: DeviceArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs
