@@ -14,7 +14,7 @@ import numpy as np
 from qokit.fur.nbcuda.qaoa_simulator import DeviceArray
 
 from ..diagonal_precomputation import precompute_gpu
-from ..lazy_import import MPI
+from ..lazy_import import MPI, pkl5
 from ..nbcuda.qaoa_simulator import (CostsType, ParamType,
                                      QAOAFastSimulatorGPUBase, TermsType)
 from ..nbcuda.utils import (copy, initialize_uniform, multiply, norm_squared,
@@ -71,7 +71,7 @@ def get_costs(terms, N, rank=0):
 
 class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
     def __init__(self, n_qubits: int, costs: CostsType | None = None, terms: TermsType | None = None) -> None:
-        self._comm = MPI.COMM_WORLD
+        self._comm = pkl5.Intracomm(MPI.COMM_WORLD)
         self._rank = self._comm.Get_rank()
         self._size = self._comm.Get_size()
         _set_gpu_device_roundrobin()
