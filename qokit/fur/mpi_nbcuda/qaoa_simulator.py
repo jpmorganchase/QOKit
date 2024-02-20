@@ -15,13 +15,10 @@ from qokit.fur.nbcuda.qaoa_simulator import DeviceArray
 
 from ..diagonal_precomputation import precompute_gpu
 from ..lazy_import import MPI, pkl5
-from ..nbcuda.qaoa_simulator import (CostsType, ParamType,
-                                     QAOAFastSimulatorGPUBase, TermsType)
-from ..nbcuda.utils import (copy, initialize_uniform, multiply, norm_squared,
-                            sum_reduce)
+from ..nbcuda.qaoa_simulator import CostsType, ParamType, QAOAFastSimulatorGPUBase, TermsType
+from ..nbcuda.utils import copy, initialize_uniform, multiply, norm_squared, sum_reduce
 from .compute_costs import compute_costs, zero_init
-from .qaoa_fur import \
-    apply_qaoa_furx  # , apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
+from .qaoa_fur import apply_qaoa_furx  # , apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
 
 
 def mpi_available(allow_single_process=False):

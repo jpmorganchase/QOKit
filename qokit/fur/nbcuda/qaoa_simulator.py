@@ -13,10 +13,8 @@ import numpy as np
 from qokit.fur.qaoa_simulator_base import TermsType
 
 from ..diagonal_precomputation import precompute_gpu
-from ..qaoa_simulator_base import (CostsType, ParamType, QAOAFastSimulatorBase,
-                                   TermsType)
-from .qaoa_fur import (apply_qaoa_furx, apply_qaoa_furxy_complete,
-                       apply_qaoa_furxy_ring)
+from ..qaoa_simulator_base import CostsType, ParamType, QAOAFastSimulatorBase, TermsType
+from .qaoa_fur import apply_qaoa_furx, apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
 from .utils import copy, initialize_uniform, multiply, norm_squared, sum_reduce
 
 DeviceArray = numba.cuda.devicearray.DeviceNDArray

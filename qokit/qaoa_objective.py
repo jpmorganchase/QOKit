@@ -16,8 +16,7 @@ from qiskit import Aer, execute
 import qokit.parameter_utils
 from qokit.parameter_utils import QAOAParameterization
 
-from .fur import (QAOAFastSimulatorBase, choose_simulator,
-                  choose_simulator_xyring)
+from .fur import QAOAFastSimulatorBase, choose_simulator, choose_simulator_xyring
 from .fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
 from .parameter_utils import from_fourier_basis
 from .qaoa_circuit_portfolio import measure_circuit

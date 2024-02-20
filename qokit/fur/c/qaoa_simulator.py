@@ -9,8 +9,7 @@ from collections.abc import Sequence
 import numpy as np
 
 from ..diagonal_precomputation import precompute_vectorized_cpu_parallel
-from ..qaoa_simulator_base import (CostsType, ParamType, QAOAFastSimulatorBase,
-                                   TermsType)
+from ..qaoa_simulator_base import CostsType, ParamType, QAOAFastSimulatorBase, TermsType
 from . import csim
 from .gates import ComplexArray
 

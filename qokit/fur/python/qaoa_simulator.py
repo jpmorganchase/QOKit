@@ -9,10 +9,8 @@ from collections.abc import Sequence
 import numpy as np
 
 from ..diagonal_precomputation import precompute_vectorized_cpu_parallel
-from ..qaoa_simulator_base import (CostsType, ParamType, QAOAFastSimulatorBase,
-                                   TermsType)
-from .qaoa_fur import (apply_qaoa_furx, apply_qaoa_furxy_complete,
-                       apply_qaoa_furxy_ring)
+from ..qaoa_simulator_base import CostsType, ParamType, QAOAFastSimulatorBase, TermsType
+from .qaoa_fur import apply_qaoa_furx, apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
 
 
 def little_to_big_endian(arr):
