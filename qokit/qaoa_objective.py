@@ -3,22 +3,25 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 from __future__ import annotations
+
+import typing
 from calendar import c
+from collections.abc import Sequence
+from functools import reduce
+
+import numba.cuda
 import numpy as np
 from qiskit import Aer, execute
-from functools import reduce
-import numba.cuda
 
-from .fur import choose_simulator, choose_simulator_xyring, QAOAFastSimulatorBase
-import typing
-
-from .parameter_utils import from_fourier_basis
 import qokit.parameter_utils
 from qokit.parameter_utils import QAOAParameterization
+
+from .fur import (QAOAFastSimulatorBase, choose_simulator,
+                  choose_simulator_xyring)
+from .fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
+from .parameter_utils import from_fourier_basis
 from .qaoa_circuit_portfolio import measure_circuit
 from .utils import reverse_array_index_bit_order
-
-from .fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
 
 
 def _get_qiskit_objective(
@@ -104,7 +107,7 @@ def get_qaoa_objective(
     terms=None,
     precomputed_optimal_bitstrings=None,
     parameterization: str | QAOAParameterization = "theta",
-    objective: str = "expectation",
+    objective: str | Sequence[str] = "expectation",
     parameterized_circuit=None,
     simulator: str = "auto",
     mixer: str = "x",
@@ -126,9 +129,10 @@ def get_qaoa_objective(
         For below Fourier parameters, q=p
         If parameterization == 'freq', then f takes one parameter (fourier parameters u and v concatenated)
         If parameterization == 'u v', then f takes two parameters (fourier parameters u and v)
-    objective : str
+    objective : str | Sequence[str]
         If objective == 'expectation', then returns f(theta) = - < theta | C_{LABS} | theta > (minus for minimization)
         If objective == 'overlap', then returns f(theta) = 1 - Overlap |<theta|optimal_bitstring>|^2 (1-overlap for minimization)
+        If objective == "std", then returns the standard deviation of the expectation value calculated with the probabilities
     simulator : str
         If simulator == 'auto', implementation is chosen automatically
             (either the fastest CPU simulator or a GPU simulator if CUDA is available)
@@ -178,19 +182,32 @@ def get_qaoa_objective(
     if precomputed_costs is None:
         precomputed_costs = sim.get_cost_diagonal()
 
+    objective = [objective] if isinstance(objective, str) else objective
+
     bitstring_loc = None
-    if precomputed_optimal_bitstrings is not None and objective != "expectation":
+    if precomputed_optimal_bitstrings is not None and "overlap" in objective:
         bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
 
     # -- Final function
     def f(*args):
         gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
         result = sim.simulate_qaoa(gamma, beta, initial_state, n_trotters=n_trotters)
-        if objective == "expectation":
-            return sim.get_expectation(result, costs=precomputed_costs, preserve_state=False, optimization_type=optimization_type)
-        elif objective == "overlap":
-            overlap = sim.get_overlap(result, costs=precomputed_costs, indices=bitstring_loc, preserve_state=False, optimization_type=optimization_type)
-            return 1 - overlap
+        ret = []
+        if "expectation" in objective:
+            ret.append(sim.get_expectation(result, costs=precomputed_costs, preserve_state=len(objective) != 1, optimization_type=optimization_type))
+        if "overlap" in objective:
+            ret.append(
+                1
+                - sim.get_overlap(
+                    result, costs=precomputed_costs, indices=bitstring_loc, preserve_state="std" in objective, optimization_type=optimization_type
+                )
+            )
+        if "std" in objective:
+            ret.append(sim.get_std(result, costs=precomputed_costs, preserve_state=False, preserve_costs=False))
+        if len(ret) == 1:
+            return ret[0]
+        order = {"expectation": 0, "overlap": int("expectation" in objective), "std": -1}
+        return tuple([ret[order[obj]] for obj in objective])
 
     return f
 
