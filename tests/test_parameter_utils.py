@@ -37,3 +37,19 @@ def test_extrapolation(simulator):
     assert np.isclose(e1, e3)
     assert np.isclose(e1, e4)
     assert e2 < e1
+
+
+def test_convert_to_gamma_beta():
+    p = 10
+    gamma = np.random.uniform(0, 1, p)
+    beta = np.random.uniform(0, 1, p)
+
+    u, v = to_fourier_basis(gamma, beta)
+
+    gamma2, beta2 = convert_to_gamma_beta(u, v, parameterization="u v")
+    gamma3, beta3 = convert_to_gamma_beta(np.hstack([gamma, beta]), parameterization="theta")
+
+    assert np.allclose(gamma, gamma2)
+    assert np.allclose(gamma, gamma3)
+    assert np.allclose(beta, beta2)
+    assert np.allclose(beta, beta3)
