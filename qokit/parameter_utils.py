@@ -39,7 +39,7 @@ def from_fourier_basis(u, v):
         for j in range(p):
             gamma[i] += u[j] * np.sin(((j + 1) - 0.5) * ((i + 1) - 0.5) * np.pi / p)
             beta[i] += v[j] * np.cos(((j + 1) - 0.5) * ((i + 1) - 0.5) * np.pi / p)
-    return beta, gamma
+    return gamma, beta
 
 
 def to_fourier_basis(gamma, beta):
@@ -131,14 +131,14 @@ def convert_to_gamma_beta(*args, parameterization: QAOAParameterization | str):
         p = int(len(freq) / 2)
         u = freq[:p]
         v = freq[p:]
-        beta, gamma = from_fourier_basis(u, v)
+        gamma, beta = from_fourier_basis(u, v)
     elif parameterization == QAOAParameterization.GAMMA_BETA:
         assert len(args) == 2, "gamma beta parameterization requires two arguments"
         gamma, beta = args
     elif parameterization == QAOAParameterization.U_V:
         assert len(args) == 2, "u v parameterization requires two arguments"
         u, v = args
-        beta, gamma = from_fourier_basis(u, v)
+        gamma, beta = from_fourier_basis(u, v)
     else:
         raise ValueError("Invalid parameterization")
     return gamma, beta
