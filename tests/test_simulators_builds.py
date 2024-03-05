@@ -21,7 +21,7 @@ def test_simulator_c_bild():
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test runs only in Github Actions.")
 def test_simulator_python_build():
-    assert "c" in get_available_simulator_names("x")
+    assert "python" in get_available_simulator_names("x")
     assert "python" in get_available_simulator_names("xyring")
     assert "python" in get_available_simulator_names("xycomplete")
 
