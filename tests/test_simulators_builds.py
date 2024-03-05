@@ -6,7 +6,7 @@ import pytest
 import os
 import numpy as np
 from qokit import get_qaoa_labs_objective
-from qokit.fur import get_available_simulators
+from qokit.fur import get_available_simulator_names
 
 # when fales tests only runs in Github actions. Chage to true to run locally
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "fales"
