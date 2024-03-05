@@ -77,3 +77,4 @@ def test_rxy_complete_trotter(N, p, n_trotters, simclass):
 
     sim = simclass(N, costs=np.zeros(2**N))
     _check_simulator_against_qiskit(sim, N, index_pairs_ring, gammas, betas, init_state, n_trotters=n_trotters)
+    
