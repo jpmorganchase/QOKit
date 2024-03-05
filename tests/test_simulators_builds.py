@@ -4,7 +4,7 @@
 ###############################################################################
 import pytest
 import os
-import dumpy as np
+import numpy as np
 from qokit import get_qaoa_labs_objective
 from qokit.fur import get_available_simulators
 
