@@ -53,7 +53,6 @@ def get_qaoa_portfolio_objective(
     if precomputed_energies is None:
         po_obj = po_obj_func(po_problem)
         precomputed_energies = reverse_array_index_bit_order(precompute_energies(po_obj, N)).real
-
     if simulator == "qiskit":
         parameterized_circuit = get_parameterized_qaoa_circuit(po_problem, depth=p, ini=ini, mixer=mixer, T=T)
     else:
@@ -68,17 +67,37 @@ def get_qaoa_portfolio_objective(
         pass
     else:
         raise ValueError(f"Unknown mixer passed to get_qaoa_portfolio_objective: {mixer}, allowed ['trotter_ring']")
-
     if objective == "overlap" and precomputed_optimal_bitstrings is None:
         bf_result = portfolio_brute_force(po_problem, return_bitstring=True)
         precomputed_optimal_bitstrings = bf_result[1].reshape(1, -1)
         assert precomputed_optimal_bitstrings.shape[1] == N  # only one optimal bitstring
 
-    return get_qaoa_objective(
+    def scaled_result(f):
+        """Return rescaled objective function 
+
+        Parameters
+        ----------
+        function returned from the get_qaoa_objective 
+
+        Return 
+        ------
+        f: callable function returning overlap and negative expectation 
+        """
+        def rescaled_f(*args):
+            if objective == "expectation":
+                return f(*args) / po_problem["scale"]
+            elif objective == "expectation and overlap":
+                res = f(*args)
+                return res[0] / po_problem["scale"], res[1]
+            else:
+                assert objective == "overlap"
+                return f(*args)
+        return rescaled_f
+    
+    get_to_scale_qaoa_objective =  get_qaoa_objective(
         N=N,
         p=p,
         precomputed_diagonal_hamiltonian=po_problem["scale"] * precomputed_energies,
-        precomputed_costs=precomputed_energies,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
         parameterized_circuit=parameterized_circuit,
         parameterization=parameterization,
@@ -87,4 +106,6 @@ def get_qaoa_portfolio_objective(
         mixer="xy",
         initial_state=sv0,
         n_trotters=T,
-    )
+    )   
+
+    return scaled_result(get_to_scale_qaoa_objective)

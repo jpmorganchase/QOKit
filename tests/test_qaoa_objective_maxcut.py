@@ -58,7 +58,7 @@ def test_maxcut_qaoa_obj_fixed_angles(simulator):
             for p in range(1, max_p + 1):
                 gamma, beta, AR = get_fixed_gamma_beta(d, p, return_AR=True)
                 f_e = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator, objective="expectation")
-                f_o = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator, objective="overlap")
+                f_o = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator="qiskit", objective="overlap")
                 assert -1 * f_e(gamma, beta) / optimal_cut > AR
                 current_overlap = 1 - f_o(gamma, beta)
                 if current_overlap < 0.5:
