@@ -73,16 +73,17 @@ def get_qaoa_portfolio_objective(
         assert precomputed_optimal_bitstrings.shape[1] == N  # only one optimal bitstring
 
     def scaled_result(f):
-        """Return rescaled objective function 
+        """Return rescaled objective function
 
         Parameters
         ----------
-        function returned from the get_qaoa_objective 
+        function returned from the get_qaoa_objective
 
-        Return 
+        Return
         ------
-        f: callable function returning overlap and negative expectation 
+        f: callable function returning overlap and negative expectation
         """
+
         def rescaled_f(*args):
             if objective == "expectation":
                 return f(*args) / po_problem["scale"]
@@ -92,9 +93,10 @@ def get_qaoa_portfolio_objective(
             else:
                 assert objective == "overlap"
                 return f(*args)
+
         return rescaled_f
-    
-    get_to_scale_qaoa_objective =  get_qaoa_objective(
+
+    get_to_scale_qaoa_objective = get_qaoa_objective(
         N=N,
         p=p,
         precomputed_diagonal_hamiltonian=po_problem["scale"] * precomputed_energies,
@@ -106,6 +108,6 @@ def get_qaoa_portfolio_objective(
         mixer="xy",
         initial_state=sv0,
         n_trotters=T,
-    )   
+    )
 
     return scaled_result(get_to_scale_qaoa_objective)

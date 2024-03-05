@@ -98,7 +98,7 @@ def test_portfolio_qokitandqiskit(simname):
             result = execute(qc2, backend).result()
             sv2 = reverse_array_index_bit_order(result.get_statevector())
             assert np.allclose(sv1, sv2)
-            #assert np.allclose(get_energy_expectation_sv(po_problem, sv1), qaoa_obj_qiskit(x0))
+            # assert np.allclose(get_energy_expectation_sv(po_problem, sv1), qaoa_obj_qiskit(x0))
 
 
 @pytest.mark.parametrize("simname", simulators_to_run)
