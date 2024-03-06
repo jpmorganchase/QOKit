@@ -74,6 +74,7 @@ def get_qaoa_portfolio_objective(
 
     def scaled_result(f):
         """Return rescaled objective function
+        This is done to accomodate po_problem["scale"]
 
         Parameters
         ----------
@@ -96,18 +97,18 @@ def get_qaoa_portfolio_objective(
 
         return rescaled_f
 
-    get_to_scale_qaoa_objective = get_qaoa_objective(
-        N=N,
-        p=p,
-        precomputed_diagonal_hamiltonian=po_problem["scale"] * precomputed_energies,
-        precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
-        parameterized_circuit=parameterized_circuit,
-        parameterization=parameterization,
-        objective=objective,
-        simulator=simulator,
-        mixer="xy",
-        initial_state=sv0,
-        n_trotters=T,
+    return scaled_result(
+        get_qaoa_objective(
+            N=N,
+            p=p,
+            precomputed_diagonal_hamiltonian=po_problem["scale"] * precomputed_energies,
+            precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
+            parameterized_circuit=parameterized_circuit,
+            parameterization=parameterization,
+            objective=objective,
+            simulator=simulator,
+            mixer="xy",
+            initial_state=sv0,
+            n_trotters=T,
+        )
     )
-
-    return scaled_result(get_to_scale_qaoa_objective)
