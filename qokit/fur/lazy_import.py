@@ -25,3 +25,4 @@ class LasyModule:
 
 
 MPI = LasyModule("mpi4py.MPI")
+pkl5 = LasyModule("mpi4py.util.pkl5")
