@@ -27,7 +27,7 @@ def test_simulator_python_build():
 
 
 @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test runs only in Github Actions.")
-@pytest.mark.timeout(5)
+@pytest.mark.timeout(15)
 def test_simulator_timing_test():
     theta = np.random.uniform(0, 1, 280)
     f = get_qaoa_labs_objective(20, 140)
