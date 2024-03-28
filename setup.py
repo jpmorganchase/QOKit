@@ -15,7 +15,7 @@ path = "./qokit/fur/c/csim/src/"
 
 python_only = os.environ.get("QOKIT_PYTHON_ONLY")
 
-if environment_variable_value is not None:
+if python_only is not None:
     QOKIT_NO_C_ENV = True
 
 
