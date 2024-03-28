@@ -124,7 +124,7 @@ def test_maxcut_weighted_qaoa_obj_qiskit_circuit():
     )
     for _, row in df.iterrows():
         precomputed_cuts = precompute_energies(maxcut_obj, row["G"].number_of_nodes(), w=get_adjacency_matrix(row["G"]))
-        qc = get_qaoa_circuit(row["G"], row["beta"], row["gamma"])
+        qc = get_qaoa_circuit(row["G"], row["gamma"], row["beta"])
         qc_param = get_parameterized_qaoa_circuit(row["G"], row["p"]).bind_parameters(np.hstack([row["beta"], row["gamma"]]))
         sv = np.asarray(qiskit_backend.run(qc).result().get_statevector())
         sv_param = np.asarray(qiskit_backend.run(qc_param).result().get_statevector())
