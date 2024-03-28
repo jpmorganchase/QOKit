@@ -20,11 +20,8 @@ if environment_variable_value is not None:
 
 
 def cbuild():
-    try:
-        if not QOKIT_PYTHON_ONLY:
-            subprocess.call(["make", "-C", path])
-    except Exception as e:
-        print("No C/C++ enviroment setup to compile the C simulator. Installing Python Simulator")
+    if not QOKIT_PYTHON_ONLY:
+        subprocess.call(["make", "-C", path])
 
 
 cbuild()
