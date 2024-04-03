@@ -60,7 +60,7 @@ def append_mixer_operator_circuit(qc: QuantumCircuit, beta: float) -> None:
         append_x_term(qc, n, beta)
 
 
-def get_qaoa_circuit(N: int, terms: Sequence, beta: Sequence, gamma: Sequence, save_statevector: bool = True) -> QuantumCircuit:
+def get_qaoa_circuit(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, save_statevector: bool = True) -> QuantumCircuit:
     """Generates a circuit for Hamiltonian of the form \sum_{term \in terms} \prod_{j \in term} Z_j
 
     Parameters

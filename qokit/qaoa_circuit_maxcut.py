@@ -31,7 +31,7 @@ def append_mixer_operator_circuit(qc, G, beta):
         append_x_term(qc, n, beta)
 
 
-def get_qaoa_circuit(G: nx.Graph, betas: Sequence, gammas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
+def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
     """Generates a circuit for weighted MaxCut on graph G.
     Parameters
     ----------

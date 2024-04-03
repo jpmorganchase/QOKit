@@ -38,7 +38,7 @@ def test_qaoa_parameterization():
 
     terms_ix, offset = get_energy_term_indices(N)
 
-    qc = get_qaoa_circuit(N, terms_ix, row["beta"], row["gamma"])
+    qc = get_qaoa_circuit(N, terms_ix, row["gamma"], row["beta"])
     backend = AerSimulator(method="statevector")
     sv = np.asarray(backend.run(qc).result().get_statevector())
 
@@ -79,7 +79,7 @@ def test_parameterized_circuit():
         negative_merit_factor_from_bitstring,
     )
 
-    qc2 = get_qaoa_circuit(N, terms, ramp["beta"], ramp["gamma"])
+    qc2 = get_qaoa_circuit(N, terms, ramp["gamma"], ramp["beta"])
     f2 = obj_from_statevector(
         np.asarray(backend.run(qc2).result().get_statevector()),
         negative_merit_factor_from_bitstring,
