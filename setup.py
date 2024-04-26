@@ -9,17 +9,13 @@ import os
 import sys
 
 
-QOKIT_PYTHON_ONLY = False
 path = "./qokit/fur/c/csim/src/"
 
 python_only = os.environ.get("QOKIT_PYTHON_ONLY")
 
-if python_only is not None:
-    QOKIT_NO_C_ENV = True
-
 
 def cbuild():
-    if not QOKIT_PYTHON_ONLY:
+    if python_only is None:
         subprocess.call(["make", "-C", path])
 
 
