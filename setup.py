@@ -6,7 +6,6 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import subprocess
 import os
-import sys
 
 
 path = "./qokit/fur/c/csim/src/"
