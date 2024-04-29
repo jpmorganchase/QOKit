@@ -157,8 +157,8 @@ def get_problem(N, K, q, seed=1, pre=False) -> dict[str, Any]:
     po_problem["pre"] = pre
     if pre == "rule":
         means_in_spins = np.array([po_problem["means"][i] - q * np.sum(po_problem["cov"][i, :]) for i in range(len(po_problem["means"]))])
-        scale = 1 / (np.sqrt(np.mean(((q * po_problem["cov"]) ** 2).flatten())) + np.sqrt(np.mean((means_in_spins**2).flatten())))
-        # scale = 1 / (0.5*(np.sqrt(np.mean((po_problem['cov']**2).flatten()))+np.sqrt(np.mean((po_problem['means']**2).flatten()))))
+        scale = 1 / np.sqrt(np.mean(((q * po_problem["cov"]) ** 2).flatten()) + np.mean((means_in_spins**2).flatten()))
+        # scale = 1 / (0.5*(np.sqrt(np.mean((po_problem['cov']**2).flatten())+np.mean((po_problem['means']**2).flatten())))
     elif np.isscalar(pre):
         scale = pre
     else:
