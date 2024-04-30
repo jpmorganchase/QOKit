@@ -19,4 +19,4 @@ def cbuild():
 
 
 cbuild()
-setup()
+setup(ext_modules=[Extension(name="your.external.module", sources=[])])
