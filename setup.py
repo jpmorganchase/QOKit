@@ -6,6 +6,7 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import subprocess
 import os
+import sys
 
 
 path = "./qokit/fur/c/csim/src/"
@@ -18,6 +19,7 @@ if python_only is None:
     extensions.append(
         Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"] if sys.platform == "win32" else [])
     )
+
 
 def cbuild():
     if python_only is None:
