@@ -12,6 +12,12 @@ path = "./qokit/fur/c/csim/src/"
 
 python_only = os.environ.get("QOKIT_PYTHON_ONLY")
 
+sources = [os.path.join(path, "diagonal.c"), os.path.join(path, "fur.c"), os.path.join(path, "qaoa_fur.c")]
+extensions = []
+if python_only is None:
+    extensions.append(
+        Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"] if sys.platform == "win32" else [])
+    )
 
 def cbuild():
     if python_only is None:
@@ -19,4 +25,4 @@ def cbuild():
 
 
 cbuild()
-setup(ext_modules=[Extension(name="your.external.module", sources=[])])
+setup(ext_modules=extensions)
