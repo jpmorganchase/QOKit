@@ -182,15 +182,12 @@ def test_overlap_maxcut(simulator):
 
     f1 = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, parameterization="gamma beta", objective="overlap")
     f2 = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", objective="overlap")
-    f3 = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, parameterization="gamma beta", objective="overlap")
 
     assert np.isclose(f1(gamma, beta), f2(gamma, beta))
-    assert np.isclose(f2(gamma, beta), f3(gamma, beta))
     assert np.isclose(f1([0], [0]), f2([0], [0]))
-    assert np.isclose(f2([0], [0]), f3([0], [0]))
 
     maxval = precomputed_energies.max()
     bitstring_loc = (precomputed_energies == maxval).nonzero()
     assert len(bitstring_loc) == 1
     bitstring_loc = bitstring_loc[0]
-    assert np.isclose(1 - f3([0], [0]), len(bitstring_loc) / len(precomputed_energies))
+    assert np.isclose(1 - f1([0], [0]), len(bitstring_loc) / len(precomputed_energies))
