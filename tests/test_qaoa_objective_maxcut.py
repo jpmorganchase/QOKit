@@ -165,3 +165,32 @@ def test_sk_ini_maxcut(simulator):
             else:
                 assert cur_ar > last_ar
                 last_ar = cur_ar
+
+
+@pytest.mark.parametrize("simulator", simulators_to_run_names_no_qiskit)
+def test_overlap_maxcut(simulator):
+    N = 4
+    d = 3
+    seed = 1
+    G = nx.random_regular_graph(d, N, seed=seed)
+    p = 1
+    beta = [np.random.uniform(0, 1)]
+    gamma = [np.random.uniform(0, 1)]
+
+    obj = partial(maxcut_obj, w=get_adjacency_matrix(G))
+    precomputed_energies = precompute_energies(obj, N)
+
+    f1 = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, parameterization="gamma beta", objective="overlap")
+    f2 = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", objective="overlap")
+    f3 = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, parameterization="gamma beta", objective="overlap")
+
+    assert np.isclose(f1(gamma, beta), f2(gamma, beta))
+    assert np.isclose(f2(gamma, beta), f3(gamma, beta))
+    assert np.isclose(f1([0], [0]), f2([0], [0]))
+    assert np.isclose(f2([0], [0]), f3([0], [0]))
+
+    maxval = precomputed_energies.max()
+    bitstring_loc = (precomputed_energies == maxval).nonzero()
+    assert len(bitstring_loc) == 1
+    bitstring_loc = bitstring_loc[0]
+    assert np.isclose(1 - f3([0], [0]), len(bitstring_loc) / len(precomputed_energies))
