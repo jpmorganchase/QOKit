@@ -26,5 +26,11 @@ def cbuild():
         subprocess.call(["make", "-C", path])
 
 
+class SimulatorBuild(build_ext):
+    def run(self):
+        cbuild()
+        super().run
+
+
 cbuild()
-setup(ext_modules=extensions)
+setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {}),
