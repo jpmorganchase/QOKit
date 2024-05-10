@@ -20,20 +20,6 @@ jobs:
         
     steps:
     - uses: actions/checkout@v3
-###### Alex: to be used in future version once permissions issue is resolved
-#     - name: black
-#       uses: lgeiger/black-action@master
-#       with:
-#           args: .      
-#     - name: Apply black formatting if reviewdog found formatting errors
-#       if: "${{ failure() }}"
-#       run: |
-#          black .
-#     - name: Commit black formatting results
-#       if: "${{ failure() }}"
-#       uses: stefanzweifel/git-auto-commit-action@v4
-#       with:
-#          commit_message: ":art: Format Python code with psf/black push"
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -47,7 +33,8 @@ jobs:
           black --check .
     - name: pip install   
       run: |
-        QOKIT_PYTHON_ONLY=1 pip install .
+        export QOKIT_PYTHON_ONLY=True 
+        pip install .
     - name: Run tests and coverage
       run: |
          pytest --cov=qokit -rs tests --cov-fail-under=70
