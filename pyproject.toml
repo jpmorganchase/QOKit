@@ -30,7 +30,6 @@ dependencies = [
     'pytket-quantinuum>=0.16.0,<1',
     'qiskit>=0.42,<1',
     'qiskit-finance>=0.3,<1',
-    'qiskit-ibmq-provider>=0.20.2,<1',
     'qiskit-terra>=0.23.2,<1',
     'scipy>=1.10.1',
     'seaborn>=0.12.2',
