@@ -34,7 +34,7 @@ def _check_simulator_against_qiskit(sim, N, terms, gammas, betas, sv0=None):
     res = sim.simulate_qaoa(gammas, betas, sv0=sv0)
     sv_qokit = sim.get_statevector(res)
     backend = Aer.get_backend("aer_simulator_statevector")
-    qc = get_qaoa_circuit(N, terms, betas, gammas)
+    qc = get_qaoa_circuit(N, terms, gammas, betas)
     sv_qiskit = np.asarray(backend.run(qc).result().get_statevector())
     assert np.allclose(sv_qiskit, sv_qokit), f"results from simulator {sim.__class__.__name__} do not match with qiskit"
 

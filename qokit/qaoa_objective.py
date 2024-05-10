@@ -149,6 +149,8 @@ def get_qaoa_objective(
 
     # -- Qiskit edge case
     if simulator == "qiskit":
+        if precomputed_costs is None:
+            precomputed_costs = precomputed_diagonal_hamiltonian
         g = _get_qiskit_objective(
             parameterized_circuit,
             precomputed_costs,

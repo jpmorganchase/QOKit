@@ -124,7 +124,7 @@ def test_maxcut_weighted_qaoa_obj_qiskit_circuit():
     )
     for _, row in df.iterrows():
         precomputed_cuts = precompute_energies(maxcut_obj, row["G"].number_of_nodes(), w=get_adjacency_matrix(row["G"]))
-        qc = get_qaoa_circuit(row["G"], row["beta"], row["gamma"])
+        qc = get_qaoa_circuit(row["G"], row["gamma"], row["beta"])
         qc_param = get_parameterized_qaoa_circuit(row["G"], row["p"]).bind_parameters(np.hstack([row["beta"], row["gamma"]]))
         sv = np.asarray(qiskit_backend.run(qc).result().get_statevector())
         sv_param = np.asarray(qiskit_backend.run(qc_param).result().get_statevector())
@@ -165,3 +165,29 @@ def test_sk_ini_maxcut(simulator):
             else:
                 assert cur_ar > last_ar
                 last_ar = cur_ar
+
+
+@pytest.mark.parametrize("simulator", simulators_to_run_names_no_qiskit)
+def test_overlap_maxcut(simulator):
+    N = 4
+    d = 3
+    seed = 1
+    G = nx.random_regular_graph(d, N, seed=seed)
+    p = 1
+    beta = [np.random.uniform(0, 1)]
+    gamma = [np.random.uniform(0, 1)]
+
+    obj = partial(maxcut_obj, w=get_adjacency_matrix(G))
+    precomputed_energies = precompute_energies(obj, N)
+
+    f1 = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, parameterization="gamma beta", objective="overlap")
+    f2 = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", objective="overlap")
+
+    assert np.isclose(f1(gamma, beta), f2(gamma, beta))
+    assert np.isclose(f1([0], [0]), f2([0], [0]))
+
+    maxval = precomputed_energies.max()
+    bitstring_loc = (precomputed_energies == maxval).nonzero()
+    assert len(bitstring_loc) == 1
+    bitstring_loc = bitstring_loc[0]
+    assert np.isclose(1 - f1([0], [0]), len(bitstring_loc) / len(precomputed_energies))

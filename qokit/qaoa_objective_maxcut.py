@@ -75,7 +75,6 @@ def get_qaoa_maxcut_objective(
         N=N,
         p=p,
         precomputed_diagonal_hamiltonian=precomputed_cuts,
-        precomputed_costs=precomputed_cuts,
         terms=terms,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
         parameterized_circuit=parameterized_circuit,
