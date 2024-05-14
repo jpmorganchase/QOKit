@@ -35,6 +35,7 @@ jobs:
       run: |
         export QOKIT_PYTHON_ONLY=True
         echo $QOKIT_PYTHON_ONLY
+        pip install .
     - name: Run tests and coverage
       run: |
          pytest --cov=qokit -rs tests --cov-fail-under=70
