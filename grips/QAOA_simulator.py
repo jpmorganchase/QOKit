@@ -5,6 +5,14 @@ import scipy
 import time
 from qokit.fur.qaoa_simulator_base import QAOAFastSimulatorBase, TermsType
 
+'''
+This will serve as a module for QAOA simulation functionalities. 
+
+The main function is QAOA_run, which uses QAOA with specified parameters for the ising model 
+that it is passed. 
+
+Most other functions are written only for the purpose of QAOA_run to use them. 
+'''
 
 def get_simulator(N: int, terms: TermsType, sim_or_none: QAOAFastSimulatorBase | None = None) -> QAOAFastSimulatorBase:
     if sim_or_none is None:
@@ -94,7 +102,7 @@ def QAOA_run(
     #the above returns a scipy optimization result object that has multiple attributes
     #result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
     #result.message #message of why algorithms terminated
-    #result.nit is number of iterations used (here, number of QAOA calls)
+    #result.nfev is number of iterations used (here, number of QAOA calls)
     end_time = time.time()
 
     gamma, beta = result.x[:p], result.x[p:]
@@ -107,4 +115,6 @@ def QAOA_run(
         "overlap": get_overlap(N, ising_model, gamma, beta),
         "runtime": end_time - start_time,  # measured in seconds
         "num_QAOA_calls": result.nfev,
+        "classical_opt_success": result.success,
+        "scipy_opt_message": result.message
     }
