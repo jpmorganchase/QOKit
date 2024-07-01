@@ -59,15 +59,16 @@ def get_overlap(
     return simulator.get_overlap(result, preserve_state=True)
 
 
-def inverse_objective_function(ising_model: TermsType, N: int, p: int, mixer: str, states: np.ndarray | None, call_counter: list[int]) -> typing.Callable:
+def inverse_objective_function(ising_model: TermsType, N: int, p: int, mixer: str, states: list[np.ndarray] | None, call_counter: list[int]) -> typing.Callable:
     def inverse_objective(*args) -> float:
-        call_counter[0] += 1
         gamma, beta = args[0][:p], args[0][p:]
         simulator, result = get_simulator_and_result(N, ising_model, gamma, beta)
         expectation = get_expectation(N, ising_model, gamma, beta, simulator, result)
 
         if states is not None:
             states.append(get_state(N, ising_model, gamma, beta, simulator, result))
+        
+        call_counter[0] += 1
 
         return -expectation
 
