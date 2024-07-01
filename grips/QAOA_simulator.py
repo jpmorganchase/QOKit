@@ -59,7 +59,7 @@ def get_overlap(
     return simulator.get_overlap(result, preserve_state=True)
 
 
-def inverse_objective_function(ising_model: TermsType, N: int, p: int, mixer: str, states: list[np.ndarray] | None, call_counter: list[int]) -> typing.Callable:
+def inverse_objective_function(ising_model: TermsType, N: int, p: int, mixer: str, states: list[np.ndarray] | None) -> typing.Callable:
     def inverse_objective(*args) -> float:
         gamma, beta = args[0][:p], args[0][p:]
         simulator, result = get_simulator_and_result(N, ising_model, gamma, beta)
@@ -67,8 +67,6 @@ def inverse_objective_function(ising_model: TermsType, N: int, p: int, mixer: st
 
         if states is not None:
             states.append(get_state(N, ising_model, gamma, beta, simulator, result))
-        
-        call_counter[0] += 1
 
         return -expectation
 
@@ -81,21 +79,25 @@ def QAOA_run(
     p: int,
     init_gamma: np.ndarray,
     init_beta: np.ndarray,
-    optimizer_method: str,
+    optimizer_method: str = 'COBYLA',
     optimizer_options: dict | None = None,
     mixer: str = "x",  # Using a different mixer is not yet supported
     states: list[np.ndarray] | None = None,
 ) -> dict:
-    init_freq = np.hstack([init_gamma, init_beta])
-    call_counter = [0]  # Annoying python hack for passing integers by reference
+    init_freq = np.hstack([init_gamma, init_beta]) 
+    #call_counter = [0]  #not needed; use result.nit instead 
 
     start_time = time.time()
-    res = scipy.optimize.minimize(
-        inverse_objective_function(ising_model, N, p, mixer, states, call_counter), init_freq, method=optimizer_method, options=optimizer_options
-    )
+    result = scipy.optimize.minimize(
+        inverse_objective_function(ising_model, N, p, mixer, states), init_freq, method=optimizer_method, options=optimizer_options
+    ) 
+    #the above returns a scipy optimization result object that has multiple attributes
+    #result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
+    #result.message #message of why algorithms terminated
+    #result.nit is number of iterations used (here, number of QAOA calls)
     end_time = time.time()
 
-    gamma, beta = res.x[:p], res.x[p:]
+    gamma, beta = result.x[:p], result.x[p:]
 
     return {
         "gamma": gamma,
@@ -104,5 +106,5 @@ def QAOA_run(
         "expectation": get_expectation(N, ising_model, gamma, beta),
         "overlap": get_overlap(N, ising_model, gamma, beta),
         "runtime": end_time - start_time,  # measured in seconds
-        "num_QAOA_calls": call_counter[0],
+        "num_QAOA_calls": result.nfev,
     }
