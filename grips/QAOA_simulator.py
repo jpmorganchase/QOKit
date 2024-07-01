@@ -84,7 +84,7 @@ def QAOA_run(
     optimizer_method: str,
     optimizer_options: dict | None = None,
     mixer: str = "x",  # Using a different mixer is not yet supported
-    states: np.ndarray | None = None,
+    states: list[np.ndarray] | None = None,
 ) -> dict:
     init_freq = np.hstack([init_gamma, init_beta])
     call_counter = [0]  # Annoying python hack for passing integers by reference
