@@ -5,17 +5,16 @@ import scipy
 import time
 from qokit.fur.qaoa_simulator_base import QAOAFastSimulatorBase, TermsType
 
-"""
+'''
 This will serve as a module for QAOA simulation functionalities. 
 
 The main function is QAOA_run, which uses QAOA with specified parameters for the ising model 
 that it is passed. 
 
 Most other functions are written only for the purpose of QAOA_run to use them. 
-"""
+'''
 
-
-def get_simulator(N: int, terms: TermsType, sim_or_none: QAOAFastSimulatorBase | None = None, simulator_name: str = "auto") -> QAOAFastSimulatorBase:
+def get_simulator(N: int, terms: TermsType, sim_or_none: QAOAFastSimulatorBase | None = None) -> QAOAFastSimulatorBase:
     if sim_or_none is None:
         simclass = qokit.fur.choose_simulator(name=simulator_name)
         return simclass(N, terms=terms)
@@ -105,12 +104,12 @@ def QAOA_run(
 
     start_time = time.time()
     result = scipy.optimize.minimize(
-        inverse_objective_function(ising_model, N, p, mixer, expectations, overlaps, simulator_name=simulator_name), init_freq, args=(), method=optimizer_method, options=optimizer_options
-    )
-    # the above returns a scipy optimization result object that has multiple attributes
-    # result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
-    # result.message #message of why algorithms terminated
-    # result.nfev is number of iterations used (here, number of QAOA calls)
+        inverse_objective_function(ising_model, N, p, mixer, states), init_freq, method=optimizer_method, options=optimizer_options
+    ) 
+    #the above returns a scipy optimization result object that has multiple attributes
+    #result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
+    #result.message #message of why algorithms terminated
+    #result.nfev is number of iterations used (here, number of QAOA calls)
     end_time = time.time()
 
     def make_time_relative(input: tuple[float, float]) -> tuple[float, float]:
@@ -134,5 +133,5 @@ def QAOA_run(
         "runtime": end_time - start_time,  # measured in seconds
         "num_QAOA_calls": result.nfev,
         "classical_opt_success": result.success,
-        "scipy_opt_message": result.message,
+        "scipy_opt_message": result.message
     }
