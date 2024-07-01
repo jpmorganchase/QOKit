@@ -81,7 +81,7 @@ def QAOA_run(
     init_gamma: np.ndarray,
     init_beta: np.ndarray,
     optimizer_method: str,
-    optimizer_options: dict = None,
+    optimizer_options: dict | None = None,
     mixer: str = "x",  # Using a different mixer is not yet supported
     states: np.ndarray | None = None,
 ) -> dict:
