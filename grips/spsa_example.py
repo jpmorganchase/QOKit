@@ -7,6 +7,7 @@ import time
 import networkx as nx
 from qokit.fur.qaoa_simulator_base import QAOAFastSimulatorBase, TermsType
 import QAOA_simulator as qs
+import scipy_additional_optimizers
 
 '''
 This is a script for testing the QAOA_simulator code. 
@@ -27,13 +28,14 @@ def random_graph(N, prob_connect = 0.7):
 def max_cut_terms_for_graph(G):
     return list(map((lambda edge : (-0.5, edge)), G.edges)) + [((G.number_of_edges()/2.0), ())]
 
-
+    
 #%% Now build the model and solve with QAOA
 
 #first, set parameters
 N = 5 #graph size
 p = 3 #circuit depth for QAOA
-optimizer_method = 'COBYLA' #classical optimizer to use
+optimizer_method = scipy_additional_optimizers.spsa_for_scipy#classical optimizer to use
+# optimizer_method = 'COBYLA'#classical optimizer to use
 init_gamma, init_beta = np.random.rand(2, p) #initial values
 (_, G) = random_graph(N, 0.5)  #generate a random graph for G (the '_' we dont need, just networkx syntax)
 ising_model = max_cut_terms_for_graph(G) #build the ising model for MaxCut on this graph

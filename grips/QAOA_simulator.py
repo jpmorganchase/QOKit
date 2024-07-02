@@ -97,7 +97,7 @@ def QAOA_run(
 
     start_time = time.time()
     result = scipy.optimize.minimize(
-        inverse_objective_function(ising_model, N, p, mixer, states), init_freq, method=optimizer_method, options=optimizer_options
+        inverse_objective_function(ising_model, N, p, mixer, states), init_freq, args = (), method=optimizer_method, options=optimizer_options
     ) 
     #the above returns a scipy optimization result object that has multiple attributes
     #result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
