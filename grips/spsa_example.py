@@ -41,8 +41,6 @@ init_gamma, init_beta = np.random.rand(2, p) #initial values
 ising_model = max_cut_terms_for_graph(G) #build the ising model for MaxCut on this graph
 sim = qs.get_simulator(N, ising_model) #simulator for this ising model
 
-print(ising_model)
-
 #now solve with QAOA_run with these parameters
 qaoa_result = qs.QAOA_run(
     ising_model,
