@@ -278,3 +278,4 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
     else: 
         result.message = 'Minimizer potentially not found; iterations limit hit.'
     return result
+
