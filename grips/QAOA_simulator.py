@@ -5,14 +5,15 @@ import scipy
 import time
 from qokit.fur.qaoa_simulator_base import QAOAFastSimulatorBase, TermsType
 
-'''
+"""
 This will serve as a module for QAOA simulation functionalities. 
 
 The main function is QAOA_run, which uses QAOA with specified parameters for the ising model 
 that it is passed. 
 
 Most other functions are written only for the purpose of QAOA_run to use them. 
-'''
+"""
+
 
 def get_simulator(N: int, terms: TermsType, sim_or_none: QAOAFastSimulatorBase | None = None) -> QAOAFastSimulatorBase:
     if sim_or_none is None:
@@ -67,14 +68,19 @@ def get_overlap(
     return simulator.get_overlap(result, preserve_state=True)
 
 
-def inverse_objective_function(ising_model: TermsType, N: int, p: int, mixer: str, states: list[np.ndarray] | None) -> typing.Callable:
+def inverse_objective_function(
+    ising_model: TermsType, N: int, p: int, mixer: str, expectations: list[np.ndarray] | None, overlaps: list[np.ndarray] | None
+) -> typing.Callable:
     def inverse_objective(*args) -> float:
         gamma, beta = args[0][:p], args[0][p:]
         simulator, result = get_simulator_and_result(N, ising_model, gamma, beta)
         expectation = get_expectation(N, ising_model, gamma, beta, simulator, result)
 
-        if states is not None:
-            states.append(get_state(N, ising_model, gamma, beta, simulator, result))
+        if expectations is not None:
+            expectations.append(expectation)
+
+        if overlaps is not None:
+            overlaps.append(get_overlap(N, ising_model, gamma, beta, simulator, result))
 
         return -expectation
 
@@ -87,22 +93,22 @@ def QAOA_run(
     p: int,
     init_gamma: np.ndarray,
     init_beta: np.ndarray,
-    optimizer_method: str = 'COBYLA',
+    optimizer_method: str = "COBYLA",
     optimizer_options: dict | None = None,
     mixer: str = "x",  # Using a different mixer is not yet supported
-    states: list[np.ndarray] | None = None,
+    expectations: list[np.ndarray] | None = None,
+    overlaps: list[np.ndarray] | None = None,
 ) -> dict:
-    init_freq = np.hstack([init_gamma, init_beta]) 
-    #call_counter = [0]  #not needed; use result.nit instead 
+    init_freq = np.hstack([init_gamma, init_beta])
 
     start_time = time.time()
     result = scipy.optimize.minimize(
-        inverse_objective_function(ising_model, N, p, mixer, states), init_freq, args = (), method=optimizer_method, options=optimizer_options
-    ) 
-    #the above returns a scipy optimization result object that has multiple attributes
-    #result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
-    #result.message #message of why algorithms terminated
-    #result.nfev is number of iterations used (here, number of QAOA calls)
+        inverse_objective_function(ising_model, N, p, mixer, expectations, overlaps), init_freq, args=(), method=optimizer_method, options=optimizer_options
+    )
+    # the above returns a scipy optimization result object that has multiple attributes
+    # result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
+    # result.message #message of why algorithms terminated
+    # result.nfev is number of iterations used (here, number of QAOA calls)
     end_time = time.time()
 
     gamma, beta = result.x[:p], result.x[p:]
@@ -116,5 +122,5 @@ def QAOA_run(
         "runtime": end_time - start_time,  # measured in seconds
         "num_QAOA_calls": result.nfev,
         "classical_opt_success": result.success,
-        "scipy_opt_message": result.message
+        "scipy_opt_message": result.message,
     }
