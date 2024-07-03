@@ -8,15 +8,9 @@ from gurobipy import GRB, Env, read
 from gurobipy import GurobiError
 from time import time, process_time
 import pandas as pd
+import numpy as np
 import logging
 import random
-
-Heuristics = 0
-Threads = 8
-Cuts = 0
-Presolve = -1
-MAXINT = 2000000000
-
 
 def run_one_instance(path: str, env: Env, TTS: bool = True, n: int = 3, log_to_write: str = "", seed=None):
     if log_to_write:
@@ -48,7 +42,23 @@ def run_one_instance(path: str, env: Env, TTS: bool = True, n: int = 3, log_to_w
     return msol, raw_time_diff, time_diff
 
 
-def run_LABS(n_range, env: Env, TTS: bool = True, nb_runs=1):
+def run_LABS_gurobi(n_range, env: Env = "", TTS: bool = True, nb_runs=1):
+    """
+    python3 run_gurobi.py TTS n_min n_max nb_runs
+
+    TTS is a flag controlling whether Gurobi should be stopped when optimal solution
+    Alternatively, if TTO is passed, Gurobi is run until the gap is closed
+
+    n_min and n_max describe the sizes of the LABS instances. Corresponding LPs must exist in lp/ folder
+
+    nb_runs in the number of times to run Gurobi with different initializations
+
+    can use this as for example run_LABS_gurobi(10, 20)
+
+    RETURNS: 
+    runtimes, TYPE numpy array of length N
+        Contains Average runtimes of solving LABS for each N over the nbruns 
+    """
     if TTS:
         prefix = "TTS_"
     else:
@@ -61,8 +71,10 @@ def run_LABS(n_range, env: Env, TTS: bool = True, nb_runs=1):
         msg = f"n,{prefix}process_time,{prefix}clock_time,node_count,runid\n"
         f.write(msg)
 
-    for n in n_range:
+    runtimes = np.zeros((len(n_range), nb_runs))
+    for ncount, n in enumerate(n_range):
         for runid in range(nb_runs):
+            runstart = time()
             log_name = f"{prefix}LABS_n_{n}_Threads_{Threads}_Cuts_{Cuts}_Heuristics_{Heuristics}_runid{runid}"
             log_to_write = log_path_dir + log_name + ".log"
             path_lp = f"lp/LABS_n{n}_cplex.lp"
@@ -73,26 +85,28 @@ def run_LABS(n_range, env: Env, TTS: bool = True, nb_runs=1):
             with open(main_log_file, "a") as f:
                 msg = f"{n},{raw_time_diff},{time_diff},{msol},{runid}\n"
                 f.write(msg)
+            runend = time()
+            runtimes[ncount, runid] = runend-runstart
+    runtimes = np.mean(runtimes, axis = 1)
+    return runtimes 
 
 
-if __name__ == "__main__":
-    """
-    python3 run_gurobi.py TTS n_min n_max nb_runs
+'''
+Here is an example script for how to use this function: 
+'''
+Heuristics = 0
+Threads = 8
+Cuts = 0
+Presolve = -1
+MAXINT = 2000000000
 
-    TTS is a flag controlling whether Gurobi should be stopped when optimal solution
-    Alternatively, if TTO is passed, Gurobi is run until the gap is closed
+n_min=10
+n_max = 22
+n_range = range(n_min, n_max)
+nb_runs = 5
+TTS = True
+gurobi_LABS_runtimes = run_LABS_gurobi(n_range, env = Env(''), TTS = TTS, nb_runs=nb_runs)
 
-    n_min and n_max describe the sizes of the LABS instances. Corresponding LPs must exist in lp/ folder
-
-    nb_runs in the number of times to run Gurobi with different initializations
-
-    Example: python3 run_gurobi.py TTS 10 20 10
-    """
-    if len(sys.argv) < 5:
-        raise ValueError("python3 run_cplex TTS n_min n_max nb_runs")
-    TTS = sys.argv[1] == "TTS"
-    n_min = int(sys.argv[2])
-    n_max = int(sys.argv[3])
-    nb_runs = int(sys.argv[4])
-    env = Env("")  # TO COMPLETE WITH LICENSE PARAMTERS
-    run_LABS(range(n_min, n_max), TTS=TTS, env=env, nb_runs=nb_runs)
+print('Gurobi runtimes were:\n')
+for count, n in enumerate(n_range):
+    print(f'N = {n_range[count]}: {gurobi_LABS_runtimes[count]}s')
