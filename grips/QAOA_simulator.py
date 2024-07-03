@@ -75,12 +75,13 @@ def inverse_objective_function(
         gamma, beta = args[0][:p], args[0][p:]
         simulator, result = get_simulator_and_result(N, ising_model, gamma, beta)
         expectation = get_expectation(N, ising_model, gamma, beta, simulator, result)
+        current_time = time.time()
 
         if expectations is not None:
-            expectations.append(expectation)
+            expectations.append((current_time, expectation))
 
         if overlaps is not None:
-            overlaps.append(get_overlap(N, ising_model, gamma, beta, simulator, result))
+            overlaps.append((current_time, get_overlap(N, ising_model, gamma, beta, simulator, result)))
 
         return -expectation
 
@@ -110,6 +111,16 @@ def QAOA_run(
     # result.message #message of why algorithms terminated
     # result.nfev is number of iterations used (here, number of QAOA calls)
     end_time = time.time()
+
+    def make_time_relative(input: tuple[float, float]) -> tuple[float, float]:
+        time, x = input
+        return (time - start_time, x)
+
+    if expectations is not None:
+        expectations = list(map(make_time_relative, expectations))
+    
+    if overlaps is not None:
+        overlaps = list(map(make_time_relative, overlaps))
 
     gamma, beta = result.x[:p], result.x[p:]
 
