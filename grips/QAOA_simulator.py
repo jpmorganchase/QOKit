@@ -5,16 +5,17 @@ import scipy
 import time
 from qokit.fur.qaoa_simulator_base import QAOAFastSimulatorBase, TermsType
 
-'''
+"""
 This will serve as a module for QAOA simulation functionalities. 
 
 The main function is QAOA_run, which uses QAOA with specified parameters for the ising model 
 that it is passed. 
 
 Most other functions are written only for the purpose of QAOA_run to use them. 
-'''
+"""
 
-def get_simulator(N: int, terms: TermsType, sim_or_none: QAOAFastSimulatorBase | None = None) -> QAOAFastSimulatorBase:
+
+def get_simulator(N: int, terms: TermsType, sim_or_none: QAOAFastSimulatorBase | None = None, simulator_name: str = "auto") -> QAOAFastSimulatorBase:
     if sim_or_none is None:
         simclass = qokit.fur.choose_simulator(name=simulator_name)
         return simclass(N, terms=terms)
@@ -67,15 +68,10 @@ def get_overlap(
     return simulator.get_overlap(result, preserve_state=True)
 
 
-<<<<<<< HEAD
 def inverse_objective_function(
     ising_model: TermsType, N: int, p: int, mixer: str, expectations: list[np.ndarray] | None, overlaps: list[np.ndarray] | None, simulator_name: str = "auto"
 ) -> typing.Callable:
-=======
-def inverse_objective_function(ising_model: TermsType, N: int, p: int, mixer: str, states: np.ndarray | None, call_counter: list[int]) -> typing.Callable:
->>>>>>> 61e12f5 (Fixed  conflicts)
     def inverse_objective(*args) -> float:
-        call_counter[0] += 1
         gamma, beta = args[0][:p], args[0][p:]
         simulator, result = get_simulator_and_result(N, ising_model, gamma, beta, simulator_name=simulator_name)
         expectation = get_expectation(N, ising_model, gamma, beta, simulator, result, simulator_name=simulator_name)
@@ -101,30 +97,22 @@ def QAOA_run(
     optimizer_method: str = "COBYLA",
     optimizer_options: dict | None = None,
     mixer: str = "x",  # Using a different mixer is not yet supported
-<<<<<<< HEAD
     expectations: list[np.ndarray] | None = None,
     overlaps: list[np.ndarray] | None = None,
     simulator_name: str = "auto",
 ) -> dict:
     init_freq = np.hstack([init_gamma, init_beta])
-=======
-    states: np.ndarray | None = None,
-) -> dict:
-    init_freq = np.hstack([init_gamma, init_beta])
-    call_counter = [0]  # Annoying python hack for passing integers by reference
->>>>>>> 61e12f5 (Fixed  conflicts)
 
     start_time = time.time()
     result = scipy.optimize.minimize(
-        inverse_objective_function(ising_model, N, p, mixer, states), init_freq, method=optimizer_method, options=optimizer_options
-    ) 
-    #the above returns a scipy optimization result object that has multiple attributes
-    #result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
-    #result.message #message of why algorithms terminated
-    #result.nfev is number of iterations used (here, number of QAOA calls)
+        inverse_objective_function(ising_model, N, p, mixer, expectations, overlaps, simulator_name=simulator_name), init_freq, args=(), method=optimizer_method, options=optimizer_options
+    )
+    # the above returns a scipy optimization result object that has multiple attributes
+    # result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
+    # result.message #message of why algorithms terminated
+    # result.nfev is number of iterations used (here, number of QAOA calls)
     end_time = time.time()
 
-<<<<<<< HEAD
     def make_time_relative(input: tuple[float, float]) -> tuple[float, float]:
         time, x = input
         return (time - start_time, x)
@@ -136,9 +124,6 @@ def QAOA_run(
         overlaps = list(map(make_time_relative, overlaps))
 
     gamma, beta = result.x[:p], result.x[p:]
-=======
-    gamma, beta = res.x[:p], res.x[p:]
->>>>>>> 61e12f5 (Fixed  conflicts)
 
     return {
         "gamma": gamma,
@@ -149,5 +134,5 @@ def QAOA_run(
         "runtime": end_time - start_time,  # measured in seconds
         "num_QAOA_calls": result.nfev,
         "classical_opt_success": result.success,
-        "scipy_opt_message": result.message
+        "scipy_opt_message": result.message,
     }
