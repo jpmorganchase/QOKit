@@ -1,4 +1,3 @@
-
 import operator
 from typing import Callable, Iterator, Optional, SupportsFloat, Tuple, Type, Union
 import numpy as np
