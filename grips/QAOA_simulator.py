@@ -65,7 +65,7 @@ def get_overlap(
     N: int, terms: TermsType, gamma: np.ndarray, beta: np.ndarray, sim: QAOAFastSimulatorBase | None = None, result: np.ndarray | None = None, simulator_name: str = "auto"
 ) -> float:
     simulator, result = get_simulator_and_result(N, terms, gamma, beta, sim, result, simulator_name=simulator_name)
-    return simulator.get_overlap(result, preserve_state=True)
+    return simulator.get_overlap(result, preserve_state=True, optimization_type="max")
 
 
 def inverse_objective_function(

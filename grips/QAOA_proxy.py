@@ -1,3 +1,4 @@
+from numba import njit, jit
 import numpy as np
 import time
 import scipy
@@ -12,6 +13,7 @@ But using direct linear approxmations of distributions
 
 
 # Gives the y-value at x=current_time on the line between (start_time, start_value) and (end_time, end_value)
+@njit
 def line_between(current_time: float, start_time: float, start_value: float, end_time: float, end_value: float) -> float:
     # Goes from 0 to 1 as current_time goes from start_time to end_time
     relative_time = (current_time - start_time) / (end_time - start_time)
@@ -23,16 +25,19 @@ def line_between(current_time: float, start_time: float, start_value: float, end
 #             /\height
 #            /  \
 # _ _ _ left/    \right _ _ _ given x, returns the corresponding y value on the preceeding curve
+@njit
 def triangle_value(x: int, left: int, right: int, height: float) -> float:
     return max(0, min(x - left, right - x) * 2 * height / (right - left))
 
 
 # P(c') from paper but dumber
+@njit
 def prob_cost(cost: int, num_constraints: int) -> float:
     return 4 / ((num_constraints + 1) ** 2) * min(cost + 1, num_constraints + 1 - cost)
 
 
 # N(c') from paper but dumber
+@njit
 def number_with_cost_proxy(cost: int, num_constraints: int, num_qubits: int) -> float:
     scale = 1 << num_qubits
     return prob_cost(cost, num_constraints) * scale
@@ -40,6 +45,7 @@ def number_with_cost_proxy(cost: int, num_constraints: int, num_qubits: int) -> 
 
 # N(c'; d, c) from paper but instead of a multinomial distribution, we just approximate by a prism whose cross-sections at fixed distances are triangles
 # TODO: This only works for prob_edge = 0.5
+@njit
 def number_of_costs_at_distance_proxy(cost_1: int, cost_2: int, distance: int, num_constraints: int, num_qubits: int) -> float:
     # Want distance to be between 0 and num_qubits//2 since further distance corresponds to being near the bitwise complement (which has the same cost)
     reflected_distance = distance
@@ -59,6 +65,7 @@ def number_of_costs_at_distance_proxy(cost_1: int, cost_2: int, distance: int, n
 
 
 # Computes the sum inside the for loop of Algorithm 1 in paper using dumb approximations
+@njit
 def compute_amplitude_sum(prev_amplitudes: np.ndarray, gamma: float, beta: float, cost_1: int, num_constraints: int, num_qubits: int) -> complex:
     sum = 0
     for cost_2 in range(num_constraints + 1):
@@ -74,9 +81,10 @@ def compute_amplitude_sum(prev_amplitudes: np.ndarray, gamma: float, beta: float
 # TODO: What if instead of optimizing expectation proxy we instead optimize high cost amplitudes (using e.g. exponential weighting)
 # Algorithm 1 from paper using dumb approximations
 # num_constraints = number of edges, and num_qubits = number of vertices
+@njit
 def QAOA_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int):
     num_costs = num_constraints + 1
-    amplitude_proxies = np.zeros([p + 1, num_costs], dtype=complex)
+    amplitude_proxies = np.zeros((p + 1, num_costs), dtype=np.complex128) # (p+1, num_costs) needs to be a tuple, not a list, in order to play nicely with numba. Also, dtype must be made more concrete (complex128 instead of complex)
     init_amplitude = np.sqrt(1 / (1 << num_qubits))
     for i in range(num_costs):
         amplitude_proxies[0][i] = init_amplitude
