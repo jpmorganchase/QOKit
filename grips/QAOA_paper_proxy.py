@@ -61,7 +61,7 @@ def compute_amplitude_sum_paper(prev_amplitudes: np.ndarray, gamma: float, beta:
 # TODO: What if instead of optimizing expectation proxy we instead optimize high cost amplitudes (using e.g. exponential weighting)
 # Algorithm 1 from paper
 # num_constraints = number of edges, and num_qubits = number of vertices
-def QAOA_paper_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int):
+def QAOA_paper_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
     num_costs = num_constraints + 1
     amplitude_proxies = np.zeros([p + 1, num_costs], dtype=complex)
     init_amplitude = np.sqrt(1 / (1 << num_qubits))
@@ -75,7 +75,7 @@ def QAOA_paper_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraint
             )
 
     expected_proxy = 0
-    for cost in range(num_costs):
+    for cost in range(terms_to_drop_in_expectation, num_costs):
         expected_proxy += number_with_cost_paper_proxy(cost, num_constraints, num_qubits) * (abs(amplitude_proxies[p][cost]) ** 2) * cost
 
     return amplitude_proxies, expected_proxy

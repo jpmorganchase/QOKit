@@ -146,6 +146,7 @@ def plot_heat_map(xs: np.ndarray, ys: np.ndarray, data: np.ndarray, title: str, 
     ax.set_xticklabels([f"{xs[i]:.2f}" for i in x_indices])
     ax.set_yticks(y_indices)
     ax.set_yticklabels([f"{ys[i]:.2f}" for i in y_indices])
+    ax.set_ylim(ax.get_ylim()[::-1])
 
     # Adds a color bar
     fig.colorbar(cax)

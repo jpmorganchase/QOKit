@@ -82,7 +82,7 @@ def compute_amplitude_sum(prev_amplitudes: np.ndarray, gamma: float, beta: float
 # Algorithm 1 from paper using dumb approximations
 # num_constraints = number of edges, and num_qubits = number of vertices
 @njit
-def QAOA_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int):
+def QAOA_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
     num_costs = num_constraints + 1
     amplitude_proxies = np.zeros((p + 1, num_costs), dtype=np.complex128) # (p+1, num_costs) needs to be a tuple, not a list, in order to play nicely with numba. Also, dtype must be made more concrete (complex128 instead of complex)
     init_amplitude = np.sqrt(1 / (1 << num_qubits))
@@ -96,7 +96,7 @@ def QAOA_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int
             )
 
     expected_proxy = 0
-    for cost in range(num_costs):
+    for cost in range(terms_to_drop_in_expectation, num_costs):
         expected_proxy += number_with_cost_proxy(cost, num_constraints, num_qubits) * (abs(amplitude_proxies[p][cost]) ** 2) * cost
 
     return amplitude_proxies, expected_proxy
