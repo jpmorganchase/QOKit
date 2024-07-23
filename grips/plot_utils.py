@@ -125,7 +125,7 @@ def plot_heat_map(xs: np.ndarray, ys: np.ndarray, data: np.ndarray, title: str, 
     ax.set_ylabel(ylabel)
 
     # Create the heatmap
-    cax = ax.imshow(data, aspect="auto")
+    cax = ax.imshow(data.T, aspect="auto")
 
     # Determine the number of labels and the step size
     x_step = len(xs) // num_labels
