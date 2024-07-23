@@ -3,6 +3,7 @@ import qokit
 import numpy as np
 import scipy
 import time
+from qokit.fur import choose_simulator
 from qokit.fur.qaoa_simulator_base import QAOAFastSimulatorBase, TermsType
 
 """
@@ -17,7 +18,7 @@ Most other functions are written only for the purpose of QAOA_run to use them.
 
 def get_simulator(N: int, terms: TermsType, sim_or_none: QAOAFastSimulatorBase | None = None, simulator_name: str = "auto") -> QAOAFastSimulatorBase:
     if sim_or_none is None:
-        simclass = qokit.fur.choose_simulator(name=simulator_name)
+        simclass = choose_simulator(name=simulator_name)
         return simclass(N, terms=terms)
     else:
         return sim_or_none
