@@ -9,6 +9,7 @@ import cupy as cp
 from pathlib import Path
 from functools import lru_cache
 
+
 ########################################
 # single-qubit X rotation
 ########################################
@@ -21,11 +22,12 @@ def get_furx_kernel(k_qubits: int, q_offset: int, state_mask: int):
         kernel_name = f"furx_kernel<{k_qubits},{q_offset},{state_mask}>"
     else:
         kernel_name = f"warp_furx_kernel<{k_qubits},{q_offset}>"
-        
-    code = open(Path(__file__).parent / "furx.cu").read()
-    return cp.RawModule(code=code, name_expressions=[kernel_name],options=("-std=c++17",)).get_function(kernel_name)
 
-def furx(sv: cp.ndarray, a: float, b: float, k_qubits: int, q_offset: int, state_mask:int):
+    code = open(Path(__file__).parent / "furx.cu").read()
+    return cp.RawModule(code=code, name_expressions=[kernel_name], options=("-std=c++17",)).get_function(kernel_name)
+
+
+def furx(sv: cp.ndarray, a: float, b: float, k_qubits: int, q_offset: int, state_mask: int):
     """
     Apply in-place fast Rx gate exp(-1j * theta * X) on k consequtive qubits to statevector array x.
 
@@ -42,14 +44,12 @@ def furx(sv: cp.ndarray, a: float, b: float, k_qubits: int, q_offset: int, state
     seq_kernel = get_furx_kernel(k_qubits, q_offset, state_mask)
 
     if k_qubits > 6:
-        threads = 1 << (k_qubits-1)
+        threads = 1 << (k_qubits - 1)
     else:
         threads = min(32, len(sv))
 
-    seq_kernel(
-            ((len(sv)//2+threads-1)//threads,),
-            (threads,),
-            (sv, a, b))    
+    seq_kernel(((len(sv) // 2 + threads - 1) // threads,), (threads,), (sv, a, b))
+
 
 def furx_all(sv: np.ndarray, theta: float, n_qubits: int):
     """
@@ -60,20 +60,21 @@ def furx_all(sv: np.ndarray, theta: float, n_qubits: int):
     n_qubits: total number of qubits
     """
     n_states = len(sv)
-    state_mask = ((n_states - 1) >> 1)
+    state_mask = (n_states - 1) >> 1
 
-    a,b = math.cos(theta), -math.sin(theta)   
+    a, b = math.cos(theta), -math.sin(theta)
 
     group_size = 10
-    last_group_size = n_qubits%group_size
+    last_group_size = n_qubits % group_size
 
     cp_sv = cp.asarray(sv)
 
-    for q_offset in range(0, n_qubits-last_group_size, group_size):
-       furx(cp_sv, a, b, group_size, q_offset, state_mask)
+    for q_offset in range(0, n_qubits - last_group_size, group_size):
+        furx(cp_sv, a, b, group_size, q_offset, state_mask)
 
     if last_group_size > 0:
-        furx(cp_sv, a, b, last_group_size, n_qubits-last_group_size, state_mask)
+        furx(cp_sv, a, b, last_group_size, n_qubits - last_group_size, state_mask)
+
 
 ########################################
 # two-qubit XX+YY rotation

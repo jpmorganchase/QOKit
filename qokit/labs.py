@@ -149,6 +149,7 @@ def get_energy_term_indices(N: int):
                 all_terms.append(tuple(sorted((i - 1, i + k - 1, j - 1, j + k - 1))))
     return set(all_terms), offset
 
+
 @njit()
 def energy_vals(s: Sequence, N: int | None = None) -> float:
     """Compute LABS energy values from a string of spins
