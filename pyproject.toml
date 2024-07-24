@@ -38,16 +38,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-GPU = [
-  'qiskit-aer-gpu>=0.8'
-]
-dev = [
-  'black[d]>=23.3.0',
-  'setuptools>=58.1.0',
-  'Deprecated>=1.2.13',
-  'urllib3>=1.26.6',
-  'statsmodels>=0.13.5',
-  'scikit-learn>=1.2.2'
+GPU-CUDA12 = [
+    'cupy-cuda12x>=13.2.0'
 ]
 solvers = [
   'docplex>=2.18.200',
