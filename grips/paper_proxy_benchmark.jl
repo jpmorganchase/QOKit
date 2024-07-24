@@ -1,3 +1,7 @@
+using TimerOutputs
+using BenchmarkTools
+include("paper_proxy.jl")
+
 cost = 1
 num_constraints = 21
 prob_edge = 0.4
