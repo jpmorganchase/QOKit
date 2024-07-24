@@ -35,12 +35,11 @@ dependencies = [
     'seaborn>=0.12.2',
     'sympy>=1.12',
     'tqdm>=4.65.0',
-    'cupy',
 ]
 
 [project.optional-dependencies]
-GPU = [
-  'qiskit-aer-gpu>=0.8'
+GPU-CUDA12 = [
+    'cupy-cuda12x>=13.2.0'
 ]
 dev = [
   'black[d]>=23.3.0',
