@@ -1,9 +1,9 @@
+from juliacall import Main as jl
 from numba import njit, jit
 import numpy as np
 import time
 import scipy
 import typing
-from juliacall import Main as jl
 import os
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

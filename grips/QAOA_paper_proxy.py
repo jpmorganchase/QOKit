@@ -1,10 +1,10 @@
+from juliacall import Main as jl
 import numpy as np
 import math
 import typing
 import time
 import scipy
 from scipy.stats import binom, multinomial
-from juliacall import Main as jl
 import os 
 
 # Import the julia file that has all the paper_proxy functions
