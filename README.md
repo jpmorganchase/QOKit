@@ -28,7 +28,7 @@ pip install -e .
 
 Some optional parts of the package require additional dependencies. 
 - GPU simulation: `pip install -e .[GPU-CUDA12]`
-- Generating LP files to solve LABS using commercial IP solvers (`qokit/classical_methods`): `pip install -e .[solvers]`
+- Generating LP files to solve LABS using commercial IP solvers (`qokit/classical_methods` and `examples/advanced/classical_solvers_for_LABS/`): `pip install -e .[solvers]`
 
 Please note that the GPU dependency is specified for CUDA 12x. For other versions of CUDA, please follow cupy installation instructions.
 
