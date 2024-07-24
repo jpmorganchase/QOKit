@@ -65,7 +65,7 @@ function number_of_costs_at_distance_paper_proxy(cost_1::Int, cost_2::Int, dista
     start_index = max(0, cost_1 + cost_2 - num_constraints)
     end_index = min(cost_1, cost_2)
     for common_constraints in start_index:end_index
-        sum += prob_common_at_distance_paper(num_constraints, common_constraints, cost_1, cost_2, distance)
+        sum += prob_common_at_distance_paper(num_constraints, num_qubits, common_constraints, cost_1, cost_2, distance)
     end
 
     p_cost = prob_cost_paper(cost_1, num_constraints, prob_edge)
@@ -139,7 +139,7 @@ terms_to_drop_in_expectation = 1
 to = TimerOutput()
 println("prob_cost_paper ", prob_cost_paper(cost, num_constraints, prob_edge))
 println("number_with_cost_paper_proxy ", number_with_cost_paper_proxy(cost, num_constraints, num_qubits, prob_edge))
-println("prob_common_at_distance_paper ", prob_common_at_distance_paper(num_constraints, common_constraints, cost_1, cost_2, distance))
+println("prob_common_at_distance_paper ", prob_common_at_distance_paper(num_constraints, num_qubits, common_constraints, cost_1, cost_2, distance))
 println("number_of_costs_at_distance_paper_proxy ", number_of_costs_at_distance_paper_proxy(cost_1, cost_2, distance, num_constraints, num_qubits, prob_edge))
 println("compute_amplitude_sum_paper ", compute_amplitude_sum_paper(prev_amplitudes, gamma, beta, cost_1, num_constraints, num_qubits))
 #QAOA_paper_proxy(p, gamma_vec, beta_vec, num_constraints, num_qubits, terms_to_drop_in_expectation)
