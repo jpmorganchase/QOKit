@@ -35,6 +35,7 @@ dependencies = [
     'seaborn>=0.12.2',
     'sympy>=1.12',
     'tqdm>=4.65.0',
+    'cupy',
 ]
 
 [project.optional-dependencies]
