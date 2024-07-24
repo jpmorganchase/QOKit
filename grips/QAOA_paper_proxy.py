@@ -4,12 +4,25 @@ import typing
 import time
 import scipy
 from scipy.stats import binom, multinomial
+from juliacall import Main as jl
+import os 
+
+# Import the julia file that has all the paper_proxy functions
+dir_path = os.path.dirname(os.path.realpath(__file__))
+jl.seval(f'include("{dir_path}/paper_proxy.jl")')
 
 """
 This file implements the QAOA proxy algorithm for MaxCut from:
 https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.023171
 """
 
+
+###
+### The following functions are defined, but QAOA_paper_proxy now uses the julia
+### implementations instead of the python ones. So most of the functions in this
+### file will never be called. But I am leaving them here in case I need to
+### double-check that the julia implementation is correct.
+###
 
 # P(c') from paper
 def prob_cost_paper(cost: int, num_constraints: int, prob_edge: float = 0.5) -> float:
@@ -58,27 +71,30 @@ def compute_amplitude_sum_paper(prev_amplitudes: np.ndarray, gamma: float, beta:
     return sum
 
 
+## Uncomment this function and comment out the next function if you want to use the python implementation instead of the julia one.
 # TODO: What if instead of optimizing expectation proxy we instead optimize high cost amplitudes (using e.g. exponential weighting)
 # Algorithm 1 from paper
 # num_constraints = number of edges, and num_qubits = number of vertices
+#def QAOA_paper_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
+#    num_costs = num_constraints + 1
+#    amplitude_proxies = np.zeros([p + 1, num_costs], dtype=complex)
+#    init_amplitude = np.sqrt(1 / (1 << num_qubits))
+#    for i in range(num_costs):
+#        amplitude_proxies[0][i] = init_amplitude
+#
+#    for current_depth in range(1, p + 1):
+#        for cost_1 in range(num_costs):
+#            amplitude_proxies[current_depth][cost_1] = compute_amplitude_sum_paper(
+#                amplitude_proxies[current_depth - 1], gamma[current_depth - 1], beta[current_depth - 1], cost_1, num_constraints, num_qubits
+#            )
+#
+#    expected_proxy = 0
+#    for cost in range(terms_to_drop_in_expectation, num_costs):
+#        expected_proxy += number_with_cost_paper_proxy(cost, num_constraints, num_qubits) * (abs(amplitude_proxies[p][cost]) ** 2) * cost
+#
+#    return amplitude_proxies, expected_proxy
 def QAOA_paper_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
-    num_costs = num_constraints + 1
-    amplitude_proxies = np.zeros([p + 1, num_costs], dtype=complex)
-    init_amplitude = np.sqrt(1 / (1 << num_qubits))
-    for i in range(num_costs):
-        amplitude_proxies[0][i] = init_amplitude
-
-    for current_depth in range(1, p + 1):
-        for cost_1 in range(num_costs):
-            amplitude_proxies[current_depth][cost_1] = compute_amplitude_sum_paper(
-                amplitude_proxies[current_depth - 1], gamma[current_depth - 1], beta[current_depth - 1], cost_1, num_constraints, num_qubits
-            )
-
-    expected_proxy = 0
-    for cost in range(terms_to_drop_in_expectation, num_costs):
-        expected_proxy += number_with_cost_paper_proxy(cost, num_constraints, num_qubits) * (abs(amplitude_proxies[p][cost]) ** 2) * cost
-
-    return amplitude_proxies, expected_proxy
+    return jl.QAOA_paper_proxy(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
 
 
 def inverse_paper_proxy_objective_function(num_constraints: int, num_qubits: int, p: int, expectations: list[np.ndarray] | None) -> typing.Callable:

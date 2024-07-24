@@ -7,6 +7,8 @@
 #from scipy.stats import binom, multinomial
 using Distributions
 using TimerOutputs
+using PythonCall
+using BenchmarkTools
 
 #"""
 #This file implements the QAOA proxy algorithm for MaxCut from:
@@ -93,10 +95,14 @@ end
 TODO: What if instead of optimizing expectation proxy we instead optimize high cost amplitudes (using e.g. exponential weighting)
 Algorithm 1 from paper
 num_constraints = number of edges, and num_qubits = number of vertices
-"""
-function QAOA_paper_proxy(p::Int, gamma::AbstractVector{Float64}, beta::AbstractVector{Float64},
-        num_constraints::Int, num_qubits::Int, terms_to_drop_in_expectation::Int = 0)
 
+gamma and beta are explicitly-typed to force explicit conversion of numpy
+arrays, which I found gives ~20% speedup.
+"""
+function QAOA_paper_proxy(p::Int, gamma::Vector{Float64}, beta::Vector{Float64},
+        num_constraints::Int, num_qubits::Int, terms_to_drop_in_expectation::Int = 0)
+    println("Hello world.")
+    println(typeof(gamma))
     num_costs = num_constraints + 1
     amplitude_proxies = zeros(ComplexF64, p+1, num_costs)
     init_amplitude = sqrt(1 / (1 << num_qubits))
@@ -119,93 +125,19 @@ function QAOA_paper_proxy(p::Int, gamma::AbstractVector{Float64}, beta::Abstract
     return amplitude_proxies, expected_proxy
 end
 
-
-cost = 1
-num_constraints = 21
-prob_edge = 0.4
-cost_1 = 1
-cost_2 = 2
-distance = 1
-num_qubits = 10
-common_constraints = 3
-prev_amplitudes = ones(ComplexF64, 22) * 1/1000
-gamma = 0.5
-beta = 0.6
-p = 4
-gamma_vec = ones(4)
-beta_vec = ones(4)
-terms_to_drop_in_expectation = 1
-
-to = TimerOutput()
-println("prob_cost_paper ", prob_cost_paper(cost, num_constraints, prob_edge))
-println("number_with_cost_paper_proxy ", number_with_cost_paper_proxy(cost, num_constraints, num_qubits, prob_edge))
-println("prob_common_at_distance_paper ", prob_common_at_distance_paper(num_constraints, num_qubits, common_constraints, cost_1, cost_2, distance))
-println("number_of_costs_at_distance_paper_proxy ", number_of_costs_at_distance_paper_proxy(cost_1, cost_2, distance, num_constraints, num_qubits, prob_edge))
-println("compute_amplitude_sum_paper ", compute_amplitude_sum_paper(prev_amplitudes, gamma, beta, cost_1, num_constraints, num_qubits))
-#QAOA_paper_proxy(p, gamma_vec, beta_vec, num_constraints, num_qubits, terms_to_drop_in_expectation)
-println("QAOA_paper_proxy ", QAOA_paper_proxy(p, gamma_vec, beta_vec, num_constraints, num_qubits, terms_to_drop_in_expectation))
-@timeit to "Finished" println("Finished")
-show(to)
-
-#=
-function inverse_paper_proxy_objective_function(num_constraints::Int, num_qubits::Int, p::Int, expectations::Union{AbstractVector, Missing}=missing)::Function
-    function inverse_objective(args...)::Float64
-        gamma, beta = args[1][1:p], args[2][1+p:end]
-        _, expectation = QAOA_paper_proxy(p, gamma, beta, num_constraints, num_qubits)
-        current_time = time.time()
-
-        if !ismissing(expectations)
-            push!(expectations, (current_time, expectation))
-        end
-
-        return -expectation
-    end
-
-    return inverse_objective
-end
-
-
-function QAOA_paper_proxy_run(
-    num_constraints::Int,
-    num_qubits::Int,
-    p::Int,
-    init_gamma::AbstractVector{Real},
-    init_beta::AbstractVector{Real},
-@@@    expectations::Union{, Missing} list[np.ndarray] | None = None,
-)
-    init_freq = np.hstack([init_gamma, init_beta])
-
-    start_time = time.time()
-    result = scipy.optimize.minimize(
-        inverse_paper_proxy_objective_function(num_constraints, num_qubits, p, expectations),
-        init_freq,
-        args=(),
-        method=optimizer_method,
-        options=optimizer_options,
+"""
+Convert numpy arrays to julia arrays before doing QAOA_proxy. This gives about
+~20% speedup over using numpy arrays in julia.
+"""
+function QAOA_paper_proxy(p, gamma::PyArray, beta::PyArray, num_constraints, num_qubits, terms_to_drop_in_expectation)
+    t = @elapsed pyconvert(Vector, gamma)
+    println("pyconvert time = ", t)
+    return QAOA_paper_proxy(
+        pyconvert(Int, p),
+        pyconvert(Vector, gamma),
+        pyconvert(Vector, beta),
+        pyconvert(Int, num_constraints),
+        pyconvert(Int, num_qubits),
+        pyconvert(Int, terms_to_drop_in_expectation),
     )
-    # the above returns a scipy optimization result object that has multiple attributes
-    # result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
-    # result.message #message of why algorithms terminated
-    # result.nfev is number of iterations used (here, number of QAOA calls)
-    end_time = time.time()
-
-    def make_time_relative(input: tuple[float, float]) -> tuple[float, float]:
-        time, x = input
-        return (time - start_time, x)
-
-    if expectations is not None:
-        expectations = list(map(make_time_relative, expectations))
-
-    gamma, beta = result.x[:p], result.x[p:]
-    _, expectation = QAOA_paper_proxy(p, gamma, beta, num_constraints, num_qubits)
-
-    return {
-        "gamma": gamma,
-        "beta": beta,
-        "expectation": expectation,
-        "runtime": end_time - start_time,  # measured in seconds
-        "num_QAOA_calls": result.nfev,  # Calls to the proxy of course
-        "classical_opt_success": result.success,
-        "scipy_opt_message": result.message,
-    }
-=#
+end
