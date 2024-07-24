@@ -23,8 +23,8 @@ def number_with_cost_paper_proxy(cost: int, num_constraints: int, num_qubits: in
 
 
 # P(b, c'-b, c-b | d) from paper
-def prob_common_at_distance_paper(num_constraints: int, common_constraints: int, cost_1: int, cost_2: int, distance: int) -> float:
-    prob_same = (math.comb(num_constraints - distance, 2) + math.comb(distance, 2)) / math.comb(num_constraints, 2)
+def prob_common_at_distance_paper(num_constraints: int, num_qubits: int, common_constraints: int, cost_1: int, cost_2: int, distance: int) -> float:
+    prob_same = (math.comb(num_qubits - distance, 2) + math.comb(distance, 2)) / math.comb(num_qubits, 2)
     prob_neither = prob_same / 2
     prob_both = prob_neither
     prob_one = (1 - prob_neither - prob_both) / 2
@@ -39,7 +39,7 @@ def prob_common_at_distance_paper(num_constraints: int, common_constraints: int,
 def number_of_costs_at_distance_paper_proxy(cost_1: int, cost_2: int, distance: int, num_constraints: int, num_qubits: int, prob_edge: float = 0.5) -> float:
     sum = 0
     for common_constraints in range(max(0, cost_1 + cost_2 - num_constraints), min(cost_1, cost_2) + 1):
-        sum += prob_common_at_distance_paper(num_constraints, common_constraints, cost_1, cost_2, distance)
+        sum += prob_common_at_distance_paper(num_constraints, num_qubits, common_constraints, cost_1, cost_2, distance)
 
     p_cost = prob_cost_paper(cost_1, num_constraints, prob_edge)
     return (math.comb(num_qubits, distance) / p_cost) * sum
