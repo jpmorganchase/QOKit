@@ -93,8 +93,6 @@ arrays, which I found gives ~20% speedup.
 """
 function QAOA_paper_proxy(p::Int, gamma::Vector{Float64}, beta::Vector{Float64},
         num_constraints::Int, num_qubits::Int, terms_to_drop_in_expectation::Int = 0)
-    println("Hello world.")
-    println(typeof(gamma))
     num_costs = num_constraints + 1
     amplitude_proxies = zeros(ComplexF64, p+1, num_costs)
     init_amplitude = sqrt(1 / (1 << num_qubits))
@@ -107,7 +105,6 @@ function QAOA_paper_proxy(p::Int, gamma::Vector{Float64}, beta::Vector{Float64},
             )
         end
     end
-    println(amplitude_proxies[:,1])
 
     expected_proxy = 0
     for cost in terms_to_drop_in_expectation:num_costs-1
@@ -122,8 +119,6 @@ Convert numpy arrays to julia arrays before doing QAOA_proxy. This gives about
 ~20% speedup over using numpy arrays in julia.
 """
 function QAOA_paper_proxy(p, gamma::PyArray, beta::PyArray, num_constraints, num_qubits, terms_to_drop_in_expectation)
-    t = @elapsed pyconvert(Vector, gamma)
-    println("pyconvert time = ", t)
     return QAOA_paper_proxy(
         pyconvert(Int, p),
         pyconvert(Vector, gamma),
