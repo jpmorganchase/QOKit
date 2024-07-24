@@ -1,14 +1,6 @@
 
-#import numpy as np
-#import math
-#import typing
-#import time
-#import scipy
-#from scipy.stats import binom, multinomial
 using Distributions
-using TimerOutputs
 using PythonCall
-using BenchmarkTools
 
 #"""
 #This file implements the QAOA proxy algorithm for MaxCut from:
