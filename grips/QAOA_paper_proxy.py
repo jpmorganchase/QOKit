@@ -27,7 +27,7 @@ def QAOA_paper_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraint
     if USE_JULIA:
         return jl.QAOA_paper_proxy(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
     else:
-        warnings.warn("USE_JULIA=False, so calling python version of QAOA_paper_proxy.\nDid you mean to call QAOA_proxy_python?", JuliaWarning)
+        warnings.warn("USE_JULIA=False, so calling python version of QAOA_paper_proxy.\nDid you mean to call QAOA_paper_proxy_python?", JuliaWarning)
         return QAOA_paper_proxy_python(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
 
 
