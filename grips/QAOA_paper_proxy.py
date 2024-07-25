@@ -1,4 +1,3 @@
-from juliacall import Main as jl
 import numpy as np
 import math
 import typing
@@ -6,10 +5,31 @@ import time
 import scipy
 from scipy.stats import binom, multinomial
 import os 
+import warnings
 
-# Import the julia file that has all the paper_proxy functions
-dir_path = os.path.dirname(os.path.realpath(__file__))
-jl.seval(f'include("{dir_path}/paper_proxy.jl")')
+# Define a custom warning category
+class JuliaWarning(Warning):
+    pass
+# Configure the warnings to show each custom warning only once per session
+warnings.filterwarnings("once", category=JuliaWarning)
+
+
+USE_JULIA=True
+if USE_JULIA:
+    from juliacall import Main as jl
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    jl.seval(f'include("{dir_path}/paper_proxy.jl")')
+
+"""
+Julia version
+"""
+def QAOA_paper_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
+    if USE_JULIA:
+        return jl.QAOA_paper_proxy(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
+    else:
+        warnings.warn("USE_JULIA=False, so calling python version of QAOA_paper_proxy.\nDid you mean to call QAOA_proxy_python?", JuliaWarning)
+        return QAOA_paper_proxy_python(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
+
 
 """
 This file implements the QAOA proxy algorithm for MaxCut from:
@@ -93,11 +113,6 @@ def QAOA_paper_proxy_python(p: int, gamma: np.ndarray, beta: np.ndarray, num_con
 
     return amplitude_proxies, expected_proxy
 
-"""
-Julia version
-"""
-def QAOA_paper_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
-    return jl.QAOA_paper_proxy(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
 
 
 def inverse_paper_proxy_objective_function(num_constraints: int, num_qubits: int, p: int, expectations: list[np.ndarray] | None) -> typing.Callable:
