@@ -3,6 +3,33 @@ import numpy as np
 import time
 import scipy
 import typing
+import os
+import warnings
+
+# Define a custom warning category
+class JuliaWarning(Warning):
+    pass
+# Configure the warnings to show each custom warning only once per session
+warnings.filterwarnings("once", category=JuliaWarning)
+
+
+USE_JULIA=True
+if USE_JULIA:
+    from juliacall import Main as jl
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    jl.seval(f'include("{dir_path}/QAOA_proxy.jl")')
+
+"""
+Julia version
+"""
+def QAOA_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
+    if USE_JULIA:
+        return jl.QAOA_proxy(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
+    else:
+        warnings.warn("USE_JULIA=False, so calling python version of QAOA_proxy. Did you mean to call QAOA_proxy_python?", JuliaWarning)
+        return QAOA_proxy_python(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
+
+
 
 """
 This file implements a version of the QAOA proxy algorithm for MaxCut from:
@@ -11,6 +38,11 @@ https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.023171
 But using direct linear approxmations of distributions
 """
 
+###
+### The following functions are defined, but QAOA_proxy now uses the julia
+### implementations instead of the python ones. So most of the functions in this
+### file will never be called. But they can be called using QAOA_proxy_python
+###
 
 # Gives the y-value at x=current_time on the line between (start_time, start_value) and (end_time, end_value)
 @njit
@@ -82,7 +114,7 @@ def compute_amplitude_sum(prev_amplitudes: np.ndarray, gamma: float, beta: float
 # Algorithm 1 from paper using dumb approximations
 # num_constraints = number of edges, and num_qubits = number of vertices
 @njit
-def QAOA_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
+def QAOA_proxy_python(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
     num_costs = num_constraints + 1
     amplitude_proxies = np.zeros((p + 1, num_costs), dtype=np.complex128) # (p+1, num_costs) needs to be a tuple, not a list, in order to play nicely with numba. Also, dtype must be made more concrete (complex128 instead of complex)
     init_amplitude = np.sqrt(1 / (1 << num_qubits))
@@ -157,3 +189,28 @@ def QAOA_proxy_run(
         "classical_opt_success": result.success,
         "scipy_opt_message": result.message,
     }
+
+#cost = 1
+#num_constraints = 21
+#prob_edge = 0.4
+#cost_1 = 1
+#cost_2 = 2
+#distance = 1
+#num_qubits = 10
+#common_constraints = 3
+#prev_amplitudes = np.full(22, 1/1000, dtype=complex)
+#gamma = 0.5
+#beta = 0.6
+#p = 4
+#gamma_vec = np.ones(4)
+#beta_vec = np.ones(4)
+#terms_to_drop_in_expectation = 1
+#
+#start = time.time()
+#print("QAOA_proxy ", QAOA_proxy(p, gamma_vec, beta_vec, num_constraints, num_qubits, terms_to_drop_in_expectation))
+#end = time.time()
+#print("Elapsed time: ", end-start)
+#start = time.time()
+#print("QAOA_proxy ", QAOA_proxy(p, gamma_vec, beta_vec, num_constraints, num_qubits, terms_to_drop_in_expectation))
+#end = time.time()
+#print("Elapsed time: ", end-start)

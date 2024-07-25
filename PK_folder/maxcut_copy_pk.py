@@ -190,6 +190,7 @@ def optimize(N, terms, init_gamma, init_beta, expectations = None, measurements 
 
     #scipy uses minimize for everything, but we want to maximize for MaxCut, so we take the negative 
     #of the MaxCut objective value in inv_max_cut_objective 
+    #scipy supported optimizers: 
     res = scipy.optimize.minimize(inv_max_cut_objective(N, p, terms, expectations, measurements, sim), init_freq, method = optimizer, options={'rhobeg': 0.01/N})
 
     gamma, beta = res.x[:p], res.x[p:]
