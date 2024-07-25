@@ -5,7 +5,7 @@
 import math
 import numba.cuda
 import numpy as np
-import cupy as cp
+from ..lazy_import import CUPY as cp
 from pathlib import Path
 from functools import lru_cache
 

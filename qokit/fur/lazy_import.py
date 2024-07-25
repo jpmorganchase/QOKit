@@ -25,3 +25,4 @@ class LasyModule:
 
 
 MPI = LasyModule("mpi4py.MPI")
+CUPY = LasyModule("cupy")
