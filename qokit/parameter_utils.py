@@ -13,6 +13,7 @@ from enum import Enum
 from typing import Callable
 from functools import lru_cache, cached_property, cache
 from datetime import datetime
+from scipy.fft import dct, dst, idct, idst
 
 
 def from_fourier_basis(u, v):
@@ -30,15 +31,11 @@ def from_fourier_basis(u, v):
         QAOA parameters in standard parameterization
         (used e.g. by qaoa_qiskit.py)
     """
-
     assert len(u) == len(v)
-    p = len(u)
-    gamma = np.zeros(p)
-    beta = np.zeros(p)
-    for i in range(p):
-        for j in range(p):
-            gamma[i] += u[j] * np.sin(((j + 1) - 0.5) * ((i + 1) - 0.5) * np.pi / p)
-            beta[i] += v[j] * np.cos(((j + 1) - 0.5) * ((i + 1) - 0.5) * np.pi / p)
+
+    gamma = 0.5 * idst(u, type=4, norm="forward")  # difference of 1/2 due to normalization of idst
+    beta = 0.5 * idct(v, type=4, norm="forward")  # difference of 1/2 due to normalization of idct
+
     return gamma, beta
 
 
@@ -57,22 +54,11 @@ def to_fourier_basis(gamma, beta):
         QAOA parameters in fourier parameterization
         (used e.g. by qaoa_qiskit.py)
     """
-
     assert len(gamma) == len(beta)
-    p = len(gamma)
-    A = np.zeros((p, p))
-    B = np.zeros((p, p))
-    # Build matrix for linear system solving
-    for i in range(p):
-        for j in range(p):
-            A[i][j] = np.sin(((j + 1) - 0.5) * ((i + 1) - 0.5) * np.pi / p)
-            B[i][j] = np.cos(((j + 1) - 0.5) * ((i + 1) - 0.5) * np.pi / p)
-    u = np.linalg.solve(A, gamma)
-    v = np.linalg.solve(B, beta)
-    if np.allclose(np.dot(A, u), gamma) == True & np.allclose(np.dot(B, v), beta) == True:
-        return u, v
-    else:
-        raise ValueError("Linear solving was incorrect")
+    u = 2 * dst(gamma, type=4, norm="forward")  # difference of 2 due to normalization of dst
+    v = 2 * dct(beta, type=4, norm="forward")  # difference of 2 due to normalization of dct
+
+    return u, v
 
 
 def extrapolate_parameters_in_fourier_basis(u, v, p, step_size):

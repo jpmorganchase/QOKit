@@ -10,6 +10,7 @@ from itertools import combinations
 from operator import mul
 from functools import reduce
 from qokit.fur import TermsType
+from numba import njit
 
 # approximate optimal merit factor and energy for small Ns
 # from Table 1 of https://arxiv.org/abs/1512.02475
@@ -149,6 +150,7 @@ def get_energy_term_indices(N: int):
     return set(all_terms), offset
 
 
+@njit()
 def energy_vals(s: Sequence, N: int | None = None) -> float:
     """Compute LABS energy values from a string of spins
 
