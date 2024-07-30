@@ -5,9 +5,15 @@
 import math
 import numba.cuda
 import numpy as np
-import cupy as cp
 from pathlib import Path
 from functools import lru_cache
+import warnings
+
+try:
+    import cupy as cp
+except ImportError:
+    if numba.cuda.is_available():
+        warnings.warn("Cupy import failed, which is required for X rotations on NVIDA GPUs", RuntimeWarning)
 
 
 ########################################
@@ -27,7 +33,7 @@ def get_furx_kernel(k_qubits: int, q_offset: int, state_mask: int):
     return cp.RawModule(code=code, name_expressions=[kernel_name], options=("-std=c++17",)).get_function(kernel_name)
 
 
-def furx(sv: cp.ndarray, a: float, b: float, k_qubits: int, q_offset: int, state_mask: int):
+def furx(sv: np.ndarray, a: float, b: float, k_qubits: int, q_offset: int, state_mask: int):
     """
     Apply in-place fast Rx gate exp(-1j * theta * X) on k consequtive qubits to statevector array x.
 
