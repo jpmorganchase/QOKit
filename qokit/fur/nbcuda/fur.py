@@ -15,6 +15,7 @@ except ImportError:
     if numba.cuda.is_available():
         warnings.warn("Cupy import failed, which is required for X rotations on NVIDA GPUs", RuntimeWarning)
 
+
 ########################################
 # single-qubit X rotation
 ########################################
