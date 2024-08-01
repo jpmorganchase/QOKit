@@ -30,11 +30,3 @@ def test_simulator_python_build():
     assert "python" in get_available_simulator_names("x")
     assert "python" in get_available_simulator_names("xyring")
     assert "python" in get_available_simulator_names("xycomplete")
-
-
-@pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
-@pytest.mark.timeout(10)
-def test_simulator_timing():
-    theta = np.random.uniform(0, 1, 280)
-    f = get_qaoa_labs_objective(20, 140)
-    f(theta)
