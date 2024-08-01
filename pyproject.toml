@@ -25,6 +25,7 @@ dependencies = [
     'pandas>=2.0.1',
     'pathos>=0.3.0',
     'pytest>=7.3.1',
+    'pytest-timeout>=2.3.1',
     'pytket==1.22.0',
     'pytket-qiskit==0.46.0',
     'pytket-quantinuum==0.25.0',
