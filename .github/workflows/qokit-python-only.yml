@@ -3,14 +3,13 @@
 
 name: QOKit test (python simulator only)
 
-on: # workflow_dispatch
+on: 
  push:
-   branches: [ "main", "**" ]
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:
