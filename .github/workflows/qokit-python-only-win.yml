@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Run tests
+name: Run tests (python simulator only, Windows)
 
 on: 
  push:
@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [windows-latest]
         python-version: ["3.9", "3.10", "3.11"]
         
     steps:
@@ -29,12 +29,13 @@ jobs:
     - name: black check
       run:  |
           black --check .
-    - name: pip install   
+    - name: pip install 
       run: |
-          pip install .  
-    - name: Run tests 
+        SET QOKIT_PYTHON_ONLY=True 
+        pip install .
+    - name: Run tests and coverage
       run: |
-         pytest --cov=qokit --cov-fail-under=75 -rs tests 
+         pytest --cov=qokit -rs tests --cov-fail-under=70
     - name: License check
       run: |
         pip-licenses --format=markdown --order=license

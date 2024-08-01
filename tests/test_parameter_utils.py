@@ -5,6 +5,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+import unittest
 from importlib_resources import files
 
 from qokit.qaoa_objective_labs import get_qaoa_labs_objective
@@ -12,6 +13,124 @@ from qokit.fur import get_available_simulator_names
 from qokit.parameter_utils import from_fourier_basis, to_fourier_basis, extrapolate_parameters_in_fourier_basis, convert_to_gamma_beta
 
 simulators_to_run = get_available_simulator_names("x") + ["qiskit"]
+
+
+def from_fourier_basis_old(u, v):
+    """Convert u,v parameterizing QAOA in the Fourier basis
+    to beta, gamma in standard parameterization
+    following https://arxiv.org/abs/1812.01041
+    Baseline version implemented by hardcoding the formula
+    Only used for tests
+
+    Parameters
+    ----------
+    u : list-like
+    v : list-like
+        QAOA parameters in Fourier basis
+    Returns
+    -------
+    beta, gamma : np.array
+        QAOA parameters in standard parameterization
+        (used e.g. by qaoa_qiskit.py)
+    """
+
+    assert len(u) == len(v)
+    p = len(u)
+    gamma = np.zeros(p)
+    beta = np.zeros(p)
+    for i in range(p):
+        for j in range(p):
+            gamma[i] += u[j] * np.sin(((j + 1) - 0.5) * ((i + 1) - 0.5) * np.pi / p)
+            beta[i] += v[j] * np.cos(((j + 1) - 0.5) * ((i + 1) - 0.5) * np.pi / p)
+    return gamma, beta
+
+
+def to_fourier_basis_old(gamma, beta):
+    """Convert gamma,beta standard parameterizing QAOA to the Fourier basis
+    of u, v in standard parameterization
+    following https://arxiv.org/abs/1812.01041
+    Baseline version implemented by hardcoding the formula
+    Only used for tests
+
+    Parameters
+    ----------
+    gamma : list-like
+    beta : list-like
+        QAOA parameters in standard basis
+    Returns
+    -------
+    u, v : np.array
+        QAOA parameters in fourier parameterization
+        (used e.g. by qaoa_qiskit.py)
+    """
+
+    assert len(gamma) == len(beta)
+    p = len(gamma)
+    A = np.zeros((p, p))
+    B = np.zeros((p, p))
+    # Build matrix for linear system solving
+    for i in range(p):
+        for j in range(p):
+            A[i][j] = np.sin(((j + 1) - 0.5) * ((i + 1) - 0.5) * np.pi / p)
+            B[i][j] = np.cos(((j + 1) - 0.5) * ((i + 1) - 0.5) * np.pi / p)
+    u = np.linalg.solve(A, gamma)
+    v = np.linalg.solve(B, beta)
+    if np.allclose(np.dot(A, u), gamma) == True & np.allclose(np.dot(B, v), beta) == True:
+        return u, v
+    else:
+        raise ValueError("Linear solving was incorrect")
+
+
+class TestQAOAFourier(unittest.TestCase):
+
+    def setUp(self):
+        # Set up some example data for testing
+        self.lengths = [100, 200, 500]
+        self.test_cases = []
+        for length in self.lengths:
+            u = np.random.rand(length)
+            v = np.random.rand(length)
+            gamma, beta = from_fourier_basis(u, v)
+            gamma_old, beta_old = from_fourier_basis_old(u, v)
+            self.test_cases.append((u, v, gamma, beta, gamma_old, beta_old))
+
+    def test_from_fourier_basis(self):
+        for u, v, gamma, beta, gamma_old, beta_old in self.test_cases:
+            gamma_new, beta_new = from_fourier_basis(u, v)
+            self.assertTrue(np.allclose(gamma_new, gamma_old))
+            self.assertTrue(np.allclose(beta_new, beta_old))
+
+    def test_to_fourier_basis(self):
+        for u, v, gamma, beta, gamma_old, beta_old in self.test_cases:
+            u_new, v_new = to_fourier_basis(gamma, beta)
+            self.assertTrue(np.allclose(u_new, u))
+            self.assertTrue(np.allclose(v_new, v))
+
+    def test_from_fourier_basis_old(self):
+        for u, v, gamma, beta, gamma_old, beta_old in self.test_cases:
+            gamma_old_new, beta_old_new = from_fourier_basis_old(u, v)
+            self.assertTrue(np.allclose(gamma_old_new, gamma))
+            self.assertTrue(np.allclose(beta_old_new, beta))
+
+    def test_to_fourier_basis_old(self):
+        for u, v, gamma, beta, gamma_old, beta_old in self.test_cases:
+            u_old_new, v_old_new = to_fourier_basis_old(gamma_old, beta_old)
+            self.assertTrue(np.allclose(u_old_new, u))
+            self.assertTrue(np.allclose(v_old_new, v))
+
+    def test_round_trip_conversion(self):
+        for u, v, gamma, beta, gamma_old, beta_old in self.test_cases:
+            # Test round-trip conversion for new methods
+            u_new, v_new = to_fourier_basis(gamma, beta)
+            gamma_new, beta_new = from_fourier_basis(u_new, v_new)
+            self.assertTrue(np.allclose(gamma_new, gamma))
+            self.assertTrue(np.allclose(beta_new, beta))
+
+            # Test round-trip conversion for old methods
+            u_old_new, v_old_new = to_fourier_basis_old(gamma_old, beta_old)
+            gamma_old_new, beta_old_new = from_fourier_basis_old(u_old_new, v_old_new)
+            self.assertTrue(np.allclose(gamma_old_new, gamma_old))
+            self.assertTrue(np.allclose(beta_old_new, beta_old))
 
 
 @pytest.mark.parametrize("simulator", simulators_to_run)

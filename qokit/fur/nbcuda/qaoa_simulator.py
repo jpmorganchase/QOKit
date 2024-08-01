@@ -127,7 +127,7 @@ class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
             indices_sel = costs_t == val
         else:
             indices_sel = indices
-        return probs[indices_sel].sum()
+        return probs[indices_sel].sum().item()
 
 
 class QAOAFURXSimulatorGPU(QAOAFastSimulatorGPUBase):

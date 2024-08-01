@@ -16,7 +16,7 @@ classifiers=[
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
-version = "0.1.4"
+version = "0.2.0"
 requires-python = ">=3.9.0"
 dependencies = [
     'networkx>=3.0.0',
@@ -25,12 +25,12 @@ dependencies = [
     'pandas>=2.0.1',
     'pathos>=0.3.0',
     'pytest>=7.3.1',
-    'pytket>=1.15.0,<2',
-    'pytket-qiskit>=0.39.0,<1',
-    'pytket-quantinuum>=0.16.0,<1',
-    'qiskit>=0.42,<1',
-    'qiskit-finance>=0.3,<1',
-    'qiskit-ibmq-provider>=0.20.2,<1',
+    'pytket==1.22.0',
+    'pytket-qiskit==0.46.0',
+    'pytket-quantinuum==0.25.0',
+    'qiskit==0.45.3',
+    'qiskit-finance==0.3.4',
+    'qiskit-ibmq-provider==0.20.2',
     'scipy>=1.10.1',
     'seaborn>=0.12.2',
     'sympy>=1.12',
@@ -38,16 +38,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-GPU = [
-  'qiskit-aer-gpu>=0.8'
-]
-dev = [
-  'black[d]>=23.3.0',
-  'setuptools>=58.1.0',
-  'Deprecated>=1.2.13',
-  'urllib3>=1.26.6',
-  'statsmodels>=0.13.5',
-  'scikit-learn>=1.2.2'
+GPU-CUDA12 = [
+    'cupy-cuda12x>=13.2.0'
 ]
 solvers = [
   'docplex>=2.18.200',
