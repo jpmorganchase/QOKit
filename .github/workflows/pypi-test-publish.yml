@@ -1,4 +1,4 @@
-name: Upload Python Package to PyPI Test
+name: Upload Python Package to Test PyPI
 
 on:
   workflow_dispatch:
