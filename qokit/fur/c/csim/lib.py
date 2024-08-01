@@ -10,7 +10,7 @@ from .libpath import libpath
 
 try:
     lib = ctypes.cdll.LoadLibrary(str(libpath))
-except OSError as e:
+except (OSError, FileNotFoundError) as e:
     raise ImportError("You must compile the C simulator before running the code. Please follow the instructions in README.md") from e
 
 
