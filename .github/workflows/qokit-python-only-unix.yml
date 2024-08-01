@@ -29,10 +29,9 @@ jobs:
     - name: black check
       run:  |
           black --check .
-    - name: qokit install 
+    - name: pip install 
       run: |
-        export QOKIT_PYTHON_ONLY=True
-        echo $QOKIT_PYTHON_ONLY
+        export QOKIT_PYTHON_ONLY=True 
         pip install .
     - name: Run tests and coverage
       run: |
