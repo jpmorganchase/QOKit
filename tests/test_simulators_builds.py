@@ -19,12 +19,14 @@ def test_simulator_c_bild():
     assert "c" in get_available_simulator_names("xyring")
     assert "c" in get_available_simulator_names("xycomplete")
 
+
 @pytest.mark.skipif(not IN_GITHUB_ACTIONS, reason="Test runs only in Github Actions.")
 @pytest.mark.skipif(not PYTHON_ONLY, reason="Fast c/c++ simulator should be installed")
 def test_simulator_c_bild():
     assert "c" not in get_available_simulator_names("x")
     assert "c" not in get_available_simulator_names("xyring")
     assert "c" not in get_available_simulator_names("xycomplete")
+
 
 @pytest.mark.skipif(not IN_GITHUB_ACTIONS, reason="Test runs only in Github Actions.")
 def test_simulator_python_build():
