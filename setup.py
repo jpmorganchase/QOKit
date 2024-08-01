@@ -11,18 +11,18 @@ import sys
 
 path = "./qokit/fur/c/csim/src/"
 
-python_only = os.environ.get("QOKIT_PYTHON_ONLY")
+PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY") == "true"
 
 sources = [os.path.join(path, "diagonal.c"), os.path.join(path, "fur.c"), os.path.join(path, "qaoa_fur.c")]
 extensions = []
-if python_only is None:
+if not PYTHON_ONLY:
     extensions.append(
         Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"] if sys.platform == "win32" else [])
     )
 
 
 def cbuild():
-    if python_only is None:
+    if not PYTHON_ONLY:
         subprocess.call(["make", "-C", path])
 
 
