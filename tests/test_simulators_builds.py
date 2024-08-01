@@ -8,8 +8,6 @@ import numpy as np
 from qokit import get_qaoa_labs_objective
 from qokit.fur import get_available_simulator_names
 
-# for GITHUB_ACTIONS = false tests are runing in Github actions only. Change to true to run locally
-
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 python_only = os.environ.get("QOKIT_PYTHON_ONLY")
 
