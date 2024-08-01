@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-
+    name: Test using ${{matrix.python-version}} on ${{matrix.os}}
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
