@@ -8,7 +8,6 @@ import numpy as np
 from qokit import get_qaoa_labs_objective
 from qokit.fur import get_available_simulator_names
 
-IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY") == "true"
 
 
