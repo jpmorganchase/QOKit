@@ -1,0 +1,46 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: QOKit test (python simulator only, Windows)
+
+on: 
+ push:
+
+jobs:
+  build:
+    name: Python ${{matrix.python-version}} on ${{matrix.os}}
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+        python-version: ["3.9", "3.10", "3.11"]
+        
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipreqs black addheader pytest-cov pip-licenses
+    - name: black check
+      run:  |
+          black --check .
+    - name: pip install 
+      run: |
+        SET QOKIT_PYTHON_ONLY=True 
+        pip install .
+    - name: Run tests and coverage
+      run: |
+         pytest --cov=qokit -rs tests --cov-fail-under=70
+    - name: License check
+      run: |
+        pip-licenses --format=markdown --order=license
+        
+    - name: SPDX check
+      run: |
+       addheader -t header.txt .
+       grep -L -f header.txt */*.py
