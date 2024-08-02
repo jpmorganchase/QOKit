@@ -15,7 +15,7 @@ QOKIT_NO_C_ENV = False  # used for tests only
 
 environment_variable_value = os.environ.get(environment_variable_name, None)
 QOKIT_PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY", False)
-print(os.system("SET"))
+
 if environment_variable_value is not None:
     QOKIT_NO_C_ENV = True
 
