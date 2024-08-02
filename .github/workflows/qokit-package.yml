@@ -36,6 +36,7 @@ jobs:
     - name: pip install   
       run: |
           pip install .  
+          make -C qokit/fur/c/csim/src/
     - name: Run tests 
       run: |
           pytest --cov=qokit --cov-fail-under=75 -rs tests 
