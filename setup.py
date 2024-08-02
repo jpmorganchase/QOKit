@@ -10,7 +10,7 @@ import sys
 
 
 environment_variable_name = "QOKIT_NO_C_ENV"
-#QOKIT_PYTHON_ONLY = False
+# QOKIT_PYTHON_ONLY = False
 QOKIT_NO_C_ENV = False  # used for tests only
 
 environment_variable_value = os.environ.get(environment_variable_name, None)
