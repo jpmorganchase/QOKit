@@ -21,13 +21,14 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
-        python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install pipreqs black addheader pytest-cov pip-licenses
-        if: runner.os == 'macOS'
-        run: |
+          python -m pip install --upgrade pip
+          pip install pipreqs black addheader pytest-cov pip-licenses
+    - name: Install GCC (macOS only)
+      if: runner.os == 'macOS'
+      run: |
           brew install gcc
     - name: black check
       run:  |
@@ -37,12 +38,12 @@ jobs:
           pip install .  
     - name: Run tests 
       run: |
-         pytest --cov=qokit --cov-fail-under=75 -rs tests 
+          pytest --cov=qokit --cov-fail-under=75 -rs tests 
     - name: License check
       run: |
-        pip-licenses --format=markdown --order=license
+          pip-licenses --format=markdown --order=license
         
     - name: SPDX check
       run: |
-       addheader -t header.txt .
-       grep -L -f header.txt */*.py
+          addheader -t header.txt .
+          grep -L -f header.txt */*.py
