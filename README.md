@@ -32,7 +32,7 @@ Some optional parts of the package require additional dependencies.
 
 Please note that the GPU dependency is specified for CUDA 12x. For other versions of CUDA, please follow cupy installation instructions.
 
-If compilation fails, try installing just the Python version using `QOKIT_PYTHON_ONLY=1 pip install -e .`.
+If compilation fails, try installing just the Python version using `QOKIT_PYTHON_ONLY=true pip install -e .`.
 
 Installation can be verified by running tests using `pytest`.
 
