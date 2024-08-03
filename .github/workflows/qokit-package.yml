@@ -15,7 +15,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["3.9", "3.10", "3.11"]
-        
+
+    if: [ "$RUNNER_OS" == "Windows" ]; then
+        env:
+          QOKIT_PYTHON_ONLY: True    
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -29,10 +32,7 @@ jobs:
     - name: black check
       run:  |
           black --check .      
-    - name: pip install
-      if: [ "$RUNNER_OS" == "Windows" ]; then
-          env:
-            QOKIT_PYTHON_ONLY: True  
+    - name: pip install  
       run: |
         pip install . 
     - name: Run tests 
