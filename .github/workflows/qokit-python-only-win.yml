@@ -31,7 +31,8 @@ jobs:
           black --check .
     - name: pip install 
       run: |
-        echo "{QOKIT_PYTHON_ONLY}={True}" >> $GITHUB_ENV 
+        set QOKIT_PYTHON_ONLY=True
+        echo "%PATH%" 
         pip install .
     - name: Run tests and coverage
       run: |
