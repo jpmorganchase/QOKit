@@ -29,7 +29,7 @@ jobs:
     - name: black check
       run:  |
           black --check .
-    - if:runner.os == 'Windows'
+    - if: runner.os == 'Windows'
       env:
         QOKIT_PYTHON_ONLY: True       
     - name: pip install   
