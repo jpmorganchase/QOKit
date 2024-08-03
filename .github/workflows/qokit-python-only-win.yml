@@ -29,10 +29,10 @@ jobs:
     - name: black check
       run:  |
           black --check .
-    - name: pip install 
+    - name: pip install
+      env:
+        QOKIT_PYTHON_ONLY: True
       run: |
-        set QOKIT_PYTHON_ONLY=True
-        echo %PATH% 
         pip install .
     - name: Run tests and coverage
       run: |
