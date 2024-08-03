@@ -32,7 +32,7 @@ jobs:
     - name: pip install 
       run: |
         set QOKIT_PYTHON_ONLY=True
-        echo "%PATH%" 
+        echo %PATH% 
         pip install .
     - name: Run tests and coverage
       run: |
