@@ -28,13 +28,13 @@ jobs:
         pip install pipreqs black addheader pytest-cov pip-licenses
     - name: black check
       run:  |
-          black --check .
-    - if: runner.os == 'Windows'
-      env:
-        QOKIT_PYTHON_ONLY: True       
-    - name: pip install   
+          black --check .      
+    - name: pip install
+      if: [ "$RUNNER_OS" == "Windows" ]; then
+          env:
+            QOKIT_PYTHON_ONLY: True  
       run: |
-          pip install . 
+        pip install . 
     - name: Run tests 
       run: |
          pytest --cov=qokit --cov-fail-under=75 -rs tests 
