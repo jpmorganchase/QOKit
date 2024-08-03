@@ -29,20 +29,12 @@ jobs:
     - name: black check
       run:  |
           black --check .
-    - if:runner.os == 'Linux'
-      name: pip install   
-      run: |
-          pip install .
-    - if:runner.os == 'macOS'
-      name: pip install   
-      run: |
-          pip install .
     - if:runner.os == 'Windows'
-      name: pip install 
       env:
-        QOKIT_PYTHON_ONLY: True  
+        QOKIT_PYTHON_ONLY: True       
+    - name: pip install   
       run: |
-          pip install .              
+          pip install . 
     - name: Run tests 
       run: |
          pytest --cov=qokit --cov-fail-under=75 -rs tests 
