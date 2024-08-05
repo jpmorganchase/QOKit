@@ -22,7 +22,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.19.2
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ matrix.python-version }}
+          name: artifact-${{ matrix.os }}-${{ matrix.python-version }}
           path: ./wheelhouse/*.whl
           overwrite: true
           compression-level: 9
@@ -40,7 +40,7 @@ jobs:
         run: pipx run build --sdist
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ matrix.python-version }}
+          name: artifact-${{ matrix.os }}-${{ matrix.python-version }}
           path: dist/*.tar.gz  
 
   upload_pypi:
@@ -54,9 +54,10 @@ jobs:
     permissions: 
       id-token: write
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.os }}-${{ matrix.python-version }}
+          pattern: artifact-*
+          merge-multiple: true
           path: dist
 
       - uses: pypa/gh-action-pypi-publish@release/v1      
