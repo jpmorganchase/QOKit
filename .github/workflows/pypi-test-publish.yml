@@ -12,9 +12,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        #python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11"]
         # python-version: ["cp310","cp311"]
-        python-version: '3.x'
         #python: ["cp311"]
 
     steps:
