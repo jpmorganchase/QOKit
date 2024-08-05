@@ -22,6 +22,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.19.2
       - uses: actions/upload-artifact@v4
         with:
+          name: ${{ matrix.os }}-${{ matrix.python-version }}
           path: ./wheelhouse/*.whl
           overwrite: true
           compression-level: 9
