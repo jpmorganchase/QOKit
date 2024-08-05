@@ -23,6 +23,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
+          overwrite: true
           compression-level: 9
 
   build_sdist:        
