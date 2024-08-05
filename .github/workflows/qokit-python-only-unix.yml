@@ -31,7 +31,7 @@ jobs:
           black --check .
     - name: pip install 
       run: |
-        export QOKIT_PYTHON_ONLY=True 
+        export QOKIT_PYTHON_ONLY=true 
         pip install .
     - name: Run tests and coverage
       run: |

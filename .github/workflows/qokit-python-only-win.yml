@@ -31,7 +31,7 @@ jobs:
           black --check .
     - name: pip install
       env:
-        QOKIT_PYTHON_ONLY: True
+        QOKIT_PYTHON_ONLY: true
       run: |
         pip install .
     - name: Run tests and coverage
