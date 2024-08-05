@@ -23,6 +23,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
+          compression-level: 9
 
   build_sdist:        
     name: Build Source Distribution
