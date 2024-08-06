@@ -35,6 +35,8 @@ jobs:
       run: |
         pip install .
     - name: Run tests and coverage
+      env:
+        QOKIT_PYTHON_ONLY: true
       run: |
          pytest --cov=qokit -rs tests --cov-fail-under=70
     - name: License check
