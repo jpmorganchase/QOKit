@@ -9,7 +9,7 @@ import os
 import sys
 
 
-QOKIT_PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY") == "true"
+QOKIT_PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY", False)
 
 path = "./qokit/fur/c/csim/src/"
 
