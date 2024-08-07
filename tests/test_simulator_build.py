@@ -8,7 +8,7 @@ import numpy as np
 from qokit import get_qaoa_labs_objective
 from qokit.fur import get_available_simulator_names
 
-PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY") == "true"
+PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY")
 
 
 @pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
