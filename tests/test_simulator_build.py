@@ -25,6 +25,7 @@ def test_simulator_lack_of_c_build():
     assert "c" not in get_available_simulator_names("xyring")
     assert "c" not in get_available_simulator_names("xycomplete")
 
+
 @pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
 def test_simulator_python_build():
     assert "python" in get_available_simulator_names("x")
