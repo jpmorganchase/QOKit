@@ -9,14 +9,7 @@ import os
 import sys
 
 
-environment_variable_name = "QOKIT_NO_C_ENV"
-QOKIT_PYTHON_ONLY = False
-QOKIT_NO_C_ENV = False  # used for tests only
-
-environment_variable_value = os.environ.get(environment_variable_name, None)
-
-if environment_variable_value is not None:
-    QOKIT_NO_C_ENV = True
+QOKIT_PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY", False)
 
 path = "./qokit/fur/c/csim/src/"
 
@@ -33,8 +26,6 @@ class SimulatorBuild(build_ext):
     def run(self):
         try:
             if not QOKIT_PYTHON_ONLY:
-                if QOKIT_NO_C_ENV:
-                    raise Exception("No C/C++ enviroment setup")
                 subprocess.call(["make", "-C", path])
             super().run
         except Exception as e:
@@ -43,6 +34,5 @@ class SimulatorBuild(build_ext):
 
 with open("README.md", "r") as f:
     long_description = f.read()
-
 
 setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {}),

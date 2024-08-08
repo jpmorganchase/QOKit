@@ -1,24 +1,20 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: QOKit test
+name: Run tests
 
-on: # workflow_dispatch
+on: 
  push:
-   branches: [ "main", "**" ]
- pull_request:
-   branches: [ "main" ]
 
 jobs:
   build:
-
+    name: Python ${{matrix.python-version}} on ${{matrix.os}}
     runs-on: ${{matrix.os}}
     strategy:
       fail-fast: false
       matrix:
-       os: [ubuntu-latest]
-       python-version: ["3.9", "3.10", "3.11"]
-        
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.9", "3.10", "3.11"]   
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -31,10 +27,12 @@ jobs:
         pip install pipreqs black addheader pytest-cov pip-licenses
     - name: black check
       run:  |
-          black --check .
-    - name: pip install   
+          black --check .      
+    - name: pip install
+      env:
+        QOKIT_PYTHON_ONLY: false    
       run: |
-          pip install .  
+        pip install . 
     - name: Run tests 
       run: |
          pytest --cov=qokit --cov-fail-under=75 -rs tests 
