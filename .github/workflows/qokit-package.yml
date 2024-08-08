@@ -29,6 +29,8 @@ jobs:
       run:  |
           black --check .      
     - name: pip install
+      env:
+        QOKIT_PYTHON_ONLY: false    
       run: |
         pip install . 
     - name: Run tests 
