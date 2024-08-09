@@ -13,7 +13,7 @@ QOKIT_PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY")
 
 
 def test_csim():
-    assert glob.glob(f"/*/libcsim*.so") == ["libcsim.so"]
+    assert glob.glob(f"/*/libcsim*.so") == "libcsim.so"
 
 
 # @pytest.mark.skipif(not QOKIT_PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
