@@ -32,7 +32,7 @@ jobs:
       env:
         QOKIT_PYTHON_ONLY: false
       run: |
-        pip install . 
+        pip install -e . 
     - run: ls /home/runner/work/QOKit/  /home/runner/work/QOKit/QOKit/qokit/fur/c/csim 
     - name: Run tests 
       env:
