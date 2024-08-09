@@ -8,17 +8,22 @@ import subprocess
 import os
 import sys
 
-
 QOKIT_PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY", False)
 
-path = "./qokit/fur/c/csim/src/"
+path = "qokit/fur/c/csim/src/"
 
 sources = [os.path.join(path, "diagonal.c"), os.path.join(path, "fur.c"), os.path.join(path, "qaoa_fur.c")]
 
 extensions = []
 if not QOKIT_PYTHON_ONLY:
     extensions.append(
-        Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"] if sys.platform == "win32" else [])
+        Extension(
+            f"qokit.fur.c.csim.libcsim",
+            sources=sources,
+            include_dirs=[os.path.join(path, "")],
+            language="c",
+            extra_compile_args=["/d2FH4-"] if sys.platform == "win32" else [],
+        )
     )
 
 

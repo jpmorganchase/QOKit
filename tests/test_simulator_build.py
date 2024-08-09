@@ -4,35 +4,21 @@
 ###############################################################################
 import pytest
 import os
-import numpy as np
-from qokit import get_qaoa_labs_objective
 from qokit.fur import get_available_simulator_names
 
 
-PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY")  # By default it is None
-# None
-PYTHON_ONLY = False
+QOKIT_PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY")
 
 
-# @pytest.skip(allow_module_level=True, reason="skip this test for now")
-@pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
+@pytest.mark.skipif(not QOKIT_PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
 def test_simulator_c_build():
-    print(PYTHON_ONLY)
     assert "c" in get_available_simulator_names("x")
     assert "c" in get_available_simulator_names("xyring")
     assert "c" in get_available_simulator_names("xycomplete")
 
 
-# @pytest.skip(allow_module_level=False, reason="skip this test for now")
-# @pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator should be installed")
-# def test_simulator_lack_of_c_build():
-#     assert "c" not in get_available_simulator_names("x")
-#     assert "c" not in get_available_simulator_names("xyring")
-#     assert "c" not in get_available_simulator_names("xycomplete")
-
-# @pytest.skip(allow_module_level=False, reason="skip this test for now")
-# # @pytest.mark.skipif(not PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
-# def test_simulator_python_build():
-#     assert "python" in get_available_simulator_names("x")
-#     assert "python" in get_available_simulator_names("xyring")
-#     assert "python" in get_available_simulator_names("xycomplete")
+@pytest.mark.skipif(QOKIT_PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
+def test_simulator_python_build():
+    assert "python" in get_available_simulator_names("x")
+    assert "python" in get_available_simulator_names("xyring")
+    assert "python" in get_available_simulator_names("xycomplete")
