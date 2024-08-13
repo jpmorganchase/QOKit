@@ -15,6 +15,7 @@ path = "qokit/fur/c/csim/src/"
 sources = [os.path.join(path, "diagonal.c"), os.path.join(path, "fur.c"), os.path.join(path, "qaoa_fur.c")]
 
 extensions = []
+xxxxx
 if not QOKIT_PYTHON_ONLY:
     extensions.append(
         Extension(
