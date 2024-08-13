@@ -33,9 +33,9 @@ jobs:
         QOKIT_PYTHON_ONLY: false
       run: |
         pip install -e . 
-    - run: find /home/runner/work/QOKit/ -name "*libcsim*.so"
+    #- run: find /home/runner/work/QOKit/ -name "*libcsim*.so"
     - run: ls /home/runner/work/QOKit/
-    - run: ls /home/runner/work/QOKit/qokit/
+    - run: ls /home/runner/work/QOKit/QOkit/
     - name: Run tests 
       env:
         QOKIT_PYTHON_ONLY: false    
