@@ -3,7 +3,7 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 from ..lazy_import import MPI
-from ..nbcuda.fur import furx as furx_local
+from ..nbcuda.fur import furx_all as furx_local
 
 
 def furx_all(x, theta: float, n_local_qubits: int, n_all_qubits: int, comm):
