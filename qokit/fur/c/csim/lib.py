@@ -14,16 +14,6 @@ except OSError as e:
     raise ImportError("You must compile the C simulator before running the code. Please follow the instructions in README.md") from e
 
 
-_furx = lib.furx
-_furx.restype = None
-_furx.argtypes = [
-    ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
-    ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
-    ctypes.c_double,
-    ctypes.c_uint,
-    ctypes.c_size_t,
-]
-
 
 _apply_qaoa_furx = lib.apply_qaoa_furx
 _apply_qaoa_furx.restype = None
