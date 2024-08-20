@@ -14,7 +14,6 @@ except OSError as e:
     raise ImportError("You must compile the C simulator before running the code. Please follow the instructions in README.md") from e
 
 
-
 _apply_qaoa_furx = lib.apply_qaoa_furx
 _apply_qaoa_furx.restype = None
 _apply_qaoa_furx.argtypes = [
