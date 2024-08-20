@@ -7,45 +7,53 @@
 #include <stdio.h>
 #include <math.h>
 
-/**
- * apply to a statevector a single-qubit Pauli-X rotation defined by
- * Rx(theta) = exp(-i*theta*X)
- * where X is the Pauli-X operator.
- * @param sv_real array of length n containing real parts of the statevector
- * @param sv_imag array of length n containing imaginary parts of the statevector
- * @param theta rotation angle
- * @param q index of qubit on which the rotation is applied
- * @param n_states size of the statevector
- */ 
-void furx(double* a_real, double* a_imag, double theta, unsigned int q, size_t n_states)
-{
-    // number of groups of states on which the operation is applied locally
-    size_t num_groups = n_states / 2;
+void furx_kernel(double* a_real, double* a_imag, const double a, const double b, 
+    const int block_idx, const int n_q, const int q_offset, const int state_mask){
 
-    // helper digit masks for constructing the locality indices
-    // the mask is applied on the index through all groups of local operations
-    size_t mask1 = ((size_t)1<<q) - 1;  // digits lower than q
-    size_t mask2 = mask1 ^ ((n_states-1) >> 1);  // digits higher than q
+    const unsigned int data_size = 1 << n_q;
+    const unsigned int stride_size = data_size >> 1;
+
+    const unsigned int stride = 1 << q_offset;
+    const unsigned int index_mask = stride - 1;
+    const unsigned int stride_mask = ~index_mask;
+    const unsigned int offset = ((stride_mask & block_idx) << n_q) | (index_mask & block_idx);
+
+    // temporary local arrays
+    double real[data_size], imag[data_size];
+
+    // load global data into local array
+    for(int idx = 0; idx < data_size; ++idx){
+        const unsigned int data_idx = offset + idx*stride;
+        real[idx] = a_real[data_idx];
+        imag[idx] = a_imag[data_idx];
+    }
+
+    // perform n_q steps
+    for(int q = 0; q < n_q; ++q){
+        const unsigned int mask1 = (1 << q) - 1;
+        const unsigned int mask2 = state_mask - mask1;
+
+        for(int tid = 0; tid < stride_size; ++tid){
+            const unsigned int ia = ((tid & mask1) | ((tid & mask2) << 1));
+            const unsigned int ib = (ia | (1 << q));
+
+            const double ar = real[ia];
+            const double ai = imag[ia];
+            const double br = real[ib];
+            const double bi = imag[ib];
+
+            real[ia] = a*ar - b*bi;
+            imag[ia] = a*ai + b*br;
+            real[ib] = a*br - b*ai;
+            imag[ib] = a*bi + b*ar;
+        }
+    }
     
-    // pre-compute coefficients in transformation
-    double cx = cos(theta), sx = sin(theta);
-
-    #pragma omp parallel for
-    for (size_t i = 0; i < num_groups; i++)
-    {
-        size_t i1 = (i&mask1) | ((i&mask2)<<1);
-        size_t i2 = i1 | ((size_t)1<<q);
-
-        double a1r = a_real[i1];
-        double a2r = a_real[i2];
-        double a1i = a_imag[i1];
-        double a2i = a_imag[i2];
-
-        a_real[i1] = cx * a1r + sx * a2i;
-        a_real[i2] = sx * a1i + cx * a2r;
-        
-        a_imag[i1] = cx * a1i - sx * a2r;
-        a_imag[i2] = -sx * a1r + cx * a2i;
+    // load local data into global array
+    for(int idx = 0; idx < data_size; ++idx){
+        const unsigned int data_idx = offset + idx*stride;
+        a_real[data_idx] = real[idx];
+        a_imag[data_idx] = imag[idx];
     }
 }
 
@@ -62,9 +70,27 @@ void furx(double* a_real, double* a_imag, double theta, unsigned int q, size_t n
  */ 
 void furx_all(double* a_real, double* a_imag, double theta, unsigned int n_qubits, size_t n_states)
 {
-    for (unsigned int i=0; i< n_qubits; i++)
-    {
-        furx(a_real, a_imag, theta, i, n_states);
+    const size_t state_mask = (n_states - 1) >> 1;
+
+    const double a = cos(theta);
+    const double b = -sin(theta);
+
+    const unsigned int group_size = 10;
+    const unsigned int group_blocks = n_states >> group_size;
+    const unsigned int last_group_size = n_qubits % group_size;
+    const unsigned int last_group_blocks = n_states >> last_group_size;
+
+    for(int q_offset = 0; q_offset < n_qubits - last_group_size; q_offset += group_size){
+        #pragma omp parallel for
+        for(int i = 0; i < group_blocks; ++i)
+            furx_kernel(a_real, a_imag, a, b,i, group_size, q_offset,state_mask);
+    }
+
+    if(last_group_size > 0){
+        const unsigned int q_offset = n_qubits - last_group_size;
+        #pragma omp parallel for
+        for(int i = 0; i < last_group_blocks; ++i)
+            furx_kernel(a_real, a_imag, a, b, i, last_group_size, q_offset, state_mask);
     }
 }
 
