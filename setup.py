@@ -8,36 +8,29 @@ import subprocess
 import os
 import sys
 
-QOKIT_PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY", False)
 
-path = "qokit/fur/c/csim/src/"
+path = "./qokit/fur/c/csim/src/"
+
+PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY") == "true"
 
 sources = [os.path.join(path, "diagonal.c"), os.path.join(path, "fur.c"), os.path.join(path, "qaoa_fur.c")]
-
 extensions = []
-if not QOKIT_PYTHON_ONLY:
+if not PYTHON_ONLY:
     extensions.append(
-        Extension(
-            f"qokit.fur.c.csim.libcsim",
-            sources=sources,
-            include_dirs=[os.path.join(path, "")],
-            language="c",
-            extra_compile_args=["/d2FH4-"] if sys.platform == "win32" else [],
-        )
+        Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"] if sys.platform == "win32" else [])
     )
+
+
+def cbuild():
+    if not PYTHON_ONLY:
+        subprocess.call(["make", "-C", path])
 
 
 class SimulatorBuild(build_ext):
     def run(self):
-        try:
-            if not QOKIT_PYTHON_ONLY:
-                subprocess.call(["make", "-C", path])
-            super().run
-        except Exception as e:
-            print("No C/C++ enviroment setup to compile the C simulator. Installing Python Simulator")
+        cbuild()
+        super().run
 
 
-with open("README.md", "r") as f:
-    long_description = f.read()
-
+cbuild()
 setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {}),
