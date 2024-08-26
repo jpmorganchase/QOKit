@@ -30,13 +30,10 @@ jobs:
       run:  |
           black --check .
     - name: pip install
-      env:
-        QOKIT_PYTHON_ONLY: true
       run: |
+        export QOKIT_PYTHON_ONLY=true 
         pip install .
     - name: Run tests and coverage
-      env:
-        QOKIT_PYTHON_ONLY: true    
       run: |
          pytest --cov=qokit -rs tests --cov-fail-under=70
     - name: License check
