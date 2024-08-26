@@ -19,7 +19,7 @@ classifiers=[
 version = "0.1.4"
 requires-python = ">=3.9.0"
 dependencies = [
-    'networkx>=3.0.0',
+    'networkx',
     'importlib-resources>=5.2.2',
     'numba>=0.56.4,<1',
     'pandas>=2.0.1',
