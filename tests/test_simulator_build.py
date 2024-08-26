@@ -9,7 +9,7 @@ import glob
 from qokit.fur import get_available_simulator_names
 
 
-QOKIT_PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY")
+QOKIT_PYTHON_ONLY = bool(os.environ.get("QOKIT_PYTHON_ONLY"))
 
 
 @pytest.mark.skipif(not QOKIT_PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
