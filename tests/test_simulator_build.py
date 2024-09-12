@@ -7,7 +7,8 @@ import os
 import numpy as np
 from qokit import get_qaoa_labs_objective
 from qokit.fur import get_available_simulator_names
-# Uncomment to install python only version locally before running pip install . 
+
+# Uncomment to install python only version locally before running pip install .
 # PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY") == "true"
 
 
