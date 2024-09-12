@@ -8,8 +8,8 @@ import numpy as np
 from qokit import get_qaoa_labs_objective
 from qokit.fur import get_available_simulator_names
 
-# Uncomment to install python only version locally before running pip install .
-# PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY") == "true"
+# Set up QOKIT_PYTHON_ONLY in your local enviroment for Python only 
+PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY") == "true"
 
 
 @pytest.mark.skipif(not PYTHON_ONLY, reason="Fast c/c++ simulator should be installed")
