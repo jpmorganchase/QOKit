@@ -30,6 +30,7 @@ jobs:
       if: runner.os == 'macOS'
       run: |
           brew install gcc
+          export PATH=$PATH:/opt/homebrew/
     # - name: black check
     #   run:  |
     #       black --check .
