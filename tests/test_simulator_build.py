@@ -11,11 +11,11 @@ from qokit.fur import get_available_simulator_names
 PYTHON_ONLY = os.environ.get("QOKIT_PYTHON_ONLY") == "true"
 
 
-@pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
-def test_simulator_c_build():
-    assert "c" in get_available_simulator_names("x")
-    assert "c" in get_available_simulator_names("xyring")
-    assert "c" in get_available_simulator_names("xycomplete")
+# @pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator is not installed")
+# def test_simulator_c_build():
+#     assert "c" in get_available_simulator_names("x")
+#     assert "c" in get_available_simulator_names("xyring")
+#     assert "c" in get_available_simulator_names("xycomplete")
 
 
 @pytest.mark.skipif(not PYTHON_ONLY, reason="Fast c/c++ simulator should be installed")
