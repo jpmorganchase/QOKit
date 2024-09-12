@@ -31,6 +31,5 @@ class SimulatorBuild(build_ext):
         cbuild()
         super().run
 
-
 cbuild()
 setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {}),
