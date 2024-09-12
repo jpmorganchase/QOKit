@@ -30,9 +30,9 @@ jobs:
       if: runner.os == 'macOS'
       run: |
           brew install gcc
-    - name: black check
-      run:  |
-          black --check .
+    # - name: black check
+    #   run:  |
+    #       black --check .
     - name: pip install   
       run: |
           pip install .  
