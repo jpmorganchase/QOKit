@@ -31,9 +31,9 @@ jobs:
       run: |
           brew install gcc
           export PATH=$PATH:/opt/homebrew/
-    # - name: black check
-    #   run:  |
-    #       black --check .
+    - name: black check
+      run:  |
+          black --check .
     - name: pip install   
       run: |
           pip install .  
