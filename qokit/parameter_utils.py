@@ -62,7 +62,7 @@ def to_fourier_basis(gamma, beta):
 
 
 def extrapolate_parameters_in_fourier_basis(u, v, p, step_size):
-    """Extrapolate the parameters u, v from p to p+step_size
+    """Extrapolate the parameters u, v from p-step_size to p
     Parameters
     ----------
     u : list-like
