@@ -4,9 +4,9 @@
 ###############################################################################
 import numpy as np
 import networkx as nx
-import random
 from itertools import combinations
 from typing import Optional
+import secrets
 
 
 def get_energy_term_indices_SK(N: int, seed: Optional[int] = None):
@@ -80,9 +80,9 @@ def get_energy_term_indices_max_q_xor(N: int, q: int, d: int, seed: Optional[int
         the Hamiltonian is 0.5*Z0Z1 + 0.7*Z0Z1Z2Z3 - 2*Z1Z2
     """
     rng = np.random.RandomState(seed)
-    random.seed(seed)
+    secrets.SystemRandom().seed(seed)
     num_edges = rng.poisson(d * N)
-    indices = random.choices(list(combinations(range(N), q)), k=num_edges)
+    indices = secrets.SystemRandom().choices(list(combinations(range(N), q)), k=num_edges)
     all_terms = []
     for term in indices:
         all_terms.append((rng.choice([-1 / np.sqrt(d), 1 / np.sqrt(d)]), term))

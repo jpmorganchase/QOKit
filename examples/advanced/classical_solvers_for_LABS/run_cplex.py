@@ -8,8 +8,8 @@ import sys
 from time import time, process_time
 import logging
 import pandas as pd
-import random
 from docplex.mp.progress import ProgressListener, ProgressClock
+import secrets
 
 
 # copied from qokit.classical_methods.utils
@@ -78,8 +78,8 @@ def run_LABS(n_range, TTS: bool = True, enable_logs: bool = True, nb_runs=1):
                 sys.stdout = open(log_path_dir + f"time_{prefix}LABS_n{n}_runid{runid}.log", "w")
             path = f"lp/LABS_n{n}_cplex.lp"
             # Set seed and get generate seed for CPLEX
-            random.seed(a=runid)
-            seed_cplex = random.randint(0, MAXINT - 1)
+            secrets.SystemRandom().seed(a=runid)
+            seed_cplex = secrets.SystemRandom().randint(0, MAXINT - 1)
             msol, raw_time_diff, time_diff = run_one_instance(path, TTS=TTS, n=n, seed=seed_cplex)
             with open(main_log_file, "a") as f:
                 msg = f"{n},{raw_time_diff},{time_diff},{runid}\n"

@@ -9,7 +9,7 @@ from gurobipy import GurobiError
 from time import time, process_time
 import pandas as pd
 import logging
-import random
+import secrets
 
 Heuristics = 0
 Threads = 8
@@ -67,8 +67,8 @@ def run_LABS(n_range, env: Env, TTS: bool = True, nb_runs=1):
             log_to_write = log_path_dir + log_name + ".log"
             path_lp = f"lp/LABS_n{n}_cplex.lp"
             # Set seed and get generate seed for gurobi
-            random.seed(a=runid)
-            seed_gurobi = random.randint(0, MAXINT - 1)
+            secrets.SystemRandom().seed(a=runid)
+            seed_gurobi = secrets.SystemRandom().randint(0, MAXINT - 1)
             msol, raw_time_diff, time_diff = run_one_instance(path_lp, env, TTS=TTS, n=n, log_to_write=log_to_write, seed=seed_gurobi)
             with open(main_log_file, "a") as f:
                 msg = f"{n},{raw_time_diff},{time_diff},{msol},{runid}\n"
