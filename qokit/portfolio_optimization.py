@@ -10,6 +10,7 @@ import itertools
 from typing import Any
 from qokit.parameter_utils import get_sk_gamma_beta
 
+from typing import Tuple, Optional, List, cast
 
 def convert_bitstring_to_int(config):
     """make configuration iterable"""
@@ -82,21 +83,16 @@ def portfolio_brute_force(po_problem: dict, return_bitstring=False) -> tuple[flo
         return min_constrained, min_x, max_constrained, max_x, mean_constrained
 
 
-def get_data(N, seed=1, real=False) -> tuple[float, float]:
+def get_data(N, seed=1, real=True) -> tuple[float, float]:
     """
     load portofolio data from qiskit-finance (Yahoo)
     https://github.com/Qiskit/qiskit-finance/blob/main/docs/tutorials/11_time_series.ipynb
     """
     import datetime
-    from qiskit_finance.data_providers import RandomDataProvider, YahooDataProvider
+    #from qiskit_finance.data_providers import RandomDataProvider, YahooDataProvider
+    from .yahoo import YahooDataProvider
 
-    tickers = []
-    for i in range(N):
-        tickers.append("t" + str(i))
-    if real is False:
-        data = RandomDataProvider(tickers=tickers, start=datetime.datetime(2016, 1, 1), end=datetime.datetime(2016, 1, 30), seed=seed)
-    else:
-        stock_symbols = [
+    stock_symbols = [
             "AAPL",
             "GOOGL",
             "AMZN",
@@ -131,7 +127,7 @@ def get_data(N, seed=1, real=False) -> tuple[float, float]:
             "MMM",
         ]
 
-        data = YahooDataProvider(
+    data = YahooDataProvider(
             tickers=stock_symbols[:N],
             start=datetime.datetime(2020, 1, 1),
             end=datetime.datetime(2020, 1, 30),
@@ -141,8 +137,14 @@ def get_data(N, seed=1, real=False) -> tuple[float, float]:
     data.run()
     # use get_period_return_mean_vector & get_period_return_covariance_matrix to get return!
     # https://github.com/Qiskit/qiskit-finance/blob/main/docs/tutorials/01_portfolio_optimization.ipynb
-    means = data.get_period_return_mean_vector()
-    cov = data.get_period_return_covariance_matrix()
+    #means = data.get_period_return_mean_vector()
+    #cov = data.get_period_return_covariance_matrix()
+    period_returns = np.array(data._data)[:, 1:]/np.array(data._data)[:, :-1] - 1
+    means = cast(np.ndarray, np.mean(period_returns, axis=1))
+    cov = np.cov(period_returns, rowvar=True)
+    print("mean: ", means)
+    print("cov: ", cov)
+    print("data: ", data._data)
     return means, cov
 
 

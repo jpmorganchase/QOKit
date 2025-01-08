@@ -4,7 +4,7 @@
 ###############################################################################
 import numpy as np
 import pandas as pd
-from qiskit.providers.aer import AerSimulator
+from qiskit_aer import AerSimulator
 from pathlib import Path
 from qokit.utils import precompute_energies, obj_from_statevector, get_ramp
 from qokit.qaoa_circuit_labs import (
@@ -73,7 +73,8 @@ def test_parameterized_circuit():
     backend = AerSimulator(method="statevector")
 
     qc_param = get_parameterized_qaoa_circuit(N, terms, p)
-    qc1 = qc_param.bind_parameters(np.hstack([ramp["beta"], ramp["gamma"]]))
+    qc1 = qc_param.assign_parameters(np.hstack([ramp["beta"], ramp["gamma"]]))
+    #qc1 = qc_param.bind_parameters(np.hstack([ramp["beta"], ramp["gamma"]]))
     f1 = obj_from_statevector(
         np.asarray(backend.run(qc1).result().get_statevector()),
         negative_merit_factor_from_bitstring,

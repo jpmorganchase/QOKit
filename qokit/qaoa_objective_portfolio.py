@@ -100,7 +100,6 @@ def get_qaoa_portfolio_objective(
     return scaled_result(
         get_qaoa_objective(
             N=N,
-            p=p,
             precomputed_diagonal_hamiltonian=po_problem["scale"] * precomputed_energies,
             precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
             parameterized_circuit=parameterized_circuit,

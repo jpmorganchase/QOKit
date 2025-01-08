@@ -25,12 +25,13 @@ sources = [os.path.join(path, "diagonal.c"), os.path.join(path, "fur.c"), os.pat
 extensions = []
 if not QOKIT_PYTHON_ONLY:
     extensions.append(
-        Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"] if sys.platform == "win32" else [])
+        Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"] if sys.platform in ['win32'] else [])
     )
 
 
 class SimulatorBuild(build_ext):
     def run(self):
+        subprocess.call(["make", "clean", "-C", path])
         try:
             if not QOKIT_PYTHON_ONLY:
                 if QOKIT_NO_C_ENV:
@@ -45,4 +46,4 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 
-setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild} if sys.platform == "win32" else {}),
+setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild} if sys.platform in ["linux", "win32"] else {}),

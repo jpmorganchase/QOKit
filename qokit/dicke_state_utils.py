@@ -3,11 +3,16 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 import qiskit
-from qiskit import QuantumRegister, QuantumCircuit, BasicAer, execute
+from qiskit import QuantumRegister, QuantumCircuit
 
 import math, numpy, scipy
 
-from qiskit.opflow import I, X, Y
+#from qiskit.opflow import I, X, Y
+from qiskit.quantum_info import Pauli
+
+I = Pauli('I')
+X = Pauli('X')
+Y = Pauli('Y')
 
 """ get_ring_xy_mixer(N)
     Mixer operator to use in QAOA ansatz (partitioned 1D XX+YY mixer that preserves Hamming weight)
