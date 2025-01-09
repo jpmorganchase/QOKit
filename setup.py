@@ -24,9 +24,12 @@ sources = [os.path.join(path, "diagonal.c"), os.path.join(path, "fur.c"), os.pat
 
 extensions = []
 if not QOKIT_PYTHON_ONLY:
-    extensions.append(
-            Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"] if sys.platform in ["win32"] elif extra_compile_args=["-Xpreprocessor"] sys.platform in ["darwin"] else [])
-    )
+    if sys.platform in ["win32"]:
+        extensions.append(Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"]))
+    elif sys.platform in ["darwin"]:
+        extensions.append(Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["-Xpreprocessor"]))
+    else:
+        extensions.append(Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")]))
 
 
 class SimulatorBuild(build_ext):
