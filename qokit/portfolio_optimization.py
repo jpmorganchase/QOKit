@@ -133,7 +133,6 @@ def get_data(N, seed=1, real=True) -> tuple[float, float]:
         tickers=stock_symbols[:N],
         start=datetime.datetime(2020, 1, 1),
         end=datetime.datetime(2020, 1, 30),
-        # end=datetime.datetime(2021, 1, 1),
     )
 
     data.run()
@@ -144,9 +143,6 @@ def get_data(N, seed=1, real=True) -> tuple[float, float]:
     period_returns = np.array(data._data)[:, 1:] / np.array(data._data)[:, :-1] - 1
     means = cast(np.ndarray, np.mean(period_returns, axis=1))
     cov = np.cov(period_returns, rowvar=True)
-    print("mean: ", means)
-    print("cov: ", cov)
-    print("data: ", data._data)
     return means, cov
 
 

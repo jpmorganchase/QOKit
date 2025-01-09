@@ -14,7 +14,6 @@ PYTHON_ONLY = False if os.environ.get("QOKIT_PYTHON_ONLY") is None else os.envir
 
 @pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator should be installed")
 def test_simulator_lack_of_c_build():
-    print("Condition: ", PYTHON_ONLY)
     assert "c" in get_available_simulator_names("x")
     assert "c" in get_available_simulator_names("xyring")
     assert "c" in get_available_simulator_names("xycomplete")
