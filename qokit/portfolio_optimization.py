@@ -92,7 +92,7 @@ def get_data(N, seed=1, real=True) -> tuple[float, float]:
     import datetime
 
     # from qiskit_finance.data_providers import RandomDataProvider, YahooDataProvider
-    from .yahoo import YahooDataProvider
+    from qokit.yahoo import YahooDataProvider
 
     stock_symbols = [
         "AAPL",
