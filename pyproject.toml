@@ -27,6 +27,7 @@ dependencies = [
     'pytest>=7.3.1',
     'pytket==1.37.0',
     'docplex',
+    'yfinance',
     'pytket-qiskit>=0.59',
     'pytket-quantinuum',
     #'pytket-quantinuum==0.42.0',
