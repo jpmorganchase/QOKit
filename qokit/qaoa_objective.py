@@ -78,7 +78,6 @@ def _get_qiskit_objective(
 
         def g(gamma, beta):
             qc = parameterized_circuit.assign_parameters(list(np.hstack([beta, gamma])))
-            # qc = parameterized_circuit.bind_parameters(list(np.hstack([beta, gamma])))
             sv = np.asarray(backend.run(qc).result().get_statevector())
             probs = np.abs(sv) ** 2
             return compute_objective_from_probabilities(probs)

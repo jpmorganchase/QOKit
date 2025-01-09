@@ -7,7 +7,6 @@ from qiskit import QuantumRegister, QuantumCircuit
 
 import math, numpy, scipy
 
-# from qiskit.opflow import I, X, Y
 from qiskit.quantum_info import Pauli
 
 I = Pauli("I")

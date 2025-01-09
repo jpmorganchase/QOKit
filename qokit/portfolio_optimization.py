@@ -84,14 +84,13 @@ def portfolio_brute_force(po_problem: dict, return_bitstring=False) -> tuple[flo
         return min_constrained, min_x, max_constrained, max_x, mean_constrained
 
 
-def get_data(N, seed=1, real=True) -> tuple[float, float]:
+def get_data(N, seed=1, real=False) -> tuple[float, float]:
     """
     load portofolio data from qiskit-finance (Yahoo)
     https://github.com/Qiskit/qiskit-finance/blob/main/docs/tutorials/11_time_series.ipynb
     """
     import datetime
 
-    # from qiskit_finance.data_providers import RandomDataProvider, YahooDataProvider
     from qokit.yahoo import YahooDataProvider
 
     stock_symbols = [
