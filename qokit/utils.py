@@ -18,7 +18,7 @@ from qiskit.providers.basic_provider import BasicProvider
 from pytket.passes import (
     SequencePass,
     AutoSquash,
-    #auto_squash_pass,
+    # auto_squash_pass,
     RemoveRedundancies,
     SimplifyInitial,
     FullPeepholeOptimise,

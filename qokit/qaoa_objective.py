@@ -78,7 +78,7 @@ def _get_qiskit_objective(
 
         def g(gamma, beta):
             qc = parameterized_circuit.assign_parameters(list(np.hstack([beta, gamma])))
-            #qc = parameterized_circuit.bind_parameters(list(np.hstack([beta, gamma])))
+            # qc = parameterized_circuit.bind_parameters(list(np.hstack([beta, gamma])))
             sv = np.asarray(backend.run(qc).result().get_statevector())
             probs = np.abs(sv) ** 2
             return compute_objective_from_probabilities(probs)
@@ -88,8 +88,8 @@ def _get_qiskit_objective(
 
         def g(gamma, beta):
             qc = parameterized_circuit.assign_parameters(np.hstack([np.asarray(beta) / 2, np.asarray(gamma) / 2]))
-            #qc = parameterized_circuit.bind_parameters(np.hstack([np.asarray(beta) / 2, np.asarray(gamma) / 2]))
-            #result = transpile(qc, backend).result()
+            # qc = parameterized_circuit.bind_parameters(np.hstack([np.asarray(beta) / 2, np.asarray(gamma) / 2]))
+            # result = transpile(qc, backend).result()
             circ = transpile(qc, backend)
             sv = reverse_array_index_bit_order(Statevector(circ))
             probs = np.abs(sv) ** 2

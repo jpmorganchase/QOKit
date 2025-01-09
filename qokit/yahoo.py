@@ -22,7 +22,7 @@ _temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
 yf.set_tz_cache_location(_temp_dir.name)
 
 
-class YahooDataProvider():
+class YahooDataProvider:
     """Yahoo data provider.
 
     Please see:
@@ -90,6 +90,4 @@ class YahooDataProvider():
             raise Exception("Accessing Yahoo Data failed.") from ex
 
         if stocks_notfound:
-            raise Exception(
-                f"No data found for this date range, symbols may be delisted: {stocks_notfound}."
-            )
+            raise Exception(f"No data found for this date range, symbols may be delisted: {stocks_notfound}.")

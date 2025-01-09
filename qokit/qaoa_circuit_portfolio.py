@@ -209,7 +209,7 @@ def measure_circuit(circuit, n_trials=1024, save_state=True):
         return bitstrings
     else:
         backend = Aer.get_backend("statevector_simulator")
-        #result = transpile(circuit, backend).result()
+        # result = transpile(circuit, backend).result()
         circ = transpile(circuit, backend)
         state = Statevector(circ)
         return reverse_array_index_bit_order(state)

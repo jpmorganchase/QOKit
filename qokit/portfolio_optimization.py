@@ -12,6 +12,7 @@ from qokit.parameter_utils import get_sk_gamma_beta
 
 from typing import Tuple, Optional, List, cast
 
+
 def convert_bitstring_to_int(config):
     """make configuration iterable"""
     N = len(config)
@@ -89,57 +90,58 @@ def get_data(N, seed=1, real=True) -> tuple[float, float]:
     https://github.com/Qiskit/qiskit-finance/blob/main/docs/tutorials/11_time_series.ipynb
     """
     import datetime
-    #from qiskit_finance.data_providers import RandomDataProvider, YahooDataProvider
+
+    # from qiskit_finance.data_providers import RandomDataProvider, YahooDataProvider
     from .yahoo import YahooDataProvider
 
     stock_symbols = [
-            "AAPL",
-            "GOOGL",
-            "AMZN",
-            "MSFT",
-            "TSLA",
-            "NFLX",
-            "NVDA",
-            "JPM",
-            "V",
-            "JNJ",
-            "WMT",
-            "PG",
-            "MA",
-            "UNH",
-            "HD",
-            "DIS",
-            "BRK-B",
-            "VZ",
-            "KO",
-            "MRK",
-            "INTC",
-            "CMCSA",
-            "PEP",
-            "PFE",
-            "CSCO",
-            "XOM",
-            "BA",
-            "MCD",
-            "ABBV",
-            "IBM",
-            "GE",
-            "MMM",
-        ]
+        "AAPL",
+        "GOOGL",
+        "AMZN",
+        "MSFT",
+        "TSLA",
+        "NFLX",
+        "NVDA",
+        "JPM",
+        "V",
+        "JNJ",
+        "WMT",
+        "PG",
+        "MA",
+        "UNH",
+        "HD",
+        "DIS",
+        "BRK-B",
+        "VZ",
+        "KO",
+        "MRK",
+        "INTC",
+        "CMCSA",
+        "PEP",
+        "PFE",
+        "CSCO",
+        "XOM",
+        "BA",
+        "MCD",
+        "ABBV",
+        "IBM",
+        "GE",
+        "MMM",
+    ]
 
     data = YahooDataProvider(
-            tickers=stock_symbols[:N],
-            start=datetime.datetime(2020, 1, 1),
-            end=datetime.datetime(2020, 1, 30),
-            # end=datetime.datetime(2021, 1, 1),
-        )
+        tickers=stock_symbols[:N],
+        start=datetime.datetime(2020, 1, 1),
+        end=datetime.datetime(2020, 1, 30),
+        # end=datetime.datetime(2021, 1, 1),
+    )
 
     data.run()
     # use get_period_return_mean_vector & get_period_return_covariance_matrix to get return!
     # https://github.com/Qiskit/qiskit-finance/blob/main/docs/tutorials/01_portfolio_optimization.ipynb
-    #means = data.get_period_return_mean_vector()
-    #cov = data.get_period_return_covariance_matrix()
-    period_returns = np.array(data._data)[:, 1:]/np.array(data._data)[:, :-1] - 1
+    # means = data.get_period_return_mean_vector()
+    # cov = data.get_period_return_covariance_matrix()
+    period_returns = np.array(data._data)[:, 1:] / np.array(data._data)[:, :-1] - 1
     means = cast(np.ndarray, np.mean(period_returns, axis=1))
     cov = np.cov(period_returns, rowvar=True)
     print("mean: ", means)
