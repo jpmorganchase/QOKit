@@ -1,1330 +1,310 @@
 {
-    "92438":{
-        "True optimal cut":10.8458185606,
-        "Expected cut of random guess":5.5,
-        "Expected cut of QAOA":9.4629810649,
-        "overlap":0.3016743182,
-        "p":2,
-        "beta":[
-            0.4989224561,
-            0.2922590634
-        ],
-        "gamma":[
-            0.9479835648,
-            1.4818295952
-        ],
-        "G_json":{
-            "directed":false,
-            "multigraph":false,
-            "graph":{
-
-            },
-            "nodes":[
-                {
-                    "id":0
-                },
-                {
-                    "id":1
-                },
-                {
-                    "id":2
-                },
-                {
-                    "id":3
-                },
-                {
-                    "id":4
-                },
-                {
-                    "id":5
-                },
-                {
-                    "id":6
-                },
-                {
-                    "id":7
-                }
+    "92438": {
+        "True optimal cut": 10.8458185606,
+        "Expected cut of random guess": 5.5,
+        "Expected cut of QAOA": 9.4629810649,
+        "overlap": 0.3016743182,
+        "p": 2,
+        "beta": [0.4989224561, 0.2922590634],
+        "gamma": [0.9479835648, 1.4818295952],
+        "G_json": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [{"id": 0}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}, {"id": 7}],
+            "links": [
+                {"edge_id": 0, "weight": 0.8539790893, "source": 0, "target": 4},
+                {"edge_id": 1, "weight": 2.3459969495, "source": 0, "target": 6},
+                {"edge_id": 2, "weight": 1.5448410322, "source": 1, "target": 5},
+                {"edge_id": 3, "weight": 0.7737439444, "source": 1, "target": 6},
+                {"edge_id": 4, "weight": 0.0051610184, "source": 1, "target": 7},
+                {"edge_id": 5, "weight": 1.2282900669, "source": 2, "target": 5},
+                {"edge_id": 6, "weight": 0.0916478025, "source": 2, "target": 6},
+                {"edge_id": 7, "weight": 2.125014834, "source": 3, "target": 5},
+                {"edge_id": 8, "weight": 0.1490204209, "source": 3, "target": 7},
+                {"edge_id": 9, "weight": 0.3187485175, "source": 5, "target": 7},
+                {"edge_id": 10, "weight": 1.5635563243, "source": 6, "target": 7},
             ],
-            "links":[
-                {
-                    "edge_id":0,
-                    "weight":0.8539790893,
-                    "source":0,
-                    "target":4
-                },
-                {
-                    "edge_id":1,
-                    "weight":2.3459969495,
-                    "source":0,
-                    "target":6
-                },
-                {
-                    "edge_id":2,
-                    "weight":1.5448410322,
-                    "source":1,
-                    "target":5
-                },
-                {
-                    "edge_id":3,
-                    "weight":0.7737439444,
-                    "source":1,
-                    "target":6
-                },
-                {
-                    "edge_id":4,
-                    "weight":0.0051610184,
-                    "source":1,
-                    "target":7
-                },
-                {
-                    "edge_id":5,
-                    "weight":1.2282900669,
-                    "source":2,
-                    "target":5
-                },
-                {
-                    "edge_id":6,
-                    "weight":0.0916478025,
-                    "source":2,
-                    "target":6
-                },
-                {
-                    "edge_id":7,
-                    "weight":2.125014834,
-                    "source":3,
-                    "target":5
-                },
-                {
-                    "edge_id":8,
-                    "weight":0.1490204209,
-                    "source":3,
-                    "target":7
-                },
-                {
-                    "edge_id":9,
-                    "weight":0.3187485175,
-                    "source":5,
-                    "target":7
-                },
-                {
-                    "edge_id":10,
-                    "weight":1.5635563243,
-                    "source":6,
-                    "target":7
-                }
-            ]
-        }
+        },
     },
-    "4617":{
-        "True optimal cut":16.4845608574,
-        "Expected cut of random guess":10.0,
-        "Expected cut of QAOA":12.4141047851,
-        "overlap":0.0766399543,
-        "p":1,
-        "beta":[
-            0.3240420907
-        ],
-        "gamma":[
-            0.6878199864
-        ],
-        "G_json":{
-            "directed":false,
-            "multigraph":false,
-            "graph":{
-
-            },
-            "nodes":[
-                {
-                    "id":0
-                },
-                {
-                    "id":1
-                },
-                {
-                    "id":2
-                },
-                {
-                    "id":3
-                },
-                {
-                    "id":4
-                },
-                {
-                    "id":5
-                },
-                {
-                    "id":6
-                },
-                {
-                    "id":7
-                }
+    "4617": {
+        "True optimal cut": 16.4845608574,
+        "Expected cut of random guess": 10.0,
+        "Expected cut of QAOA": 12.4141047851,
+        "overlap": 0.0766399543,
+        "p": 1,
+        "beta": [0.3240420907],
+        "gamma": [0.6878199864],
+        "G_json": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [{"id": 0}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}, {"id": 7}],
+            "links": [
+                {"edge_id": 0, "weight": 1.0885258046, "source": 0, "target": 2},
+                {"edge_id": 1, "weight": 1.2695200386, "source": 0, "target": 4},
+                {"edge_id": 2, "weight": 1.3500768615, "source": 0, "target": 5},
+                {"edge_id": 3, "weight": 0.3600458788, "source": 0, "target": 6},
+                {"edge_id": 4, "weight": 2.6767545184, "source": 0, "target": 7},
+                {"edge_id": 5, "weight": 0.3078327516, "source": 1, "target": 3},
+                {"edge_id": 6, "weight": 1.6109543238, "source": 1, "target": 4},
+                {"edge_id": 7, "weight": 0.6374506329, "source": 1, "target": 5},
+                {"edge_id": 8, "weight": 1.0858352042, "source": 1, "target": 6},
+                {"edge_id": 9, "weight": 0.5621474328, "source": 1, "target": 7},
+                {"edge_id": 10, "weight": 1.9034765988, "source": 2, "target": 4},
+                {"edge_id": 11, "weight": 0.2194777109, "source": 2, "target": 5},
+                {"edge_id": 12, "weight": 1.2409335134, "source": 2, "target": 6},
+                {"edge_id": 13, "weight": 1.3463585787, "source": 2, "target": 7},
+                {"edge_id": 14, "weight": 0.4588991293, "source": 3, "target": 5},
+                {"edge_id": 15, "weight": 0.1198279726, "source": 3, "target": 6},
+                {"edge_id": 16, "weight": 1.6428024626, "source": 3, "target": 7},
+                {"edge_id": 17, "weight": 1.3386215702, "source": 4, "target": 7},
+                {"edge_id": 18, "weight": 0.0179606093, "source": 5, "target": 6},
+                {"edge_id": 19, "weight": 0.7624984068, "source": 5, "target": 7},
             ],
-            "links":[
-                {
-                    "edge_id":0,
-                    "weight":1.0885258046,
-                    "source":0,
-                    "target":2
-                },
-                {
-                    "edge_id":1,
-                    "weight":1.2695200386,
-                    "source":0,
-                    "target":4
-                },
-                {
-                    "edge_id":2,
-                    "weight":1.3500768615,
-                    "source":0,
-                    "target":5
-                },
-                {
-                    "edge_id":3,
-                    "weight":0.3600458788,
-                    "source":0,
-                    "target":6
-                },
-                {
-                    "edge_id":4,
-                    "weight":2.6767545184,
-                    "source":0,
-                    "target":7
-                },
-                {
-                    "edge_id":5,
-                    "weight":0.3078327516,
-                    "source":1,
-                    "target":3
-                },
-                {
-                    "edge_id":6,
-                    "weight":1.6109543238,
-                    "source":1,
-                    "target":4
-                },
-                {
-                    "edge_id":7,
-                    "weight":0.6374506329,
-                    "source":1,
-                    "target":5
-                },
-                {
-                    "edge_id":8,
-                    "weight":1.0858352042,
-                    "source":1,
-                    "target":6
-                },
-                {
-                    "edge_id":9,
-                    "weight":0.5621474328,
-                    "source":1,
-                    "target":7
-                },
-                {
-                    "edge_id":10,
-                    "weight":1.9034765988,
-                    "source":2,
-                    "target":4
-                },
-                {
-                    "edge_id":11,
-                    "weight":0.2194777109,
-                    "source":2,
-                    "target":5
-                },
-                {
-                    "edge_id":12,
-                    "weight":1.2409335134,
-                    "source":2,
-                    "target":6
-                },
-                {
-                    "edge_id":13,
-                    "weight":1.3463585787,
-                    "source":2,
-                    "target":7
-                },
-                {
-                    "edge_id":14,
-                    "weight":0.4588991293,
-                    "source":3,
-                    "target":5
-                },
-                {
-                    "edge_id":15,
-                    "weight":0.1198279726,
-                    "source":3,
-                    "target":6
-                },
-                {
-                    "edge_id":16,
-                    "weight":1.6428024626,
-                    "source":3,
-                    "target":7
-                },
-                {
-                    "edge_id":17,
-                    "weight":1.3386215702,
-                    "source":4,
-                    "target":7
-                },
-                {
-                    "edge_id":18,
-                    "weight":0.0179606093,
-                    "source":5,
-                    "target":6
-                },
-                {
-                    "edge_id":19,
-                    "weight":0.7624984068,
-                    "source":5,
-                    "target":7
-                }
-            ]
-        }
+        },
     },
-    "110094":{
-        "True optimal cut":14.0556201048,
-        "Expected cut of random guess":9.5,
-        "Expected cut of QAOA":12.2044843482,
-        "overlap":0.127196605,
-        "p":2,
-        "beta":[
-            0.3959800684,
-            0.2221359564
-        ],
-        "gamma":[
-            0.590152134,
-            1.3798931132
-        ],
-        "G_json":{
-            "directed":false,
-            "multigraph":false,
-            "graph":{
-
-            },
-            "nodes":[
-                {
-                    "id":0
-                },
-                {
-                    "id":1
-                },
-                {
-                    "id":2
-                },
-                {
-                    "id":3
-                },
-                {
-                    "id":4
-                },
-                {
-                    "id":5
-                },
-                {
-                    "id":6
-                },
-                {
-                    "id":7
-                }
+    "110094": {
+        "True optimal cut": 14.0556201048,
+        "Expected cut of random guess": 9.5,
+        "Expected cut of QAOA": 12.2044843482,
+        "overlap": 0.127196605,
+        "p": 2,
+        "beta": [0.3959800684, 0.2221359564],
+        "gamma": [0.590152134, 1.3798931132],
+        "G_json": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [{"id": 0}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}, {"id": 7}],
+            "links": [
+                {"edge_id": 0, "weight": 0.3276318411, "source": 0, "target": 3},
+                {"edge_id": 1, "weight": 1.6228203231, "source": 0, "target": 4},
+                {"edge_id": 2, "weight": 1.4422266858, "source": 0, "target": 5},
+                {"edge_id": 3, "weight": 1.172674406, "source": 0, "target": 6},
+                {"edge_id": 4, "weight": 0.5196733791, "source": 0, "target": 7},
+                {"edge_id": 5, "weight": 1.2528986009, "source": 1, "target": 4},
+                {"edge_id": 6, "weight": 0.7070595032, "source": 1, "target": 6},
+                {"edge_id": 7, "weight": 1.5373607225, "source": 1, "target": 7},
+                {"edge_id": 8, "weight": 0.975407387, "source": 2, "target": 5},
+                {"edge_id": 9, "weight": 0.6500454154, "source": 2, "target": 7},
+                {"edge_id": 10, "weight": 0.1744046672, "source": 3, "target": 4},
+                {"edge_id": 11, "weight": 1.3153181603, "source": 3, "target": 5},
+                {"edge_id": 12, "weight": 1.0549893372, "source": 3, "target": 6},
+                {"edge_id": 13, "weight": 0.9462812556, "source": 3, "target": 7},
+                {"edge_id": 14, "weight": 1.5209778159, "source": 4, "target": 6},
+                {"edge_id": 15, "weight": 1.0103320611, "source": 4, "target": 7},
+                {"edge_id": 16, "weight": 0.5248133151, "source": 5, "target": 6},
+                {"edge_id": 17, "weight": 0.6716927466, "source": 5, "target": 7},
+                {"edge_id": 18, "weight": 1.5733923769, "source": 6, "target": 7},
             ],
-            "links":[
-                {
-                    "edge_id":0,
-                    "weight":0.3276318411,
-                    "source":0,
-                    "target":3
-                },
-                {
-                    "edge_id":1,
-                    "weight":1.6228203231,
-                    "source":0,
-                    "target":4
-                },
-                {
-                    "edge_id":2,
-                    "weight":1.4422266858,
-                    "source":0,
-                    "target":5
-                },
-                {
-                    "edge_id":3,
-                    "weight":1.172674406,
-                    "source":0,
-                    "target":6
-                },
-                {
-                    "edge_id":4,
-                    "weight":0.5196733791,
-                    "source":0,
-                    "target":7
-                },
-                {
-                    "edge_id":5,
-                    "weight":1.2528986009,
-                    "source":1,
-                    "target":4
-                },
-                {
-                    "edge_id":6,
-                    "weight":0.7070595032,
-                    "source":1,
-                    "target":6
-                },
-                {
-                    "edge_id":7,
-                    "weight":1.5373607225,
-                    "source":1,
-                    "target":7
-                },
-                {
-                    "edge_id":8,
-                    "weight":0.975407387,
-                    "source":2,
-                    "target":5
-                },
-                {
-                    "edge_id":9,
-                    "weight":0.6500454154,
-                    "source":2,
-                    "target":7
-                },
-                {
-                    "edge_id":10,
-                    "weight":0.1744046672,
-                    "source":3,
-                    "target":4
-                },
-                {
-                    "edge_id":11,
-                    "weight":1.3153181603,
-                    "source":3,
-                    "target":5
-                },
-                {
-                    "edge_id":12,
-                    "weight":1.0549893372,
-                    "source":3,
-                    "target":6
-                },
-                {
-                    "edge_id":13,
-                    "weight":0.9462812556,
-                    "source":3,
-                    "target":7
-                },
-                {
-                    "edge_id":14,
-                    "weight":1.5209778159,
-                    "source":4,
-                    "target":6
-                },
-                {
-                    "edge_id":15,
-                    "weight":1.0103320611,
-                    "source":4,
-                    "target":7
-                },
-                {
-                    "edge_id":16,
-                    "weight":0.5248133151,
-                    "source":5,
-                    "target":6
-                },
-                {
-                    "edge_id":17,
-                    "weight":0.6716927466,
-                    "source":5,
-                    "target":7
-                },
-                {
-                    "edge_id":18,
-                    "weight":1.5733923769,
-                    "source":6,
-                    "target":7
-                }
-            ]
-        }
+        },
     },
-    "152906":{
-        "True optimal cut":5.8756876369,
-        "Expected cut of random guess":1.5472541909,
-        "Expected cut of QAOA":4.9038560776,
-        "overlap":0.2236968369,
-        "p":3,
-        "beta":[
-            0.5312707551,
-            0.371158877,
-            0.2219688265
-        ],
-        "gamma":[
-            0.691963188,
-            1.3224984271,
-            1.3777190707
-        ],
-        "G_json":{
-            "directed":false,
-            "multigraph":false,
-            "graph":{
-
-            },
-            "nodes":[
-                {
-                    "id":0
-                },
-                {
-                    "id":1
-                },
-                {
-                    "id":2
-                },
-                {
-                    "id":3
-                },
-                {
-                    "id":4
-                },
-                {
-                    "id":5
-                },
-                {
-                    "id":6
-                },
-                {
-                    "id":7
-                }
+    "152906": {
+        "True optimal cut": 5.8756876369,
+        "Expected cut of random guess": 1.5472541909,
+        "Expected cut of QAOA": 4.9038560776,
+        "overlap": 0.2236968369,
+        "p": 3,
+        "beta": [0.5312707551, 0.371158877, 0.2219688265],
+        "gamma": [0.691963188, 1.3224984271, 1.3777190707],
+        "G_json": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [{"id": 0}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}, {"id": 7}],
+            "links": [
+                {"edge_id": 0, "weight": -0.2709592481, "source": 0, "target": 4},
+                {"edge_id": 1, "weight": 0.2209084202, "source": 0, "target": 6},
+                {"edge_id": 2, "weight": 0.7771575726, "source": 1, "target": 5},
+                {"edge_id": 3, "weight": 1.4801501941, "source": 1, "target": 6},
+                {"edge_id": 4, "weight": 2.2833478267, "source": 1, "target": 7},
+                {"edge_id": 5, "weight": 0.9778248253, "source": 2, "target": 6},
+                {"edge_id": 6, "weight": 0.3572072183, "source": 2, "target": 7},
+                {"edge_id": 7, "weight": -2.2483284179, "source": 3, "target": 7},
+                {"edge_id": 8, "weight": -0.9334581431, "source": 4, "target": 7},
+                {"edge_id": 9, "weight": 0.4506581337, "source": 6, "target": 7},
             ],
-            "links":[
-                {
-                    "edge_id":0,
-                    "weight":-0.2709592481,
-                    "source":0,
-                    "target":4
-                },
-                {
-                    "edge_id":1,
-                    "weight":0.2209084202,
-                    "source":0,
-                    "target":6
-                },
-                {
-                    "edge_id":2,
-                    "weight":0.7771575726,
-                    "source":1,
-                    "target":5
-                },
-                {
-                    "edge_id":3,
-                    "weight":1.4801501941,
-                    "source":1,
-                    "target":6
-                },
-                {
-                    "edge_id":4,
-                    "weight":2.2833478267,
-                    "source":1,
-                    "target":7
-                },
-                {
-                    "edge_id":5,
-                    "weight":0.9778248253,
-                    "source":2,
-                    "target":6
-                },
-                {
-                    "edge_id":6,
-                    "weight":0.3572072183,
-                    "source":2,
-                    "target":7
-                },
-                {
-                    "edge_id":7,
-                    "weight":-2.2483284179,
-                    "source":3,
-                    "target":7
-                },
-                {
-                    "edge_id":8,
-                    "weight":-0.9334581431,
-                    "source":4,
-                    "target":7
-                },
-                {
-                    "edge_id":9,
-                    "weight":0.4506581337,
-                    "source":6,
-                    "target":7
-                }
-            ]
-        }
+        },
     },
-    "161681":{
-        "True optimal cut":12.6331280192,
-        "Expected cut of random guess":7.0,
-        "Expected cut of QAOA":11.3960855235,
-        "overlap":0.5028205526,
-        "p":3,
-        "beta":[
-            0.4514655241,
-            0.34928056,
-            0.2480310026
-        ],
-        "gamma":[
-            0.6365389747,
-            1.1046500767,
-            0.9960809103
-        ],
-        "G_json":{
-            "directed":false,
-            "multigraph":false,
-            "graph":{
-
-            },
-            "nodes":[
-                {
-                    "id":0
-                },
-                {
-                    "id":1
-                },
-                {
-                    "id":2
-                },
-                {
-                    "id":3
-                },
-                {
-                    "id":4
-                },
-                {
-                    "id":5
-                },
-                {
-                    "id":6
-                },
-                {
-                    "id":7
-                }
+    "161681": {
+        "True optimal cut": 12.6331280192,
+        "Expected cut of random guess": 7.0,
+        "Expected cut of QAOA": 11.3960855235,
+        "overlap": 0.5028205526,
+        "p": 3,
+        "beta": [0.4514655241, 0.34928056, 0.2480310026],
+        "gamma": [0.6365389747, 1.1046500767, 0.9960809103],
+        "G_json": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [{"id": 0}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}, {"id": 7}],
+            "links": [
+                {"edge_id": 0, "weight": 1.1924163246, "source": 0, "target": 4},
+                {"edge_id": 1, "weight": 1.5283181239, "source": 0, "target": 5},
+                {"edge_id": 2, "weight": 1.0905694397, "source": 0, "target": 6},
+                {"edge_id": 3, "weight": 2.7840915783, "source": 0, "target": 7},
+                {"edge_id": 4, "weight": 0.0588414504, "source": 1, "target": 4},
+                {"edge_id": 5, "weight": 0.4985821407, "source": 1, "target": 5},
+                {"edge_id": 6, "weight": 1.8284798933, "source": 1, "target": 7},
+                {"edge_id": 7, "weight": 0.113385795, "source": 2, "target": 6},
+                {"edge_id": 8, "weight": 1.6853347514, "source": 2, "target": 7},
+                {"edge_id": 9, "weight": 0.7409579344, "source": 3, "target": 6},
+                {"edge_id": 10, "weight": 1.1121505876, "source": 3, "target": 7},
+                {"edge_id": 11, "weight": 0.3364462008, "source": 4, "target": 6},
+                {"edge_id": 12, "weight": 0.8927885733, "source": 5, "target": 7},
+                {"edge_id": 13, "weight": 0.1376372066, "source": 6, "target": 7},
             ],
-            "links":[
-                {
-                    "edge_id":0,
-                    "weight":1.1924163246,
-                    "source":0,
-                    "target":4
-                },
-                {
-                    "edge_id":1,
-                    "weight":1.5283181239,
-                    "source":0,
-                    "target":5
-                },
-                {
-                    "edge_id":2,
-                    "weight":1.0905694397,
-                    "source":0,
-                    "target":6
-                },
-                {
-                    "edge_id":3,
-                    "weight":2.7840915783,
-                    "source":0,
-                    "target":7
-                },
-                {
-                    "edge_id":4,
-                    "weight":0.0588414504,
-                    "source":1,
-                    "target":4
-                },
-                {
-                    "edge_id":5,
-                    "weight":0.4985821407,
-                    "source":1,
-                    "target":5
-                },
-                {
-                    "edge_id":6,
-                    "weight":1.8284798933,
-                    "source":1,
-                    "target":7
-                },
-                {
-                    "edge_id":7,
-                    "weight":0.113385795,
-                    "source":2,
-                    "target":6
-                },
-                {
-                    "edge_id":8,
-                    "weight":1.6853347514,
-                    "source":2,
-                    "target":7
-                },
-                {
-                    "edge_id":9,
-                    "weight":0.7409579344,
-                    "source":3,
-                    "target":6
-                },
-                {
-                    "edge_id":10,
-                    "weight":1.1121505876,
-                    "source":3,
-                    "target":7
-                },
-                {
-                    "edge_id":11,
-                    "weight":0.3364462008,
-                    "source":4,
-                    "target":6
-                },
-                {
-                    "edge_id":12,
-                    "weight":0.8927885733,
-                    "source":5,
-                    "target":7
-                },
-                {
-                    "edge_id":13,
-                    "weight":0.1376372066,
-                    "source":6,
-                    "target":7
-                }
-            ]
-        }
+        },
     },
-    "57175":{
-        "True optimal cut":12.8515785889,
-        "Expected cut of random guess":6.5,
-        "Expected cut of QAOA":9.5339745978,
-        "overlap":0.1184543619,
-        "p":1,
-        "beta":[
-            0.3904423598
-        ],
-        "gamma":[
-            1.0057146777
-        ],
-        "G_json":{
-            "directed":false,
-            "multigraph":false,
-            "graph":{
-
-            },
-            "nodes":[
-                {
-                    "id":0
-                },
-                {
-                    "id":1
-                },
-                {
-                    "id":2
-                },
-                {
-                    "id":3
-                },
-                {
-                    "id":4
-                },
-                {
-                    "id":5
-                },
-                {
-                    "id":6
-                },
-                {
-                    "id":7
-                }
+    "57175": {
+        "True optimal cut": 12.8515785889,
+        "Expected cut of random guess": 6.5,
+        "Expected cut of QAOA": 9.5339745978,
+        "overlap": 0.1184543619,
+        "p": 1,
+        "beta": [0.3904423598],
+        "gamma": [1.0057146777],
+        "G_json": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [{"id": 0}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}, {"id": 7}],
+            "links": [
+                {"edge_id": 0, "weight": 2.1237900117, "source": 0, "target": 5},
+                {"edge_id": 1, "weight": 0.6163778476, "source": 0, "target": 6},
+                {"edge_id": 2, "weight": 1.4198253618, "source": 0, "target": 7},
+                {"edge_id": 3, "weight": 0.1487219106, "source": 1, "target": 5},
+                {"edge_id": 4, "weight": 2.4172342557, "source": 1, "target": 6},
+                {"edge_id": 5, "weight": 0.5295115071, "source": 1, "target": 7},
+                {"edge_id": 6, "weight": 1.0092913489, "source": 2, "target": 5},
+                {"edge_id": 7, "weight": 1.9245620011, "source": 2, "target": 7},
+                {"edge_id": 8, "weight": 0.6852311549, "source": 3, "target": 6},
+                {"edge_id": 9, "weight": 0.6114719597, "source": 3, "target": 7},
+                {"edge_id": 10, "weight": 0.6557039585, "source": 4, "target": 6},
+                {"edge_id": 11, "weight": 0.7098572714, "source": 4, "target": 7},
+                {"edge_id": 12, "weight": 0.1484214111, "source": 6, "target": 7},
             ],
-            "links":[
-                {
-                    "edge_id":0,
-                    "weight":2.1237900117,
-                    "source":0,
-                    "target":5
-                },
-                {
-                    "edge_id":1,
-                    "weight":0.6163778476,
-                    "source":0,
-                    "target":6
-                },
-                {
-                    "edge_id":2,
-                    "weight":1.4198253618,
-                    "source":0,
-                    "target":7
-                },
-                {
-                    "edge_id":3,
-                    "weight":0.1487219106,
-                    "source":1,
-                    "target":5
-                },
-                {
-                    "edge_id":4,
-                    "weight":2.4172342557,
-                    "source":1,
-                    "target":6
-                },
-                {
-                    "edge_id":5,
-                    "weight":0.5295115071,
-                    "source":1,
-                    "target":7
-                },
-                {
-                    "edge_id":6,
-                    "weight":1.0092913489,
-                    "source":2,
-                    "target":5
-                },
-                {
-                    "edge_id":7,
-                    "weight":1.9245620011,
-                    "source":2,
-                    "target":7
-                },
-                {
-                    "edge_id":8,
-                    "weight":0.6852311549,
-                    "source":3,
-                    "target":6
-                },
-                {
-                    "edge_id":9,
-                    "weight":0.6114719597,
-                    "source":3,
-                    "target":7
-                },
-                {
-                    "edge_id":10,
-                    "weight":0.6557039585,
-                    "source":4,
-                    "target":6
-                },
-                {
-                    "edge_id":11,
-                    "weight":0.7098572714,
-                    "source":4,
-                    "target":7
-                },
-                {
-                    "edge_id":12,
-                    "weight":0.1484214111,
-                    "source":6,
-                    "target":7
-                }
-            ]
-        }
+        },
     },
-    "182298":{
-        "True optimal cut":7.0855882076,
-        "Expected cut of random guess":1.0093341239,
-        "Expected cut of QAOA":6.039986611,
-        "overlap":0.3039708482,
-        "p":3,
-        "beta":[
-            0.6336229428,
-            0.4531651339,
-            0.2591933756
-        ],
-        "gamma":[
-            0.7575877152,
-            1.2051936771,
-            1.2401429504
-        ],
-        "G_json":{
-            "directed":false,
-            "multigraph":false,
-            "graph":{
-
-            },
-            "nodes":[
-                {
-                    "id":0
-                },
-                {
-                    "id":1
-                },
-                {
-                    "id":2
-                },
-                {
-                    "id":3
-                },
-                {
-                    "id":4
-                },
-                {
-                    "id":5
-                },
-                {
-                    "id":6
-                },
-                {
-                    "id":7
-                }
+    "182298": {
+        "True optimal cut": 7.0855882076,
+        "Expected cut of random guess": 1.0093341239,
+        "Expected cut of QAOA": 6.039986611,
+        "overlap": 0.3039708482,
+        "p": 3,
+        "beta": [0.6336229428, 0.4531651339, 0.2591933756],
+        "gamma": [0.7575877152, 1.2051936771, 1.2401429504],
+        "G_json": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [{"id": 0}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}, {"id": 7}],
+            "links": [
+                {"edge_id": 0, "weight": 1.6539595046, "source": 0, "target": 3},
+                {"edge_id": 1, "weight": 1.5372574136, "source": 0, "target": 4},
+                {"edge_id": 2, "weight": 0.0487476044, "source": 0, "target": 6},
+                {"edge_id": 3, "weight": -1.46975737, "source": 0, "target": 7},
+                {"edge_id": 4, "weight": -1.5417639593, "source": 1, "target": 3},
+                {"edge_id": 5, "weight": -0.667653222, "source": 1, "target": 5},
+                {"edge_id": 6, "weight": -0.2432976843, "source": 1, "target": 6},
+                {"edge_id": 7, "weight": -0.3140918582, "source": 2, "target": 4},
+                {"edge_id": 8, "weight": 1.3241584861, "source": 2, "target": 5},
+                {"edge_id": 9, "weight": -0.6555101529, "source": 2, "target": 6},
+                {"edge_id": 10, "weight": -0.7809828599, "source": 2, "target": 7},
+                {"edge_id": 11, "weight": -0.3176087694, "source": 3, "target": 6},
+                {"edge_id": 12, "weight": 1.888942014, "source": 4, "target": 7},
+                {"edge_id": 13, "weight": 1.5562691011, "source": 5, "target": 7},
             ],
-            "links":[
-                {
-                    "edge_id":0,
-                    "weight":1.6539595046,
-                    "source":0,
-                    "target":3
-                },
-                {
-                    "edge_id":1,
-                    "weight":1.5372574136,
-                    "source":0,
-                    "target":4
-                },
-                {
-                    "edge_id":2,
-                    "weight":0.0487476044,
-                    "source":0,
-                    "target":6
-                },
-                {
-                    "edge_id":3,
-                    "weight":-1.46975737,
-                    "source":0,
-                    "target":7
-                },
-                {
-                    "edge_id":4,
-                    "weight":-1.5417639593,
-                    "source":1,
-                    "target":3
-                },
-                {
-                    "edge_id":5,
-                    "weight":-0.667653222,
-                    "source":1,
-                    "target":5
-                },
-                {
-                    "edge_id":6,
-                    "weight":-0.2432976843,
-                    "source":1,
-                    "target":6
-                },
-                {
-                    "edge_id":7,
-                    "weight":-0.3140918582,
-                    "source":2,
-                    "target":4
-                },
-                {
-                    "edge_id":8,
-                    "weight":1.3241584861,
-                    "source":2,
-                    "target":5
-                },
-                {
-                    "edge_id":9,
-                    "weight":-0.6555101529,
-                    "source":2,
-                    "target":6
-                },
-                {
-                    "edge_id":10,
-                    "weight":-0.7809828599,
-                    "source":2,
-                    "target":7
-                },
-                {
-                    "edge_id":11,
-                    "weight":-0.3176087694,
-                    "source":3,
-                    "target":6
-                },
-                {
-                    "edge_id":12,
-                    "weight":1.888942014,
-                    "source":4,
-                    "target":7
-                },
-                {
-                    "edge_id":13,
-                    "weight":1.5562691011,
-                    "source":5,
-                    "target":7
-                }
-            ]
-        }
+        },
     },
-    "198876":{
-        "True optimal cut":13.4385263545,
-        "Expected cut of random guess":9.0,
-        "Expected cut of QAOA":12.147556593,
-        "overlap":0.1800254889,
-        "p":3,
-        "beta":[
-            0.3981181512,
-            0.2613652793,
-            0.1946927186
-        ],
-        "gamma":[
-            0.5616475961,
-            1.2660752088,
-            1.4231435499
-        ],
-        "G_json":{
-            "directed":false,
-            "multigraph":false,
-            "graph":{
-
-            },
-            "nodes":[
-                {
-                    "id":0
-                },
-                {
-                    "id":1
-                },
-                {
-                    "id":2
-                },
-                {
-                    "id":3
-                },
-                {
-                    "id":4
-                },
-                {
-                    "id":5
-                },
-                {
-                    "id":6
-                },
-                {
-                    "id":7
-                }
+    "198876": {
+        "True optimal cut": 13.4385263545,
+        "Expected cut of random guess": 9.0,
+        "Expected cut of QAOA": 12.147556593,
+        "overlap": 0.1800254889,
+        "p": 3,
+        "beta": [0.3981181512, 0.2613652793, 0.1946927186],
+        "gamma": [0.5616475961, 1.2660752088, 1.4231435499],
+        "G_json": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [{"id": 0}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}, {"id": 7}],
+            "links": [
+                {"edge_id": 0, "weight": 3.0747171011, "source": 0, "target": 3},
+                {"edge_id": 1, "weight": 0.5111494054, "source": 0, "target": 4},
+                {"edge_id": 2, "weight": 1.8059737131, "source": 0, "target": 5},
+                {"edge_id": 3, "weight": 0.7177458877, "source": 0, "target": 6},
+                {"edge_id": 4, "weight": 0.99392141, "source": 0, "target": 7},
+                {"edge_id": 5, "weight": 0.3532609377, "source": 1, "target": 5},
+                {"edge_id": 6, "weight": 0.1806578868, "source": 1, "target": 7},
+                {"edge_id": 7, "weight": 1.8266901966, "source": 2, "target": 6},
+                {"edge_id": 8, "weight": 0.8135206158, "source": 2, "target": 7},
+                {"edge_id": 9, "weight": 1.1346629248, "source": 3, "target": 4},
+                {"edge_id": 10, "weight": 1.0659546326, "source": 3, "target": 5},
+                {"edge_id": 11, "weight": 0.9475039525, "source": 3, "target": 6},
+                {"edge_id": 12, "weight": 1.1044349654, "source": 3, "target": 7},
+                {"edge_id": 13, "weight": 0.2383379391, "source": 4, "target": 5},
+                {"edge_id": 14, "weight": 0.1581579667, "source": 4, "target": 6},
+                {"edge_id": 15, "weight": 0.682193107, "source": 4, "target": 7},
+                {"edge_id": 16, "weight": 0.190510172, "source": 5, "target": 7},
+                {"edge_id": 17, "weight": 2.2006071858, "source": 6, "target": 7},
             ],
-            "links":[
-                {
-                    "edge_id":0,
-                    "weight":3.0747171011,
-                    "source":0,
-                    "target":3
-                },
-                {
-                    "edge_id":1,
-                    "weight":0.5111494054,
-                    "source":0,
-                    "target":4
-                },
-                {
-                    "edge_id":2,
-                    "weight":1.8059737131,
-                    "source":0,
-                    "target":5
-                },
-                {
-                    "edge_id":3,
-                    "weight":0.7177458877,
-                    "source":0,
-                    "target":6
-                },
-                {
-                    "edge_id":4,
-                    "weight":0.99392141,
-                    "source":0,
-                    "target":7
-                },
-                {
-                    "edge_id":5,
-                    "weight":0.3532609377,
-                    "source":1,
-                    "target":5
-                },
-                {
-                    "edge_id":6,
-                    "weight":0.1806578868,
-                    "source":1,
-                    "target":7
-                },
-                {
-                    "edge_id":7,
-                    "weight":1.8266901966,
-                    "source":2,
-                    "target":6
-                },
-                {
-                    "edge_id":8,
-                    "weight":0.8135206158,
-                    "source":2,
-                    "target":7
-                },
-                {
-                    "edge_id":9,
-                    "weight":1.1346629248,
-                    "source":3,
-                    "target":4
-                },
-                {
-                    "edge_id":10,
-                    "weight":1.0659546326,
-                    "source":3,
-                    "target":5
-                },
-                {
-                    "edge_id":11,
-                    "weight":0.9475039525,
-                    "source":3,
-                    "target":6
-                },
-                {
-                    "edge_id":12,
-                    "weight":1.1044349654,
-                    "source":3,
-                    "target":7
-                },
-                {
-                    "edge_id":13,
-                    "weight":0.2383379391,
-                    "source":4,
-                    "target":5
-                },
-                {
-                    "edge_id":14,
-                    "weight":0.1581579667,
-                    "source":4,
-                    "target":6
-                },
-                {
-                    "edge_id":15,
-                    "weight":0.682193107,
-                    "source":4,
-                    "target":7
-                },
-                {
-                    "edge_id":16,
-                    "weight":0.190510172,
-                    "source":5,
-                    "target":7
-                },
-                {
-                    "edge_id":17,
-                    "weight":2.2006071858,
-                    "source":6,
-                    "target":7
-                }
-            ]
-        }
+        },
     },
-    "2761":{
-        "True optimal cut":9.705368068,
-        "Expected cut of random guess":5.0,
-        "Expected cut of QAOA":7.4098841104,
-        "overlap":0.0931134868,
-        "p":1,
-        "beta":[
-            0.3839404087
-        ],
-        "gamma":[
-            1.1866423331
-        ],
-        "G_json":{
-            "directed":false,
-            "multigraph":false,
-            "graph":{
-
-            },
-            "nodes":[
-                {
-                    "id":0
-                },
-                {
-                    "id":1
-                },
-                {
-                    "id":2
-                },
-                {
-                    "id":3
-                },
-                {
-                    "id":4
-                },
-                {
-                    "id":5
-                },
-                {
-                    "id":6
-                },
-                {
-                    "id":7
-                }
+    "2761": {
+        "True optimal cut": 9.705368068,
+        "Expected cut of random guess": 5.0,
+        "Expected cut of QAOA": 7.4098841104,
+        "overlap": 0.0931134868,
+        "p": 1,
+        "beta": [0.3839404087],
+        "gamma": [1.1866423331],
+        "G_json": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [{"id": 0}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}, {"id": 7}],
+            "links": [
+                {"edge_id": 0, "weight": 0.294631932, "source": 0, "target": 4},
+                {"edge_id": 1, "weight": 1.0458219507, "source": 0, "target": 6},
+                {"edge_id": 2, "weight": 0.5656326782, "source": 0, "target": 7},
+                {"edge_id": 3, "weight": 2.019551386, "source": 1, "target": 5},
+                {"edge_id": 4, "weight": 0.3580477354, "source": 1, "target": 7},
+                {"edge_id": 5, "weight": 1.7746245635, "source": 2, "target": 6},
+                {"edge_id": 6, "weight": 0.8097840941, "source": 2, "target": 7},
+                {"edge_id": 7, "weight": 0.3666010964, "source": 3, "target": 6},
+                {"edge_id": 8, "weight": 1.8531949849, "source": 4, "target": 6},
+                {"edge_id": 9, "weight": 0.9121095787, "source": 4, "target": 7},
             ],
-            "links":[
-                {
-                    "edge_id":0,
-                    "weight":0.294631932,
-                    "source":0,
-                    "target":4
-                },
-                {
-                    "edge_id":1,
-                    "weight":1.0458219507,
-                    "source":0,
-                    "target":6
-                },
-                {
-                    "edge_id":2,
-                    "weight":0.5656326782,
-                    "source":0,
-                    "target":7
-                },
-                {
-                    "edge_id":3,
-                    "weight":2.019551386,
-                    "source":1,
-                    "target":5
-                },
-                {
-                    "edge_id":4,
-                    "weight":0.3580477354,
-                    "source":1,
-                    "target":7
-                },
-                {
-                    "edge_id":5,
-                    "weight":1.7746245635,
-                    "source":2,
-                    "target":6
-                },
-                {
-                    "edge_id":6,
-                    "weight":0.8097840941,
-                    "source":2,
-                    "target":7
-                },
-                {
-                    "edge_id":7,
-                    "weight":0.3666010964,
-                    "source":3,
-                    "target":6
-                },
-                {
-                    "edge_id":8,
-                    "weight":1.8531949849,
-                    "source":4,
-                    "target":6
-                },
-                {
-                    "edge_id":9,
-                    "weight":0.9121095787,
-                    "source":4,
-                    "target":7
-                }
-            ]
-        }
+        },
     },
-    "7000":{
-        "True optimal cut":8.9153770481,
-        "Expected cut of random guess":4.5,
-        "Expected cut of QAOA":6.6323481062,
-        "overlap":0.0749014863,
-        "p":1,
-        "beta":[
-            0.3926990738
-        ],
-        "gamma":[
-            1.211065119
-        ],
-        "G_json":{
-            "directed":false,
-            "multigraph":false,
-            "graph":{
-
-            },
-            "nodes":[
-                {
-                    "id":0
-                },
-                {
-                    "id":1
-                },
-                {
-                    "id":2
-                },
-                {
-                    "id":3
-                },
-                {
-                    "id":4
-                },
-                {
-                    "id":5
-                },
-                {
-                    "id":6
-                },
-                {
-                    "id":7
-                }
+    "7000": {
+        "True optimal cut": 8.9153770481,
+        "Expected cut of random guess": 4.5,
+        "Expected cut of QAOA": 6.6323481062,
+        "overlap": 0.0749014863,
+        "p": 1,
+        "beta": [0.3926990738],
+        "gamma": [1.211065119],
+        "G_json": {
+            "directed": false,
+            "multigraph": false,
+            "graph": {},
+            "nodes": [{"id": 0}, {"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}, {"id": 5}, {"id": 6}, {"id": 7}],
+            "links": [
+                {"edge_id": 0, "weight": 1.3857745228, "source": 0, "target": 5},
+                {"edge_id": 1, "weight": 0.0846229519, "source": 0, "target": 6},
+                {"edge_id": 2, "weight": 1.540821859, "source": 1, "target": 6},
+                {"edge_id": 3, "weight": 1.5065739423, "source": 1, "target": 7},
+                {"edge_id": 4, "weight": 0.1127928216, "source": 2, "target": 6},
+                {"edge_id": 5, "weight": 1.3538552793, "source": 2, "target": 7},
+                {"edge_id": 6, "weight": 1.5330320008, "source": 3, "target": 7},
+                {"edge_id": 7, "weight": 0.3380286892, "source": 4, "target": 7},
+                {"edge_id": 8, "weight": 1.1444979331, "source": 5, "target": 7},
             ],
-            "links":[
-                {
-                    "edge_id":0,
-                    "weight":1.3857745228,
-                    "source":0,
-                    "target":5
-                },
-                {
-                    "edge_id":1,
-                    "weight":0.0846229519,
-                    "source":0,
-                    "target":6
-                },
-                {
-                    "edge_id":2,
-                    "weight":1.540821859,
-                    "source":1,
-                    "target":6
-                },
-                {
-                    "edge_id":3,
-                    "weight":1.5065739423,
-                    "source":1,
-                    "target":7
-                },
-                {
-                    "edge_id":4,
-                    "weight":0.1127928216,
-                    "source":2,
-                    "target":6
-                },
-                {
-                    "edge_id":5,
-                    "weight":1.3538552793,
-                    "source":2,
-                    "target":7
-                },
-                {
-                    "edge_id":6,
-                    "weight":1.5330320008,
-                    "source":3,
-                    "target":7
-                },
-                {
-                    "edge_id":7,
-                    "weight":0.3380286892,
-                    "source":4,
-                    "target":7
-                },
-                {
-                    "edge_id":8,
-                    "weight":1.1444979331,
-                    "source":5,
-                    "target":7
-                }
-            ]
-        }
-    }
+        },
+    },
 }
