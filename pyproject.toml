@@ -26,6 +26,7 @@ dependencies = [
     'pathos>=0.3.0',
     'pytest>=7.3.1',
     'pytket==1.37.0',
+    'docplex',
     'pytket-qiskit>=0.59',
     'pytket-quantinuum',
     #'pytket-quantinuum==0.42.0',
