@@ -21,7 +21,6 @@ from functools import reduce
 simulators_to_run = get_available_simulator_names("xyring")
 
 
-@pytest.mark.skip(reason="Testing precomputei fails on Github actions.")
 def test_portfolio_precompute():
     N = 6
     K = 5
