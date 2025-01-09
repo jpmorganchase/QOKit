@@ -7,12 +7,13 @@ import os
 import numpy as np
 from qokit import get_qaoa_labs_objective
 from qokit.fur import get_available_simulator_names
+import sys
 
 # Set up QOKIT_PYTHON_ONLY in your local enviroment for Python only
 PYTHON_ONLY = False if os.environ.get("QOKIT_PYTHON_ONLY") is None else os.environ.get("QOKIT_PYTHON_ONLY")
 
 
-@pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator should be installed")
+@pytest.mark.skipif(PYTHON_ONLY or sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
 def test_simulator_lack_of_c_build():
     assert "c" in get_available_simulator_names("x")
     assert "c" in get_available_simulator_names("xyring")
