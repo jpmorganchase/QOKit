@@ -17,7 +17,7 @@ classifiers=[
     "Programming Language :: Python :: 3.11",
 ]
 version = "0.1.4"
-requires-python = ">=3.9.0"
+requires-python = ">=3.10.0"
 dependencies = [
     'networkx==3.0.0',
     'importlib-resources>=5.2.2',
@@ -26,8 +26,8 @@ dependencies = [
     'pathos>=0.3.0',
     'pytest>=7.3.1',
     'pytket==1.37.0',
-    'docplex',
-    'yfinance',
+    'docplex==2.28.240',
+    'yfinance==0.2.49',
     'pytket-qiskit>=0.59',
     'pytket-quantinuum',
     #'pytket-quantinuum==0.42.0',
