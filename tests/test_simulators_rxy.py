@@ -29,7 +29,6 @@ def _create_rxy_circuit_qiskit(N, index_pairs, betas: list):
     for beta in betas:
         for i, j in index_pairs:
             qc.append(qiskit.circuit.library.XXPlusYYGate(beta * 2), [i, j])
-    # qc.save_state()  # type: ignore
     return qc
 
 
@@ -40,7 +39,6 @@ def _check_simulator_against_qiskit(sim, N, index_pairs, gammas, betas, sv0=None
     betas_qiskit = [b / n_trotters for b in betas for _ in range(n_trotters)]
     qc = _create_rxy_circuit_qiskit(N, index_pairs, betas_qiskit)
     sv_qiskit = Statevector(transpile(qc, backend))  # .result().get_statevector()
-    # sv_qiskit = transpile(qc, backend).result().get_statevector()
     assert sv_qiskit.equiv(res)
 
 

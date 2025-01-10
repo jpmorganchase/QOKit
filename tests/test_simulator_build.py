@@ -13,11 +13,16 @@ import sys
 PYTHON_ONLY = False if os.environ.get("QOKIT_PYTHON_ONLY") is None else os.environ.get("QOKIT_PYTHON_ONLY")
 
 
-@pytest.mark.skipif(PYTHON_ONLY or sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
+@pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
 def test_simulator_lack_of_c_build():
-    assert "c" in get_available_simulator_names("x")
-    assert "c" in get_available_simulator_names("xyring")
-    assert "c" in get_available_simulator_names("xycomplete")
+    if PYTHON_ONLY:
+        assert "c" not in get_available_simulator_names("x")
+        assert "c" not in get_available_simulator_names("xyring")
+        assert "c" not in get_available_simulator_names("xycomplete")
+    elif not PYTHON_ONLY:
+        assert "c" in get_available_simulator_names("x")
+        assert "c" in get_available_simulator_names("xyring")
+        assert "c" in get_available_simulator_names("xycomplete")
 
 
 def test_simulator_python_build():

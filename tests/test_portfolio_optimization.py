@@ -92,13 +92,10 @@ def test_portfolio_qokitandqiskit(simname):
             assert np.allclose(qaoa_obj_qiskit(x0), qaoa_obj_qokit(x0))
 
             qc = get_qaoa_circuit(po_problem, gammas=x0[:p] / 2, betas=x0[p:] / 2, depth=p)
-            # result = transpile(qc, backend).result()
             circ = transpile(qc, backend)
             sv1 = reverse_array_index_bit_order(Statevector(circ))
-            #####
             parameterized_qc = get_parameterized_qaoa_circuit(po_problem, depth=p)
             qc2 = parameterized_qc.assign_parameters(np.hstack([x0[p:] / 2, x0[:p] / 2]))
-            # result = transpile(qc2, backend).result()
             circ = transpile(qc2, backend)
             sv2 = reverse_array_index_bit_order(Statevector(circ))
             assert np.allclose(sv1, sv2)
@@ -142,7 +139,6 @@ def test_portfolio_AR():
     x0 = get_sk_ini(p=p)
     po_energy = qaoa_obj(x0).real
     po_ar = (po_energy - best_portfolio[1]) / (best_portfolio[0] - best_portfolio[1])
-    # a problem with known AR > 0.7564
     # a problem with known AR Yahoo >= 0.7349
     assert po_ar >= 0.7349
 

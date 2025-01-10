@@ -50,4 +50,3 @@ with open("README.md", "r") as f:
 
 
 setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild})
-# setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild} if sys.platform in ["linux", "win32", "darwin"] else {}),

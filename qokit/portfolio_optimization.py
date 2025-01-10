@@ -135,10 +135,6 @@ def get_data(N, seed=1, real=False) -> tuple[float, float]:
     )
 
     data.run()
-    # use get_period_return_mean_vector & get_period_return_covariance_matrix to get return!
-    # https://github.com/Qiskit/qiskit-finance/blob/main/docs/tutorials/01_portfolio_optimization.ipynb
-    # means = data.get_period_return_mean_vector()
-    # cov = data.get_period_return_covariance_matrix()
     period_returns = np.array(data._data)[:, 1:] / np.array(data._data)[:, :-1] - 1
     means = cast(np.ndarray, np.mean(period_returns, axis=1))
     cov = np.cov(period_returns, rowvar=True)
