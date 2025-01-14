@@ -23,6 +23,8 @@ def test_simulator_c_build():
         assert "c" in get_available_simulator_names("x")
         assert "c" in get_available_simulator_names("xyring")
         assert "c" in get_available_simulator_names("xycomplete")
+    else:
+        assert False
 
 
 def test_simulator_python_build():
