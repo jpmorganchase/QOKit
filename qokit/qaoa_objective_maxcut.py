@@ -73,7 +73,6 @@ def get_qaoa_maxcut_objective(
 
     return get_qaoa_objective(
         N=N,
-        p=p,
         precomputed_diagonal_hamiltonian=precomputed_cuts,
         terms=terms,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,

@@ -13,10 +13,11 @@ from pytket.circuit import Circuit
 from pytket.extensions.quantinuum import QuantinuumBackend
 from pytket.extensions.qiskit import qiskit_to_tk
 from importlib_resources import files
+from qiskit.providers.basic_provider import BasicProvider
 
 from pytket.passes import (
     SequencePass,
-    auto_squash_pass,
+    AutoSquash,
     RemoveRedundancies,
     SimplifyInitial,
     FullPeepholeOptimise,
@@ -206,8 +207,8 @@ def obj_from_statevector(sv, obj_f, precomputed_energies=None):
 
 
 def unitary_from_circuit(qc: QuantumCircuit):
-    backend = qiskit.BasicAer.get_backend("unitary_simulator")
-    job = qiskit.execute(qc, backend)
+    backend = BasicProvider().get_backend("unitary_simulator")
+    job = qiskit.transpile(qc, backend)
     U = job.result().get_unitary()
     return U
 

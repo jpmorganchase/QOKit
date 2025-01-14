@@ -199,7 +199,6 @@ def get_qaoa_labs_objective(
 
     return get_qaoa_objective(
         N=N,
-        p=p,
         precomputed_diagonal_hamiltonian=precomputed_diagonal_hamiltonian,
         precomputed_costs=precomputed_negative_merit_factors,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
