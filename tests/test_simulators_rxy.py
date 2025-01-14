@@ -38,7 +38,7 @@ def _check_simulator_against_qiskit(sim, N, index_pairs, gammas, betas, sv0=None
     backend = Aer.get_backend("aer_simulator_statevector")
     betas_qiskit = [b / n_trotters for b in betas for _ in range(n_trotters)]
     qc = _create_rxy_circuit_qiskit(N, index_pairs, betas_qiskit)
-    sv_qiskit = Statevector(transpile(qc, backend))  # .result().get_statevector()
+    sv_qiskit = Statevector(transpile(qc, backend))
     assert sv_qiskit.equiv(res)
 
 
