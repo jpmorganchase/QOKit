@@ -14,15 +14,14 @@ def test_sk_obj(n=5):
     J = (J + J.T)/2
 
     for edge in G.edges:
-        G.edges[edge[0], edge[1]]['weight'] = 1 #J[edge[0], edge[1]]
+        G.edges[edge[0], edge[1]]['weight'] = J[edge[0], edge[1]]
 
     def sk_obj_simple(x, G):
-        cut = 0
+        obj = 0
+        w=get_adjacency_matrix(G)
         for i, j in G.edges():
-            if x[i] != x[j]:
-                # the edge is cut
-                cut += 1
-        return cut
+                obj += w[i, j] * (2*x[i] - 1) * (2*x[j] - 1)
+        return -2*obj/np.sqrt(n)
 
     x = np.random.choice([0, 1], G.number_of_nodes())
     assert np.isclose(sk_obj(x, w=get_adjacency_matrix(G)), sk_obj_simple(x, G))

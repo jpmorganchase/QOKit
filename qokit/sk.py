@@ -18,8 +18,9 @@ def sk_obj(x: np.ndarray, w: np.ndarray) -> float:
     Returns:
         float: value of the cut.
     """
-    X = np.outer(x, (1 - x))
-    return np.sum(w * X)  # type: ignore
+    n = len(x)
+    X = np.outer(2*x-1, 2*x-1)
+    return -np.sum(w * X)/np.sqrt(n)  # type: ignore
 
 
 def get_sk_terms(G: nx.Graph) -> TermsType:
@@ -27,22 +28,16 @@ def get_sk_terms(G: nx.Graph) -> TermsType:
 
     .. math::
 
-        S = \\sum_{(i,j)\\in G} J_ij * (1-s_i*s_j)/2
+        S = \\sum_{(i,j)\\in G} J_ij * (s_i*s_j)/2
 
     Args:
         G: MaxCut problem graph
     Returns:
         terms to be used in the simulation
     """
-    if nx.is_weighted(G):
-        terms = [(-float(G[u][v]["weight"]) / 2, (int(u), int(v))) for u, v, *_ in G.edges()]
-        total_w = sum([float(G[u][v]["weight"]) for u, v, *_ in G.edges()])
-
-    else:
-        terms = [(-(1 / 2), (int(e[0]), int(e[1]))) for e in G.edges()]
-        total_w = int(G.number_of_edges())
+    n = G.number_of_nodes()
+    terms = [(-2*float(G[u][v]["weight"])/np.sqrt(n) , (int(u), int(v))) for u, v, *_ in G.edges()]
     N = G.number_of_nodes()
-    terms.append((+total_w / 2, tuple()))
     return terms
 
 
