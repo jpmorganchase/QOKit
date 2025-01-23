@@ -19,8 +19,8 @@ def sk_obj(x: np.ndarray, w: np.ndarray) -> float:
         float: value of the cut.
     """
     n = len(x)
-    X = np.outer(2*x-1, 2*x-1)
-    return -np.sum(w * X)/np.sqrt(n)  # type: ignore
+    X = np.outer(2 * x - 1, 2 * x - 1)
+    return -np.sum(w * X) / np.sqrt(n)  # type: ignore
 
 
 def get_sk_terms(G: nx.Graph) -> TermsType:
@@ -36,7 +36,7 @@ def get_sk_terms(G: nx.Graph) -> TermsType:
         terms to be used in the simulation
     """
     n = G.number_of_nodes()
-    terms = [(-2*float(G[u][v]["weight"])/np.sqrt(n) , (int(u), int(v))) for u, v, *_ in G.edges()]
+    terms = [(-2 * float(G[u][v]["weight"]) / np.sqrt(n), (int(u), int(v))) for u, v, *_ in G.edges()]
     N = G.number_of_nodes()
     return terms
 
