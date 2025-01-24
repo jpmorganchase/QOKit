@@ -10,7 +10,7 @@ import numpy as np
 import networkx as nx
 
 
-def sk_obj(x: np.ndarray, w: np.ndarray) -> float:
+def sk_obj(x: np.ndarray, J: np.ndarray) -> float:
     """Compute the value of a cut.
     Args:
         x (numpy.ndarray): binary string as numpy array.
@@ -20,10 +20,10 @@ def sk_obj(x: np.ndarray, w: np.ndarray) -> float:
     """
     n = len(x)
     X = np.outer(2 * x - 1, 2 * x - 1)
-    return -np.sum(w * X) / np.sqrt(n)  # type: ignore
+    return -np.sum(J * X) / np.sqrt(n)  # type: ignore
 
 
-def get_sk_terms(G: nx.Graph) -> TermsType:
+def get_sk_terms(J: np.ndarray) -> TermsType:
     """Get terms corresponding to cost function value
 
     .. math::
@@ -35,9 +35,12 @@ def get_sk_terms(G: nx.Graph) -> TermsType:
     Returns:
         terms to be used in the simulation
     """
-    n = G.number_of_nodes()
-    terms = [(-2 * float(G[u][v]["weight"]) / np.sqrt(n), (int(u), int(v))) for u, v, *_ in G.edges()]
-    N = G.number_of_nodes()
+    N = J.shape[0]
+    G = nx.complete_graph(N)
+    for edge in G.edges:
+        G.edges[edge[0], edge[1]]["weight"] = J[edge[0], edge[1]]
+
+    terms = [(-2 * float(G[u][v]["weight"]) / np.sqrt(N), (int(u), int(v))) for u, v, *_ in G.edges()]
     return terms
 
 

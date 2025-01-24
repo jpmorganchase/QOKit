@@ -17,7 +17,7 @@ from .qaoa_objective import get_qaoa_objective
 def get_qaoa_sk_objective(
     N: int,
     p: int,
-    G: nx.Graph | None = None,
+    J: np.ndarray,
     precomputed_cuts: np.ndarray | None = None,
     parameterization: str = "theta",
     objective: str = "expectation",
@@ -57,17 +57,17 @@ def get_qaoa_sk_objective(
     terms = None
     optimization_type = "max"
 
-    if precomputed_cuts is not None and G is not None:
+    if precomputed_cuts is not None and J is not None:
         warnings.warn("If precomputed_cuts is passed, G is ignored")
 
     if precomputed_cuts is None:
-        assert G is not None, "G must be passed if precomputed_cuts is None"
-        terms = get_sk_terms(G)
+        assert J is not None, "J must be passed if precomputed_cuts is None"
+        terms = get_sk_terms(J)
 
     if simulator == "qiskit":
-        assert G is not None, "G must be passed if simulator == 'qiskit'"
-        precomputed_cuts = precompute_energies(sk_obj, N, w=get_adjacency_matrix(G))
-        parameterized_circuit = get_parameterized_qaoa_circuit(G, p)
+        assert J is not None, "J must be passed if simulator == 'qiskit'"
+        precomputed_cuts = precompute_energies(sk_obj, N, J)
+        parameterized_circuit = get_parameterized_qaoa_circuit(J, p)
     else:
         parameterized_circuit = None
 

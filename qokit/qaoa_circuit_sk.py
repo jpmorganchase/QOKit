@@ -5,6 +5,7 @@
 # QAOA circuit for S_k
 
 import networkx as nx
+import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit.circuit import ParameterVector
 from typing import Sequence
@@ -14,24 +15,23 @@ def append_zz_term(qc, q1, q2, gamma):
     qc.rzz(-gamma / 2, q1, q2)
 
 
-def append_sk_cost_operator_circuit(qc, G, gamma):
-    for i, j in G.edges():
-        if nx.is_weighted(G):
-            append_zz_term(qc, i, j, gamma * G[i][j]["weight"])
-        else:
-            append_zz_term(qc, i, j, gamma)
+def append_sk_cost_operator_circuit(qc, J, gamma):
+    N = J.shape[0]
+    for i in range(N):
+        for j in range(i + 1, N):
+            append_zz_term(qc, i, j, gamma * J[i][j])
 
 
 def append_x_term(qc, q1, beta):
     qc.rx(2 * beta, q1)
 
 
-def append_mixer_operator_circuit(qc, G, beta):
-    for n in G.nodes():
+def append_mixer_operator_circuit(qc, J, beta):
+    for n in range(J.shape[0]):
         append_x_term(qc, n, beta)
 
 
-def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
+def get_qaoa_circuit(J: np.ndarray, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
     """Generates a circuit for weighted MaxCut on graph G.
     Parameters
     ----------
@@ -57,7 +57,7 @@ def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statev
     """
     assert len(betas) == len(gammas)
     p = len(betas)  # infering number of QAOA steps from the parameters passed
-    N = G.number_of_nodes()
+    N = J.shape[0]
     if qr is not None:
         assert qr.size >= N
     else:
@@ -72,23 +72,23 @@ def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statev
     qc.h(range(N))
     # second, apply p alternating operators
     for i in range(p):
-        append_sk_cost_operator_circuit(qc, G, gammas[i])
-        append_mixer_operator_circuit(qc, G, betas[i])
+        append_sk_cost_operator_circuit(qc, J, gammas[i])
+        append_mixer_operator_circuit(qc, J, betas[i])
     if save_statevector:
         qc.save_statevector()
     return qc
 
 
 def get_parameterized_qaoa_circuit(
-    G: nx.Graph, p: int, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None, return_parameter_vectors: bool = False
+    J: np.ndarray, p: int, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None, return_parameter_vectors: bool = False
 ):
     """Generates a parameterized circuit for weighted MaxCut on graph G.
     This version is recommended for long circuits
 
     Parameters
     ----------
-    G : networkx.Graph
-        Graph to solve MaxCut on
+    J : numpy.ndarray
+        J_ij for the SK model.
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
     save_statevector : bool, default True
@@ -111,7 +111,7 @@ def get_parameterized_qaoa_circuit(
         (beta first, then gamma). To bind:
         qc.bind_parameters(np.hstack([angles['beta'], angles['gamma']]))
     """
-    N = G.number_of_nodes()
+    N = J.shape[0]
     if qr is not None:
         assert qr.size >= N
     else:
@@ -129,8 +129,8 @@ def get_parameterized_qaoa_circuit(
     qc.h(range(N))
     # second, apply p alternating operators
     for i in range(p):
-        append_sk_cost_operator_circuit(qc, G, gammas[i])
-        append_mixer_operator_circuit(qc, G, betas[i])
+        append_sk_cost_operator_circuit(qc, J, gammas[i])
+        append_mixer_operator_circuit(qc, J, betas[i])
     if save_statevector:
         qc.save_statevector()
     if return_parameter_vectors:
