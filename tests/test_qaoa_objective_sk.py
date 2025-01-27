@@ -50,6 +50,33 @@ def test_sk_obj(n=5):
     assert np.isclose(sk_obj(x, J), sk_obj_simple(x, J))
 
 
+def test_sk_qaoa_convergence_with_p():
+    N = 8
+    J = np.random.randn(N, N)
+    J = (J + J.T) / 2
+    np.fill_diagonal(J, 0)
+
+    obj = partial(sk_obj, J=J)
+    precomputed_energies = precompute_energies(obj, N)
+    optimal_cut = np.max(precomputed_energies)
+
+    last_ar = [0.0, 0.0]
+
+    for p in range(1, 18):
+        gamma, beta = get_sk_gamma_beta(p)
+        for objective in ["expectation"]:
+            qaoa_objectives = [
+                -get_qaoa_sk_objective(
+                    N, p, J=J, precomputed_cuts=precomputed_energies, parameterization="gamma beta", simulator=simulator, objective=objective
+                )(gamma / np.sqrt(N), beta)
+                for simulator in simulators_to_run_names_no_qiskit
+            ]
+            print("p: ", p, "Approximation Ratio:", np.round(qaoa_objectives / optimal_cut, 3))
+            current_ar = qaoa_objectives / optimal_cut
+            assert list(current_ar) > list(last_ar)
+            last_ar = current_ar
+
+
 def test_sk_qaoa_obj_consistency_across_simulators():
     N = 8
     G = nx.complete_graph(N)
