@@ -32,8 +32,8 @@ def get_qaoa_sk_objective(
         Number of qubits
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
-    G : nx.Graph
-        graph on which S-k will be solved
+    J : numpy.ndarray
+        J_ij for SK model.
     precomputed_cuts : np.array
         precomputed cuts to compute the QAOA expectation, for maximization problem
         send the precomputed cuts/energies as negative
@@ -58,7 +58,7 @@ def get_qaoa_sk_objective(
     optimization_type = "max"
 
     if precomputed_cuts is not None and J is not None:
-        warnings.warn("If precomputed_cuts is passed, G is ignored")
+        warnings.warn("If precomputed_cuts is passed, J is ignored")
 
     if precomputed_cuts is None:
         assert J is not None, "J must be passed if precomputed_cuts is None"

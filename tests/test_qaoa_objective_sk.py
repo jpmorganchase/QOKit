@@ -9,6 +9,7 @@ from pathlib import Path
 from functools import partial
 from qiskit_aer import AerSimulator
 import pytest
+from itertools import combinations
 
 from qokit.sk import sk_obj, get_sk_terms
 
@@ -27,6 +28,7 @@ from qokit.qaoa_objective import get_qaoa_objective
 
 test_sk_folder = Path(__file__).parent
 
+np.random.seed(100)
 
 qiskit_backend = AerSimulator(method="statevector")
 SIMULATORS = get_available_simulators("x") + get_available_simulators("xyring") + get_available_simulators("xycomplete")
@@ -50,6 +52,36 @@ def test_sk_obj(n=5):
     assert np.isclose(sk_obj(x, J), sk_obj_simple(x, J))
 
 
+def test_energy_pre_optimized():
+    N = 8
+    J = np.array(
+        [
+            [0.00000000e00, 1.15336475e00, -5.85084225e-01, 7.12352577e-01, 3.68067836e-01, -1.13088622e00, -8.64623738e-02, -3.77646427e-01],
+            [1.15336475e00, 0.00000000e00, -9.13387355e-02, -7.66210270e-01, -7.19919730e-01, -8.00833339e-01, 2.33528912e-01, -6.65389692e-01],
+            [-5.85084225e-01, -9.13387355e-02, 0.00000000e00, 2.68564121e-01, 9.91582576e-01, -9.31645738e-01, 2.33491255e-02, -7.41120517e-01],
+            [7.12352577e-01, -7.66210270e-01, 2.68564121e-01, 0.00000000e00, 9.70605475e-01, 1.02954907e00, -3.94682792e-01, -3.25847934e-04],
+            [3.68067836e-01, -7.19919730e-01, 9.91582576e-01, 9.70605475e-01, 0.00000000e00, -4.07804975e-01, 2.67471661e-01, -1.60992252e-02],
+            [-1.13088622e00, -8.00833339e-01, -9.31645738e-01, 1.02954907e00, -4.07804975e-01, 0.00000000e00, 8.64544538e-01, 7.83512686e-01],
+            [-8.64623738e-02, 2.33528912e-01, 2.33491255e-02, -3.94682792e-01, 2.67471661e-01, 8.64544538e-01, 0.00000000e00, -1.23662276e-01],
+            [-3.77646427e-01, -6.65389692e-01, -7.41120517e-01, -3.25847934e-04, -1.60992252e-02, 7.83512686e-01, -1.23662276e-01, 0.00000000e00],
+        ]
+    )
+
+    p = 8
+    gamma = np.array([0.2268, 0.4162, 0.4332, 0.4608, 0.4818, 0.5179, 0.5717, 0.6393])
+    beta = np.array([0.6151, 0.4906, 0.4244, 0.3780, 0.3224, 0.2606, 0.1884, 0.1030])
+
+    # Precomputed expected energy with the above fixed parameters: [3.838980017541577, 3.8389800175415765]
+    expected_energy = [3.838980017541577, 3.8389800175415765]
+
+    qaoa_objectives = [
+        -get_qaoa_sk_objective(N, p, J=J, parameterization="gamma beta", simulator=simulator, objective="expectation")(gamma, beta)
+        for simulator in simulators_to_run_names_no_qiskit
+    ]
+    print(qaoa_objectives)
+    assert np.allclose(qaoa_objectives, expected_energy)
+
+
 def test_sk_qaoa_convergence_with_p():
     N = 8
     J = np.random.randn(N, N)
@@ -71,23 +103,43 @@ def test_sk_qaoa_convergence_with_p():
                 )(gamma / np.sqrt(N), beta)
                 for simulator in simulators_to_run_names_no_qiskit
             ]
-            print("p: ", p, "Approximation Ratio:", np.round(qaoa_objectives / optimal_cut, 3))
+            print("p: ", p, "Approximation Ratio:", qaoa_objectives / optimal_cut)
             current_ar = qaoa_objectives / optimal_cut
             assert list(current_ar) > list(last_ar)
             last_ar = current_ar
 
 
-def test_sk_qaoa_obj_consistency_across_simulators():
+def test_sk_withJ_and_maxcut_with_terms():
     N = 8
-    G = nx.complete_graph(N)
     J = np.random.randn(N, N)
     J = (J + J.T) / 2
     np.fill_diagonal(J, 0)
 
-    for edge in G.edges:
-        G.edges[edge[0], edge[1]]["weight"] = J[edge[0], edge[1]]
+    terms = [(-2 * J[spin_pair[0], spin_pair[1]] / np.sqrt(N), spin_pair) for spin_pair in combinations(range(N), r=2)]
 
-    for p in [11, 4]:
+    for p in range(1, 18):
+        gamma, beta = get_sk_gamma_beta(p)
+        f1 = [
+            get_qaoa_objective(N, terms=terms, parameterization="gamma beta", simulator=simulator, objective="expectation")(gamma, beta)
+            for simulator in simulators_to_run_names_no_qiskit
+        ]
+        f2 = [
+            -get_qaoa_sk_objective(N, p, J=J, parameterization="gamma beta", simulator=simulator, objective="expectation")(gamma, beta)
+            for simulator in simulators_to_run_names_no_qiskit
+        ]
+
+        print(f1, f2)
+
+        assert np.allclose(f1, f2)
+
+
+def test_sk_qaoa_obj_consistency_across_simulators():
+    N = 8
+    J = np.random.randn(N, N)
+    J = (J + J.T) / 2
+    np.fill_diagonal(J, 0)
+
+    for p in range(1, 18):
         gamma, beta = get_sk_gamma_beta(p)
         for objective in ["expectation", "overlap"]:
             qaoa_objectives = [

@@ -35,8 +35,8 @@ def get_qaoa_circuit(J: np.ndarray, gammas: Sequence, betas: Sequence, save_stat
     """Generates a circuit for weighted MaxCut on graph G.
     Parameters
     ----------
-    G : networkx.Graph
-        Graph to solve MaxCut on
+    J : numpy.ndarray
+        J_ij for the SK model.
     beta : list-like
         QAOA parameter beta
     gamma : list-like

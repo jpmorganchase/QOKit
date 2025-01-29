@@ -28,7 +28,7 @@ def get_sk_terms(J: np.ndarray) -> TermsType:
 
     .. math::
 
-        S = \\sum_{(i,j)\\in G} J_ij * (s_i*s_j)/2
+        S = 1/\sqrt(N) \sum_{(i,j)\\in G} J_ij * (s_i*s_j)/2
 
     Args:
         G: MaxCut problem graph
