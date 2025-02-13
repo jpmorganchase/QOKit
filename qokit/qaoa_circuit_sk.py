@@ -31,7 +31,7 @@ def append_mixer_operator_circuit(qc, J, beta):
 
 
 def get_qaoa_circuit(J: np.ndarray, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
-    """Generates a circuit for weighted MaxCut on graph G.
+    """Generates a circuit for SK model for given coupling matrix J.
     Parameters
     ----------
     J : numpy.ndarray
@@ -81,13 +81,13 @@ def get_qaoa_circuit(J: np.ndarray, gammas: Sequence, betas: Sequence, save_stat
 def get_parameterized_qaoa_circuit(
     J: np.ndarray, p: int, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None, return_parameter_vectors: bool = False
 ):
-    """Generates a parameterized circuit for weighted MaxCut on graph G.
+    """Generates a parameterized circuit for SK model for given coupling matrix J.
     This version is recommended for long circuits
 
     Parameters
     ----------
     J : numpy.ndarray
-        J_ij for the SK model.
+        Coupling matrix for the SK model.
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
     save_statevector : bool, default True
