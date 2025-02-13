@@ -4,7 +4,6 @@
 ###############################################################################
 # QAOA circuit for S_k
 
-import networkx as nx
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit.circuit import ParameterVector
@@ -36,7 +35,7 @@ def get_qaoa_circuit(J: np.ndarray, gammas: Sequence, betas: Sequence, save_stat
     Parameters
     ----------
     J : numpy.ndarray
-        J_ij for the SK model.
+        Matrix representing couplings in the SK model.
     beta : list-like
         QAOA parameter beta
     gamma : list-like

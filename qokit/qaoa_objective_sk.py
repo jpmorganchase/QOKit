@@ -2,13 +2,11 @@
 # // SPDX-License-Identifier: Apache-2.0
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
-from __future__ import annotations
 import numpy as np
-import networkx as nx
 import warnings
 
 from .utils import precompute_energies
-from .sk import sk_obj, get_adjacency_matrix, get_sk_terms
+from .sk import sk_obj, get_sk_terms
 
 from .qaoa_circuit_sk import get_parameterized_qaoa_circuit
 from .qaoa_objective import get_qaoa_objective
@@ -33,7 +31,7 @@ def get_qaoa_sk_objective(
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
     J : numpy.ndarray
-        J_ij for SK model.
+        Couplinf matrix for the SK model.
     precomputed_cuts : np.array
         precomputed cuts to compute the QAOA expectation, for maximization problem
         send the precomputed cuts/energies as negative
@@ -55,7 +53,7 @@ def get_qaoa_sk_objective(
         Function returning the negative of expected value of QAOA with parameters theta
     """
     terms = None
-    optimization_type = "max"
+    optimization_type = "min"
 
     if precomputed_cuts is not None and J is not None:
         warnings.warn("If precomputed_cuts is passed, J is ignored")
