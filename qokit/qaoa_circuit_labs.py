@@ -6,7 +6,7 @@
 from collections.abc import Sequence
 from qiskit import QuantumCircuit
 from qiskit.circuit import ParameterVector
-from .qaoa_circuit_utils import *
+from .qaoa_circuit_utils import _get_qaoa_circuit_labs, _get_parameterized_qaoa_circuit_labs
 
 
 def get_qaoa_circuit(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, save_statevector: bool = True) -> QuantumCircuit:
@@ -31,20 +31,7 @@ def get_qaoa_circuit(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, s
     qc : qiskit.QuantumCircuit
         Quantum circuit implementing QAOA
     """
-    assert len(beta) == len(gamma)
-    p = len(beta)  # infering number of QAOA steps from the parameters passed
-
-    qc = QuantumCircuit(N)
-
-    # first, apply a layer of Hadamards
-    qc.h(range(N))
-    # second, apply p alternating operators
-    for i in range(p):
-        append_labs_cost_operator_circuit(qc, terms, gamma[i])
-        append_labs_mixer_operator_circuit(qc, beta[i])
-    if save_statevector:
-        qc.save_statevector()  # type: ignore
-    return qc
+    return _get_qaoa_circuit_labs(N=N, terms=terms, gamma=gamma, beta=beta, save_statevector=save_statevector)
 
 
 def get_parameterized_qaoa_circuit(N: int, terms: Sequence, p: int, save_statevector: bool = True, return_parameter_vectors: bool = False) -> QuantumCircuit:
@@ -83,20 +70,10 @@ def get_parameterized_qaoa_circuit(N: int, terms: Sequence, p: int, save_stateve
         (beta first, then gamma). To bind:
         qc.bind_parameters(np.hstack([angles['beta'], angles['gamma']]))
     """
-    qc = QuantumCircuit(N)
-
-    betas = ParameterVector("beta", p)
-    gammas = ParameterVector("gamma", p)
-
-    # first, apply a layer of Hadamards
-    qc.h(range(N))
-    # second, apply p alternating operators
-    for i in range(p):
-        append_labs_cost_operator_circuit(qc, terms, gammas[i])  # type: ignore
-        append_labs_mixer_operator_circuit(qc, betas[i])  # type: ignore
-    if save_statevector:
-        qc.save_statevector()  # type: ignore
-    if return_parameter_vectors:
-        return qc, betas, gammas
-    else:
-        return qc
+    return _get_parameterized_qaoa_circuit_labs(
+        N=N,
+        terms=terms,
+        p=p,
+        save_statevector=save_statevector,
+        return_parameter_vectors=return_parameter_vectors,
+    )
