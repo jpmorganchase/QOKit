@@ -8,27 +8,8 @@ import networkx as nx
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit.circuit import ParameterVector
 from typing import Sequence
-
-
-def append_zz_term(qc, q1, q2, gamma):
-    qc.rzz(-gamma / 2, q1, q2)
-
-
-def append_maxcut_cost_operator_circuit(qc, G, gamma):
-    for i, j in G.edges():
-        if nx.is_weighted(G):
-            append_zz_term(qc, i, j, gamma * G[i][j]["weight"])
-        else:
-            append_zz_term(qc, i, j, gamma)
-
-
-def append_x_term(qc, q1, beta):
-    qc.rx(2 * beta, q1)
-
-
-def append_mixer_operator_circuit(qc, G, beta):
-    for n in G.nodes():
-        append_x_term(qc, n, beta)
+from .maxcut import get_adjacency_matrix
+from .qaoa_circuit_utils import _get_qaoa_circuit, _get_parameterized_qaoa_circuit
 
 
 def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
@@ -55,28 +36,9 @@ def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statev
     qc : qiskit.QuantumCircuit
         Quantum circuit implementing QAOA
     """
-    assert len(betas) == len(gammas)
-    p = len(betas)  # infering number of QAOA steps from the parameters passed
-    N = G.number_of_nodes()
-    if qr is not None:
-        assert qr.size >= N
-    else:
-        qr = QuantumRegister(N)
 
-    if cr is not None:
-        qc = QuantumCircuit(qr, cr)
-    else:
-        qc = QuantumCircuit(qr)
-
-    # first, apply a layer of Hadamards
-    qc.h(range(N))
-    # second, apply p alternating operators
-    for i in range(p):
-        append_maxcut_cost_operator_circuit(qc, G, gammas[i])
-        append_mixer_operator_circuit(qc, G, betas[i])
-    if save_statevector:
-        qc.save_statevector()
-    return qc
+    w = get_adjacency_matrix(G)
+    return _get_qaoa_circuit(J=w, gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
 
 
 def get_parameterized_qaoa_circuit(
@@ -111,29 +73,5 @@ def get_parameterized_qaoa_circuit(
         (beta first, then gamma). To bind:
         qc.bind_parameters(np.hstack([angles['beta'], angles['gamma']]))
     """
-    N = G.number_of_nodes()
-    if qr is not None:
-        assert qr.size >= N
-    else:
-        qr = QuantumRegister(N)
-
-    if cr is not None:
-        qc = QuantumCircuit(qr, cr)
-    else:
-        qc = QuantumCircuit(qr)
-
-    betas = ParameterVector("beta", p)
-    gammas = ParameterVector("gamma", p)
-
-    # first, apply a layer of Hadamards
-    qc.h(range(N))
-    # second, apply p alternating operators
-    for i in range(p):
-        append_maxcut_cost_operator_circuit(qc, G, gammas[i])
-        append_mixer_operator_circuit(qc, G, betas[i])
-    if save_statevector:
-        qc.save_statevector()
-    if return_parameter_vectors:
-        return qc, betas, gammas
-    else:
-        return qc
+    w = get_adjacency_matrix(G)
+    return _get_parameterized_qaoa_circuit(J=w, p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors)

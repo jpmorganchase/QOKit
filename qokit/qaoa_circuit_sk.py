@@ -8,26 +8,7 @@ import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit.circuit import ParameterVector
 from typing import Sequence
-
-
-def append_zz_term(qc, q1, q2, gamma):
-    qc.rzz(-gamma / 2, q1, q2)
-
-
-def append_sk_cost_operator_circuit(qc, J, gamma):
-    N = J.shape[0]
-    for i in range(N):
-        for j in range(i + 1, N):
-            append_zz_term(qc, i, j, gamma * J[i][j])
-
-
-def append_x_term(qc, q1, beta):
-    qc.rx(2 * beta, q1)
-
-
-def append_mixer_operator_circuit(qc, J, beta):
-    for n in range(J.shape[0]):
-        append_x_term(qc, n, beta)
+from .qaoa_circuit_utils import _get_qaoa_circuit, _get_parameterized_qaoa_circuit
 
 
 def get_qaoa_circuit(J: np.ndarray, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
@@ -54,28 +35,7 @@ def get_qaoa_circuit(J: np.ndarray, gammas: Sequence, betas: Sequence, save_stat
     qc : qiskit.QuantumCircuit
         Quantum circuit implementing QAOA
     """
-    assert len(betas) == len(gammas)
-    p = len(betas)  # infering number of QAOA steps from the parameters passed
-    N = J.shape[0]
-    if qr is not None:
-        assert qr.size >= N
-    else:
-        qr = QuantumRegister(N)
-
-    if cr is not None:
-        qc = QuantumCircuit(qr, cr)
-    else:
-        qc = QuantumCircuit(qr)
-
-    # first, apply a layer of Hadamards
-    qc.h(range(N))
-    # second, apply p alternating operators
-    for i in range(p):
-        append_sk_cost_operator_circuit(qc, J, gammas[i])
-        append_mixer_operator_circuit(qc, J, betas[i])
-    if save_statevector:
-        qc.save_statevector()
-    return qc
+    return _get_qaoa_circuit(J=J, gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
 
 
 def get_parameterized_qaoa_circuit(
@@ -110,29 +70,4 @@ def get_parameterized_qaoa_circuit(
         (beta first, then gamma). To bind:
         qc.bind_parameters(np.hstack([angles['beta'], angles['gamma']]))
     """
-    N = J.shape[0]
-    if qr is not None:
-        assert qr.size >= N
-    else:
-        qr = QuantumRegister(N)
-
-    if cr is not None:
-        qc = QuantumCircuit(qr, cr)
-    else:
-        qc = QuantumCircuit(qr)
-
-    betas = ParameterVector("beta", p)
-    gammas = ParameterVector("gamma", p)
-
-    # first, apply a layer of Hadamards
-    qc.h(range(N))
-    # second, apply p alternating operators
-    for i in range(p):
-        append_sk_cost_operator_circuit(qc, J, gammas[i])
-        append_mixer_operator_circuit(qc, J, betas[i])
-    if save_statevector:
-        qc.save_statevector()
-    if return_parameter_vectors:
-        return qc, betas, gammas
-    else:
-        return qc
+    return _get_parameterized_qaoa_circuit(J=J, p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors)

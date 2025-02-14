@@ -6,58 +6,7 @@
 from collections.abc import Sequence
 from qiskit import QuantumCircuit
 from qiskit.circuit import ParameterVector
-
-
-def append_z_prod_term(qc: QuantumCircuit, term: Sequence, gamma: float) -> None:
-    """Appends a  multi-body Pauli-Z interaction acting on qubits whose indices
-    correspond to those in 'term'.
-
-    Parameters:
-        qc: QuantumCircuit
-        term: iterable
-            ordered iterable containing qubit indices to apply Pauli-Z interaction to
-        gamma: float
-            evolution time for interaction
-
-    """
-    # term_weight, term = term
-    term_weight = len(term)
-    assert all(term[i] < term[i + 1] for i in range(len(term) - 1))
-    if term_weight == 4:
-        # in labs, four-body terms appear two times more than two-body
-        # there is also a global scaling factor of 2 for all terms (four and two), which is ignored here
-        _gamma = 2 * gamma
-        qc.cx(term[0], term[1])
-        qc.cx(term[3], term[2])
-        qc.rzz(2 * _gamma, term[1], term[2])
-        qc.cx(term[3], term[2])
-        qc.cx(term[0], term[1])
-    elif term_weight == 2:
-        qc.rzz(2 * gamma, term[0], term[1])
-    else:
-        # fallback to general case
-        target = term[-1]
-        for control in term[:-1]:
-            qc.cx(control, target)
-        qc.rz(2 * gamma, target)
-        for control in term[:-1]:
-            qc.cx(control, target)
-
-
-def append_cost_operator_circuit(qc: QuantumCircuit, terms: Sequence, gamma: float) -> None:
-    for term in terms:
-        append_z_prod_term(qc, term, gamma)
-
-
-def append_x_term(qc: QuantumCircuit, q1, beta: float) -> None:
-    qc.h(q1)
-    qc.rz(2 * beta, q1)
-    qc.h(q1)
-
-
-def append_mixer_operator_circuit(qc: QuantumCircuit, beta: float) -> None:
-    for n in qc.qubits:
-        append_x_term(qc, n, beta)
+from .qaoa_circuit_utils import *
 
 
 def get_qaoa_circuit(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, save_statevector: bool = True) -> QuantumCircuit:
@@ -91,8 +40,8 @@ def get_qaoa_circuit(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, s
     qc.h(range(N))
     # second, apply p alternating operators
     for i in range(p):
-        append_cost_operator_circuit(qc, terms, gamma[i])
-        append_mixer_operator_circuit(qc, beta[i])
+        append_labs_cost_operator_circuit(qc, terms, gamma[i])
+        append_labs_mixer_operator_circuit(qc, beta[i])
     if save_statevector:
         qc.save_statevector()  # type: ignore
     return qc
@@ -143,8 +92,8 @@ def get_parameterized_qaoa_circuit(N: int, terms: Sequence, p: int, save_stateve
     qc.h(range(N))
     # second, apply p alternating operators
     for i in range(p):
-        append_cost_operator_circuit(qc, terms, gammas[i])  # type: ignore
-        append_mixer_operator_circuit(qc, betas[i])  # type: ignore
+        append_labs_cost_operator_circuit(qc, terms, gammas[i])  # type: ignore
+        append_labs_mixer_operator_circuit(qc, betas[i])  # type: ignore
     if save_statevector:
         qc.save_statevector()  # type: ignore
     if return_parameter_vectors:
