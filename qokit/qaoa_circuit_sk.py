@@ -2,21 +2,20 @@
 # // SPDX-License-Identifier: Apache-2.0
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
-# QAOA circuit for MAXCUT
+# QAOA circuit for S_k
 
-import networkx as nx
+import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from typing import Sequence
-from .maxcut import get_adjacency_matrix
 from .qaoa_circuit_utils import _get_qaoa_circuit, _get_parameterized_qaoa_circuit
 
 
-def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
-    """Generates a circuit for weighted MaxCut on graph G.
+def get_qaoa_circuit(J: np.ndarray, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
+    """Generates a circuit for SK model for given coupling matrix J.
     Parameters
     ----------
-    G : networkx.Graph
-        Graph to solve MaxCut on
+    J : numpy.ndarray
+        Matrix representing couplings in the SK model.
     beta : list-like
         QAOA parameter beta
     gamma : list-like
@@ -35,21 +34,19 @@ def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statev
     qc : qiskit.QuantumCircuit
         Quantum circuit implementing QAOA
     """
-
-    w = get_adjacency_matrix(G)
-    return _get_qaoa_circuit(J=w, gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
+    return _get_qaoa_circuit(J=J, gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
 
 
 def get_parameterized_qaoa_circuit(
-    G: nx.Graph, p: int, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None, return_parameter_vectors: bool = False
+    J: np.ndarray, p: int, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None, return_parameter_vectors: bool = False
 ):
-    """Generates a parameterized circuit for weighted MaxCut on graph G.
+    """Generates a parameterized circuit for SK model for given coupling matrix J.
     This version is recommended for long circuits
 
     Parameters
     ----------
-    G : networkx.Graph
-        Graph to solve MaxCut on
+    J : numpy.ndarray
+        Coupling matrix for the SK model.
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
     save_statevector : bool, default True
@@ -72,5 +69,4 @@ def get_parameterized_qaoa_circuit(
         (beta first, then gamma). To bind:
         qc.bind_parameters(np.hstack([angles['beta'], angles['gamma']]))
     """
-    w = get_adjacency_matrix(G)
-    return _get_parameterized_qaoa_circuit(J=w, p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors)
+    return _get_parameterized_qaoa_circuit(J=J, p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors)
