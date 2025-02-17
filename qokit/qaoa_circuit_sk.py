@@ -6,7 +6,6 @@
 
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-from qiskit.circuit import ParameterVector
 from typing import Sequence
 from .qaoa_circuit_utils import _get_qaoa_circuit, _get_parameterized_qaoa_circuit
 

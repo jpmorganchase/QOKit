@@ -5,7 +5,6 @@
 # QAOA circuit for some Z objective
 from collections.abc import Sequence
 from qiskit import QuantumCircuit
-from qiskit.circuit import ParameterVector
 from .qaoa_circuit_utils import _get_qaoa_circuit_labs, _get_parameterized_qaoa_circuit_labs
 
 
