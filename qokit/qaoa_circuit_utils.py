@@ -85,7 +85,7 @@ def append_labs_mixer_operator_circuit(qc: QuantumCircuit, beta: float) -> None:
 def _get_qaoa_circuit(
     J: np.ndarray, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None
 ):
-    """Generates a circuit for weighted MaxCut on graph G.
+    """Generates a circuit for weighted MaxCut on graph G, or for coupling matrix J for SK problem.
     Parameters
     ----------
     J : numpy.ndarray

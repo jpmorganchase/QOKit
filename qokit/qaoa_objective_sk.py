@@ -5,7 +5,7 @@
 import numpy as np
 import warnings
 
-from .utils import precompute_energies
+from .utils import precompute_energies, reverse_array_index_bit_order
 from .sk import sk_obj, get_sk_terms
 
 from .qaoa_circuit_sk import get_parameterized_qaoa_circuit
