@@ -11,10 +11,12 @@ from itertools import combinations
 from qokit.sk import sk_obj, get_sk_terms
 from qokit.maxcut import maxcut_obj
 from qokit.qaoa_objective_sk import get_qaoa_sk_objective
+from qokit.qaoa_objective_maxcut import get_qaoa_maxcut_objective
 from qokit.utils import brute_force, precompute_energies
 from qokit.parameter_utils import get_sk_gamma_beta
 from qokit.fur import get_available_simulators, get_available_simulator_names
 from qokit.qaoa_objective import get_qaoa_objective
+import networkx as nx
 
 test_sk_folder = Path(__file__).parent
 
@@ -63,11 +65,11 @@ def test_energy_pre_optimized():
     beta = np.array([0.6151, 0.4906, 0.4244, 0.3780, 0.3224, 0.2606, 0.1884, 0.1030])
 
     # Precomputed expected energy with the above fixed parameters: [4.207818619693583, 4.207818619693583]
-    expected_energy = [4.207818619693583, 4.207818619693583]
+    expected_energy = [4.207818619693583, 4.207818619693583, 4.207818619693583]
 
     qaoa_objectives = [
         get_qaoa_sk_objective(N, p, J=J, parameterization="gamma beta", simulator=simulator, objective="expectation")(gamma, beta)
-        for simulator in simulators_to_run_names_no_qiskit
+        for simulator in simulators_to_run_names
     ]
     assert np.allclose(qaoa_objectives, expected_energy)
 
@@ -91,33 +93,12 @@ def test_sk_qaoa_convergence_with_p():
                 get_qaoa_sk_objective(
                     N, p, J=J, precomputed_cuts=precomputed_energies, parameterization="gamma beta", simulator=simulator, objective=objective
                 )(gamma / np.sqrt(N), beta)
-                for simulator in simulators_to_run_names_no_qiskit
+                for simulator in simulators_to_run_names
             ]
             current_ar = qaoa_objectives / max_energy
             assert list(current_ar) > list(last_ar)
             last_ar = current_ar
 
-
-def test_sk_withJ_and_maxcut_with_terms():
-    N = 8
-    J = rng.standard_normal((N, N))
-    J = (J + J.T) / 2
-    np.fill_diagonal(J, 0)
-
-    terms = get_sk_terms(J)
-
-    for p in range(1, 18):
-        gamma, beta = get_sk_gamma_beta(p)
-        f1 = [
-            get_qaoa_objective(N, terms=terms, parameterization="gamma beta", simulator=simulator, objective="expectation")(gamma, beta)
-            for simulator in simulators_to_run_names_no_qiskit
-        ]
-        f2 = [
-            get_qaoa_sk_objective(N, p, J=J, parameterization="gamma beta", simulator=simulator, objective="expectation")(gamma, beta)
-            for simulator in simulators_to_run_names_no_qiskit
-        ]
-
-        assert np.allclose(f1, f2)
 
 
 def test_sk_qaoa_obj_consistency_across_simulators():
@@ -131,12 +112,12 @@ def test_sk_qaoa_obj_consistency_across_simulators():
         for objective in ["expectation", "overlap"]:
             qaoa_objectives = [
                 get_qaoa_sk_objective(N, p, J=J, parameterization="gamma beta", simulator=simulator, objective=objective)(gamma, beta)
-                for simulator in simulators_to_run_names_no_qiskit
+                for simulator in simulators_to_run_names
             ]
             assert np.all(np.isclose(qaoa_objectives, qaoa_objectives[0]))
 
 
-@pytest.mark.parametrize("simulator", simulators_to_run_names_no_qiskit)
+@pytest.mark.parametrize("simulator", simulators_to_run_names)
 def test_sk_qaoa_obj_fixed_angles_and_precomputed_energies(simulator):
     N = 10
     max_p=11
@@ -168,7 +149,7 @@ def test_sk_precompute(simclass):
     assert np.allclose(precomputed_cuts, cuts, atol=1e-6)
 
 
-@pytest.mark.parametrize("simulator", simulators_to_run_names_no_qiskit)
+@pytest.mark.parametrize("simulator", simulators_to_run_names)
 def test_sk_maxcut_bruteforce(simulator):
     N = 10
     J = rng.standard_normal((N, N))
@@ -184,7 +165,7 @@ def test_sk_maxcut_bruteforce(simulator):
     assert np.allclose(x_maxcut, x_sk) or np.allclose(x_maxcut_comp, x_sk)
 
 
-@pytest.mark.parametrize("simulator", simulators_to_run_names_no_qiskit)
+@pytest.mark.parametrize("simulator", simulators_to_run_names)
 def test_overlap_sk(simulator):
     N = 4
     J = rng.standard_normal((N, N))

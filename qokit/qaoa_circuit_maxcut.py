@@ -7,8 +7,8 @@
 import networkx as nx
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from typing import Sequence
-from .maxcut import get_adjacency_matrix
-from .qaoa_circuit_utils import _get_qaoa_circuit, _get_parameterized_qaoa_circuit
+from .maxcut import get_maxcut_terms
+from .qaoa_circuit_utils import get_qaoa_circuit_with_terms, get_parameterized_qaoa_circuit_with_terms
 
 
 def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
@@ -36,8 +36,9 @@ def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statev
         Quantum circuit implementing QAOA
     """
 
-    w = get_adjacency_matrix(G)
-    return _get_qaoa_circuit(J=w, gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
+    terms = get_maxcut_terms(G)
+    N = G.number_of_nodes()
+    return get_qaoa_circuit_with_terms(N=N, terms=terms[:-1], gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
 
 
 def get_parameterized_qaoa_circuit(
@@ -72,5 +73,6 @@ def get_parameterized_qaoa_circuit(
         (beta first, then gamma). To bind:
         qc.bind_parameters(np.hstack([angles['beta'], angles['gamma']]))
     """
-    w = get_adjacency_matrix(G)
-    return _get_parameterized_qaoa_circuit(J=w, p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors)
+    terms = get_maxcut_terms(G)
+    N= G.number_of_nodes()
+    return get_parameterized_qaoa_circuit_with_terms(N=N, terms=terms[:-1], p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors)

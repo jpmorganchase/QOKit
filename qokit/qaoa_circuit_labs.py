@@ -5,7 +5,7 @@
 # QAOA circuit for some Z objective
 from collections.abc import Sequence
 from qiskit import QuantumCircuit
-from .qaoa_circuit_utils import _get_qaoa_circuit_labs, _get_parameterized_qaoa_circuit_labs
+from .qaoa_circuit_utils import get_qaoa_circuit_labs, get_parameterized_qaoa_circuit_labs
 
 
 def get_qaoa_circuit(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, save_statevector: bool = True) -> QuantumCircuit:
@@ -30,7 +30,7 @@ def get_qaoa_circuit(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, s
     qc : qiskit.QuantumCircuit
         Quantum circuit implementing QAOA
     """
-    return _get_qaoa_circuit_labs(N=N, terms=terms, gamma=gamma, beta=beta, save_statevector=save_statevector)
+    return get_qaoa_circuit_labs(N=N, terms=terms, gamma=gamma, beta=beta, save_statevector=save_statevector)
 
 
 def get_parameterized_qaoa_circuit(N: int, terms: Sequence, p: int, save_statevector: bool = True, return_parameter_vectors: bool = False) -> QuantumCircuit:
@@ -69,7 +69,7 @@ def get_parameterized_qaoa_circuit(N: int, terms: Sequence, p: int, save_stateve
         (beta first, then gamma). To bind:
         qc.bind_parameters(np.hstack([angles['beta'], angles['gamma']]))
     """
-    return _get_parameterized_qaoa_circuit_labs(
+    return get_parameterized_qaoa_circuit_labs(
         N=N,
         terms=terms,
         p=p,

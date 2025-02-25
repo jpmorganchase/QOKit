@@ -11,7 +11,7 @@ from typing import Sequence
 
 
 def append_zz_term(qc, q1, q2, gamma):
-    qc.rzz(-gamma / 2, q1, q2)
+    qc.rzz(gamma, q1, q2)
 
 
 def append_z_prod_term(qc: QuantumCircuit, term: Sequence, gamma: float) -> None:
@@ -50,11 +50,9 @@ def append_z_prod_term(qc: QuantumCircuit, term: Sequence, gamma: float) -> None
             qc.cx(control, target)
 
 
-def append_cost_operator_circuit(qc, J, gamma):
-    N = J.shape[0]
-    for i in range(N):
-        for j in range(i + 1, N):
-            append_zz_term(qc, i, j, gamma * J[i][j])
+def append_cost_operator_circuit(qc, terms, gamma):
+    for term, (i, j) in terms:
+        append_zz_term(qc, i, j, gamma * term)
 
 
 def append_labs_cost_operator_circuit(qc: QuantumCircuit, terms: Sequence, gamma: float) -> None:
@@ -82,15 +80,15 @@ def append_labs_mixer_operator_circuit(qc: QuantumCircuit, beta: float) -> None:
         append_labs_x_term(qc, n, beta)
 
 
-def _get_qaoa_circuit(
-    J: np.ndarray, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None
+def get_qaoa_circuit_with_terms(
+    N: int, terms: Sequence, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None
 ):
-    """Generates a circuit for weighted MaxCut on graph G, or for coupling matrix J for SK problem.
+    """Generates a circuit for weighted MaxCut, or SK problem.
     Parameters
     ----------
-    J : numpy.ndarray
-        Matrix representing couplings in the SK model.
-        Or, Adjacency matrix for the Graph for Maxcut problem.
+    terms : list-like
+        Each element corresponds to terms in the Hamiltonian 
+        and pair of spins or graph nodes.
     beta : list-like
         QAOA parameter beta
     gamma : list-like
@@ -111,7 +109,6 @@ def _get_qaoa_circuit(
     """
     assert len(betas) == len(gammas)
     p = len(betas)  # infering number of QAOA steps from the parameters passed
-    N = J.shape[0]
     if qr is not None:
         assert qr.size >= N
     else:
@@ -126,24 +123,24 @@ def _get_qaoa_circuit(
     qc.h(range(N))
     # second, apply p alternating operators
     for i in range(p):
-        append_cost_operator_circuit(qc, J, gammas[i])
+        append_cost_operator_circuit(qc, terms, gammas[i])
         append_mixer_operator_circuit(qc, N, betas[i])
     if save_statevector:
         qc.save_statevector()
     return qc
 
 
-def _get_parameterized_qaoa_circuit(
-    J: np.ndarray, p: int, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None, return_parameter_vectors: bool = False
+def get_parameterized_qaoa_circuit_with_terms(
+        N: int, terms: Sequence, p: int, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None, return_parameter_vectors: bool = False
 ):
     """Generates a parameterized circuit for weighted MaxCut on graph G.
     This version is recommended for long circuits
 
     Parameters
     ----------
-    J : numpy.ndarray
-        Matrix representing couplings in the SK model.
-        Or, Adjacency matrix for the Graph for Maxcut problem.
+    terms : list-like
+        Each element corresponds to terms in the Hamiltonian 
+        and pair of spins or graph nodes.
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
     save_statevector : bool, default True
@@ -166,7 +163,6 @@ def _get_parameterized_qaoa_circuit(
         (beta first, then gamma). To bind:
         qc.bind_parameters(np.hstack([angles['beta'], angles['gamma']]))
     """
-    N = J.shape[0]
     if qr is not None:
         assert qr.size >= N
     else:
@@ -184,7 +180,7 @@ def _get_parameterized_qaoa_circuit(
     qc.h(range(N))
     # second, apply p alternating operators
     for i in range(p):
-        append_cost_operator_circuit(qc, J, gammas[i])
+        append_cost_operator_circuit(qc, terms, gammas[i])
         append_mixer_operator_circuit(qc, N, betas[i])
     if save_statevector:
         qc.save_statevector()
@@ -194,7 +190,7 @@ def _get_parameterized_qaoa_circuit(
         return qc
 
 
-def _get_qaoa_circuit_labs(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, save_statevector: bool = True) -> QuantumCircuit:
+def get_qaoa_circuit_labs(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, save_statevector: bool = True) -> QuantumCircuit:
     """Generates a circuit for Hamiltonian of the form \sum_{term \in terms} \prod_{j \in term} Z_j
 
     Parameters
@@ -232,7 +228,7 @@ def _get_qaoa_circuit_labs(N: int, terms: Sequence, gamma: Sequence, beta: Seque
     return qc
 
 
-def _get_parameterized_qaoa_circuit_labs(
+def get_parameterized_qaoa_circuit_labs(
     N: int, terms: Sequence, p: int, save_statevector: bool = True, return_parameter_vectors: bool = False
 ) -> QuantumCircuit:
     """Generates a parameterized circuit for Hamiltonian of the form \sum_{term \in terms} \prod_{j \in term} Z_j
