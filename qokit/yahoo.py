@@ -74,7 +74,6 @@ class YahooDataProvider:
                 threads=False,
                 progress=logger.isEnabledFor(logging.DEBUG),
             )
-            # stock_data=yf.download("MSFT", start="2019-01-01", end="2019-04-30")
             if len(self._tickers) == 1:
                 ticker_name = self._tickers[0]
                 stock_value = stock_data["Close"]

@@ -65,6 +65,7 @@ def test_energy_pre_optimized():
 
     # Precomputed expected energy with the above fixed parameters: [4.207818619693583, 4.207818619693583]
     expected_energy = [4.207818619693583, 4.207818619693583, 4.207818619693583]
+    print("Simualtors:", simulators_to_run_names)
 
     qaoa_objectives = [
         get_qaoa_sk_objective(N, p, J=J, parameterization="gamma beta", simulator=simulator, objective="expectation")(gamma, beta)
