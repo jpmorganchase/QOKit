@@ -34,8 +34,8 @@ class YahooDataProvider:
     def __init__(
         self,
         tickers: Optional[Union[str, List[str]]] = None,
-        start: datetime.datetime = datetime.datetime(2020, 1, 1),
-        end: datetime.datetime = datetime.datetime(2020, 1, 30),
+        start: datetime.datetime = datetime.datetime(2019, 1, 1),
+        end: datetime.datetime = datetime.datetime(2019, 4, 30),
     ) -> None:
         """
         Args:
@@ -74,15 +74,16 @@ class YahooDataProvider:
                 threads=False,
                 progress=logger.isEnabledFor(logging.DEBUG),
             )
+            # stock_data=yf.download("MSFT", start="2019-01-01", end="2019-04-30")
             if len(self._tickers) == 1:
                 ticker_name = self._tickers[0]
-                stock_value = stock_data["Adj Close"]
+                stock_value = stock_data["Close"]
                 if stock_value.dropna().empty:
                     stocks_notfound.append(ticker_name)
                 self._data.append(stock_value)
             else:
                 for ticker_name in self._tickers:
-                    stock_value = stock_data[ticker_name]["Adj Close"]
+                    stock_value = stock_data[ticker_name]["Close"]
                     if stock_value.dropna().empty:
                         stocks_notfound.append(ticker_name)
                     self._data.append(stock_value)
