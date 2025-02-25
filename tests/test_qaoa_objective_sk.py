@@ -64,8 +64,7 @@ def test_energy_pre_optimized():
     beta = np.array([0.6151, 0.4906, 0.4244, 0.3780, 0.3224, 0.2606, 0.1884, 0.1030])
 
     # Precomputed expected energy with the above fixed parameters: [4.207818619693583, 4.207818619693583]
-    expected_energy = [4.207818619693583, 4.207818619693583, 4.207818619693583]
-    print("Simualtors:", simulators_to_run_names)
+    expected_energy = 3 * [4.207818619693583]
 
     qaoa_objectives = [
         get_qaoa_sk_objective(N, p, J=J, parameterization="gamma beta", simulator=simulator, objective="expectation")(gamma, beta)
