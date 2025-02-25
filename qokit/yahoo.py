@@ -1,7 +1,7 @@
-""" Yahoo data provider. 
+"""Yahoo data provider.
 
-    Based on Qiskit YahooDataProvider: https://qiskit-community.github.io/qiskit-finance/_modules/
-        qiskit_finance/data_providers/yahoo_data_provider.html#YahooDataProvider
+Based on Qiskit YahooDataProvider: https://qiskit-community.github.io/qiskit-finance/_modules/
+    qiskit_finance/data_providers/yahoo_data_provider.html#YahooDataProvider
 
 """
 

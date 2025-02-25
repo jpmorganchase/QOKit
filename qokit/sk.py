@@ -20,7 +20,7 @@ def sk_obj(x: np.array, J: np.ndarray) -> float:
         float: value of the objective function.
     """
     n = len(x)
-    X = np.outer( 1 - 2 * x , 1 - 2 * x)
+    X = np.outer(1 - 2 * x, 1 - 2 * x)
     return np.sum(J * X) / np.sqrt(n)  # type: ignore
 
 

@@ -28,7 +28,6 @@ simulators_to_run_names = get_available_simulator_names("x") + ["qiskit"]
 simulators_to_run_names_no_qiskit = get_available_simulator_names("x")
 
 
-
 def test_sk_obj(n=5):
     J = rng.standard_normal((n, n))
     J = (J + J.T) / 2
@@ -100,7 +99,6 @@ def test_sk_qaoa_convergence_with_p():
             last_ar = current_ar
 
 
-
 def test_sk_qaoa_obj_consistency_across_simulators():
     N = 8
     J = rng.standard_normal((N, N))
@@ -120,7 +118,7 @@ def test_sk_qaoa_obj_consistency_across_simulators():
 @pytest.mark.parametrize("simulator", simulators_to_run_names)
 def test_sk_qaoa_obj_fixed_angles_and_precomputed_energies(simulator):
     N = 10
-    max_p=11
+    max_p = 11
     J = rng.standard_normal((N, N))
     J = (J + J.T) / 2
     np.fill_diagonal(J, 0)

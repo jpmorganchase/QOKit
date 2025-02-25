@@ -74,5 +74,7 @@ def get_parameterized_qaoa_circuit(
         qc.bind_parameters(np.hstack([angles['beta'], angles['gamma']]))
     """
     terms = get_maxcut_terms(G)
-    N= G.number_of_nodes()
-    return get_parameterized_qaoa_circuit_with_terms(N=N, terms=terms[:-1], p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors)
+    N = G.number_of_nodes()
+    return get_parameterized_qaoa_circuit_with_terms(
+        N=N, terms=terms[:-1], p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors
+    )

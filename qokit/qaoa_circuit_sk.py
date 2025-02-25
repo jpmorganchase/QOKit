@@ -74,4 +74,6 @@ def get_parameterized_qaoa_circuit(
     """
     terms = get_sk_terms(J)
     N = J.shape[0]
-    return get_parameterized_qaoa_circuit_with_terms(N=N, terms=terms, p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors)
+    return get_parameterized_qaoa_circuit_with_terms(
+        N=N, terms=terms, p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors
+    )

@@ -87,7 +87,7 @@ def get_qaoa_circuit_with_terms(
     Parameters
     ----------
     terms : list-like
-        Each element corresponds to terms in the Hamiltonian 
+        Each element corresponds to terms in the Hamiltonian
         and pair of spins or graph nodes.
     beta : list-like
         QAOA parameter beta
@@ -131,7 +131,13 @@ def get_qaoa_circuit_with_terms(
 
 
 def get_parameterized_qaoa_circuit_with_terms(
-        N: int, terms: Sequence, p: int, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None, return_parameter_vectors: bool = False
+    N: int,
+    terms: Sequence,
+    p: int,
+    save_statevector: bool = True,
+    qr: QuantumRegister = None,
+    cr: ClassicalRegister = None,
+    return_parameter_vectors: bool = False,
 ):
     """Generates a parameterized circuit for weighted MaxCut on graph G.
     This version is recommended for long circuits
@@ -139,7 +145,7 @@ def get_parameterized_qaoa_circuit_with_terms(
     Parameters
     ----------
     terms : list-like
-        Each element corresponds to terms in the Hamiltonian 
+        Each element corresponds to terms in the Hamiltonian
         and pair of spins or graph nodes.
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
