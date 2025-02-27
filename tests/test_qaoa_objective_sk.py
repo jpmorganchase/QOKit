@@ -4,21 +4,16 @@
 ###############################################################################
 import numpy as np
 import pytest
-from pathlib import Path
 from functools import partial
 from qiskit_aer import AerSimulator
 from itertools import combinations
 from qokit.sk import sk_obj, get_sk_terms
 from qokit.maxcut import maxcut_obj
 from qokit.qaoa_objective_sk import get_qaoa_sk_objective
-from qokit.qaoa_objective_maxcut import get_qaoa_maxcut_objective
 from qokit.utils import brute_force, precompute_energies
 from qokit.parameter_utils import get_sk_gamma_beta
 from qokit.fur import get_available_simulators, get_available_simulator_names
-from qokit.qaoa_objective import get_qaoa_objective
-import networkx as nx
 
-test_sk_folder = Path(__file__).parent
 
 rng = np.random.default_rng(seed=42)
 
@@ -90,7 +85,7 @@ def test_sk_qaoa_convergence_with_p():
         for objective in ["expectation"]:
             qaoa_objectives = [
                 get_qaoa_sk_objective(
-                    N, p, J=J, precomputed_cuts=precomputed_energies, parameterization="gamma beta", simulator=simulator, objective=objective
+                    N, p, J=J, precomputed_energies=precomputed_energies, parameterization="gamma beta", simulator=simulator, objective=objective
                 )(gamma / np.sqrt(N), beta)
                 for simulator in simulators_to_run_names
             ]
@@ -127,7 +122,7 @@ def test_sk_qaoa_obj_fixed_angles_and_precomputed_energies(simulator):
     for p in range(1, max_p + 1):
         gamma, beta = get_sk_gamma_beta(p)
         f1 = get_qaoa_sk_objective(N, p, J=J, parameterization="gamma beta", simulator=simulator)
-        f2 = get_qaoa_sk_objective(N, p, J=J, precomputed_cuts=precomputed_energies, parameterization="gamma beta", simulator=simulator)
+        f2 = get_qaoa_sk_objective(N, p, J=J, precomputed_energies=precomputed_energies, parameterization="gamma beta", simulator=simulator)
         e1 = f1(gamma, beta)
         e2 = f2(gamma, beta)
         assert np.isclose(e1, e2)
@@ -140,11 +135,11 @@ def test_sk_precompute(simclass):
     J = (J + J.T) / 2
     np.fill_diagonal(J, 0)
 
-    precomputed_cuts = precompute_energies(sk_obj, N, J)
+    precomputed_energies = precompute_energies(sk_obj, N, J)
     terms = get_sk_terms(J)
     sim = simclass(N, terms=terms)
     cuts = sim.get_cost_diagonal()
-    assert np.allclose(precomputed_cuts, cuts, atol=1e-6)
+    assert np.allclose(precomputed_energies, cuts, atol=1e-6)
 
 
 @pytest.mark.parametrize("simulator", simulators_to_run_names)
@@ -176,7 +171,7 @@ def test_overlap_sk(simulator):
     obj = partial(sk_obj, J=J)
     precomputed_energies = precompute_energies(obj, N)
 
-    f1 = get_qaoa_sk_objective(N, p, J=J, precomputed_cuts=precomputed_energies, parameterization="gamma beta", objective="overlap")
+    f1 = get_qaoa_sk_objective(N, p, J=J, precomputed_energies=precomputed_energies, parameterization="gamma beta", objective="overlap")
     f2 = get_qaoa_sk_objective(N, p, J=J, parameterization="gamma beta", objective="overlap")
 
     assert np.isclose(f1(gamma, beta), f2(gamma, beta))

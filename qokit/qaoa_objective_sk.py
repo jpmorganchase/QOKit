@@ -16,7 +16,7 @@ def get_qaoa_sk_objective(
     N: int,
     p: int,
     J: np.ndarray,
-    precomputed_cuts: np.ndarray | None = None,
+    precomputed_energies: np.ndarray | None = None,
     parameterization: str = "theta",
     objective: str = "expectation",
     precomputed_optimal_bitstrings: np.ndarray | None = None,
@@ -32,7 +32,7 @@ def get_qaoa_sk_objective(
         Number of QAOA layers (number of parameters will be 2*p)
     J : numpy.ndarray
         Couplinf matrix for the SK model.
-    precomputed_cuts : np.array
+    precomputed_energies : np.array
         precomputed cuts to compute the QAOA expectation, for maximization problem
         send the precomputed cuts/energies as negative
     parameterization : str
@@ -55,23 +55,23 @@ def get_qaoa_sk_objective(
     terms = None
     optimization_type = "min"
 
-    if precomputed_cuts is not None and J is not None:
-        warnings.warn("If precomputed_cuts is passed, J is ignored")
+    if precomputed_energies is not None and J is not None:
+        warnings.warn("If precomputed_energies is passed, J is ignored")
 
-    if precomputed_cuts is None:
-        assert J is not None, "J must be passed if precomputed_cuts is None"
+    if precomputed_energies is None:
+        assert J is not None, "J must be passed if precomputed_energies is None"
         terms = get_sk_terms(J)
 
     if simulator == "qiskit":
         assert J is not None, "J must be passed if simulator == 'qiskit'"
-        precomputed_cuts = precompute_energies(sk_obj, N, J)
+        precomputed_energies = precompute_energies(sk_obj, N, J)
         parameterized_circuit = get_parameterized_qaoa_circuit(J, p)
     else:
         parameterized_circuit = None
 
     return get_qaoa_objective(
         N=N,
-        precomputed_diagonal_hamiltonian=precomputed_cuts,
+        precomputed_diagonal_hamiltonian=precomputed_energies,
         terms=terms,
         precomputed_optimal_bitstrings=precomputed_optimal_bitstrings,
         parameterized_circuit=parameterized_circuit,
