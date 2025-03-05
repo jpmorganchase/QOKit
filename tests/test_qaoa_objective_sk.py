@@ -36,11 +36,13 @@ def test_sk_obj(N=5):
     x = rng.choice([0, 1], N)
     assert np.isclose(sk_obj(x, J), sk_obj_simple(x, J))
 
+
 def test_parameter_normalization(N=20):
     J = get_random_J(N=N)
 
-    f = get_qaoa_sk_objective(N, 1, J=J, parameterization="gamma beta", simulator='c', objective="expectation")
-    assert np.isclose(f([1], [np.pi/8])/N, 0.3, atol=1e-1)
+    f = get_qaoa_sk_objective(N, 1, J=J, parameterization="gamma beta", simulator="c", objective="expectation")
+    assert np.isclose(f([1], [np.pi / 8]) / N, 0.3, atol=1e-1)
+
 
 def test_variance_normalization(N=1000):
     J = get_random_J(N=N)
@@ -95,11 +97,11 @@ def test_sk_qaoa_convergence_with_p():
     for p in range(1, 18):
         gamma, beta = get_sk_gamma_beta(p)
         qaoa_objectives = [
-                get_qaoa_sk_objective( N, p, J=J, precomputed_energies=precomputed_energies, 
-                    parameterization="gamma beta", simulator=simulator, 
-                    objective="expectation")(2 * gamma / np.sqrt(N), beta)
-                for simulator in simulators_to_run_names
-            ]
+            get_qaoa_sk_objective(
+                N, p, J=J, precomputed_energies=precomputed_energies, parameterization="gamma beta", simulator=simulator, objective="expectation"
+            )(2 * gamma / np.sqrt(N), beta)
+            for simulator in simulators_to_run_names
+        ]
         current_ar = qaoa_objectives / max_energy
         assert list(current_ar) > list(last_ar)
         last_ar = current_ar
