@@ -7,7 +7,6 @@ Helper functions for the S_k problem
 """
 from qokit.fur.qaoa_simulator_base import TermsType
 import numpy as np
-import networkx as nx
 from itertools import combinations
 
 
@@ -40,3 +39,18 @@ def get_sk_terms(J: np.ndarray) -> TermsType:
 
     terms = [((2 * J[i, j]) / np.sqrt(N), (int(i), int(j))) for i, j in combinations(range(N), 2)]
     return terms
+
+def get_random_J(N: int, seed=42):
+    """Return a random coupling matrix J for a gicen N and seed.
+    Args:
+        N (int): size of the coupling matrix.
+        seed (int): random seed
+    """
+    rng = np.random.default_rng(seed=seed)
+
+    J = rng.standard_normal((N, N))
+    J = (J + J.T)/(2*np.sqrt(2))
+    np.fill_diagonal(J, 0)
+    return J
+
+

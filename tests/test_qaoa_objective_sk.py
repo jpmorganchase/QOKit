@@ -7,7 +7,7 @@ import pytest
 from functools import partial
 from qiskit_aer import AerSimulator
 from itertools import combinations
-from qokit.sk import sk_obj, get_sk_terms
+from qokit.sk import sk_obj, get_sk_terms, get_random_J
 from qokit.maxcut import maxcut_obj
 from qokit.qaoa_objective_sk import get_qaoa_sk_objective
 from qokit.utils import brute_force, precompute_energies
@@ -23,20 +23,34 @@ simulators_to_run_names = get_available_simulator_names("x") + ["qiskit"]
 simulators_to_run_names_no_qiskit = get_available_simulator_names("x")
 
 
-def test_sk_obj(n=5):
-    J = rng.standard_normal((n, n))
-    J = (J + J.T) / 2
-    np.fill_diagonal(J, 0)
+def test_sk_obj(N=5):
+    J = get_random_J(N=N)
 
     def sk_obj_simple(x, J):
         obj = 0
-        for i in range(n):
-            for j in range(i, n):
+        for i in range(N):
+            for j in range(i, N):
                 obj += J[i, j] * (2 * x[i] - 1) * (2 * x[j] - 1)
-        return 2 * obj / np.sqrt(n)
+        return 2 * obj / np.sqrt(N)
 
-    x = rng.choice([0, 1], n)
+    x = rng.choice([0, 1], N)
     assert np.isclose(sk_obj(x, J), sk_obj_simple(x, J))
+
+def test_parameter_normalization(N=20):
+    J = get_random_J(N=N)
+
+    f = get_qaoa_sk_objective(N, 1, J=J, parameterization="gamma beta", simulator='c', objective="expectation")
+    assert np.isclose(f([1], [np.pi/8])/N, 0.3, atol=1e-1)
+
+def test_variance_normalization(N=1000):
+    J = get_random_J(N=N)
+
+    terms = get_sk_terms(J)
+    terms_0 = [x[0] for x in terms]
+    var = np.var(terms_0)
+    print("var: ", var)
+
+    assert np.isclose(N * var, 1, atol=1e-2)
 
 
 def test_energy_pre_optimized():
@@ -69,10 +83,8 @@ def test_energy_pre_optimized():
 
 
 def test_sk_qaoa_convergence_with_p():
-    N = 8
-    J = rng.standard_normal((N, N))
-    J = (J + J.T) / 2
-    np.fill_diagonal(J, 0)
+    N = 12
+    J = get_random_J(N=N)
 
     obj = partial(sk_obj, J=J)
     precomputed_energies = precompute_energies(obj, N)
@@ -82,23 +94,20 @@ def test_sk_qaoa_convergence_with_p():
 
     for p in range(1, 18):
         gamma, beta = get_sk_gamma_beta(p)
-        for objective in ["expectation"]:
-            qaoa_objectives = [
-                get_qaoa_sk_objective(
-                    N, p, J=J, precomputed_energies=precomputed_energies, parameterization="gamma beta", simulator=simulator, objective=objective
-                )(gamma / np.sqrt(N), beta)
+        qaoa_objectives = [
+                get_qaoa_sk_objective( N, p, J=J, precomputed_energies=precomputed_energies, 
+                    parameterization="gamma beta", simulator=simulator, 
+                    objective="expectation")(2 * gamma / np.sqrt(N), beta)
                 for simulator in simulators_to_run_names
             ]
-            current_ar = qaoa_objectives / max_energy
-            assert list(current_ar) > list(last_ar)
-            last_ar = current_ar
+        current_ar = qaoa_objectives / max_energy
+        assert list(current_ar) > list(last_ar)
+        last_ar = current_ar
 
 
 def test_sk_qaoa_obj_consistency_across_simulators():
     N = 8
-    J = rng.standard_normal((N, N))
-    J = (J + J.T) / 2
-    np.fill_diagonal(J, 0)
+    J = get_random_J(N=N)
 
     for p in range(1, 18):
         gamma, beta = get_sk_gamma_beta(p)
@@ -114,9 +123,7 @@ def test_sk_qaoa_obj_consistency_across_simulators():
 def test_sk_qaoa_obj_fixed_angles_and_precomputed_energies(simulator):
     N = 10
     max_p = 11
-    J = rng.standard_normal((N, N))
-    J = (J + J.T) / 2
-    np.fill_diagonal(J, 0)
+    J = get_random_J(N=N)
     obj = partial(sk_obj, J=J)
     precomputed_energies = precompute_energies(obj, N)
     for p in range(1, max_p + 1):
@@ -131,9 +138,7 @@ def test_sk_qaoa_obj_fixed_angles_and_precomputed_energies(simulator):
 @pytest.mark.parametrize("simclass", SIMULATORS)
 def test_sk_precompute(simclass):
     N = 4
-    J = rng.standard_normal((N, N))
-    J = (J + J.T) / 2
-    np.fill_diagonal(J, 0)
+    J = get_random_J(N=N)
 
     precomputed_energies = precompute_energies(sk_obj, N, J)
     terms = get_sk_terms(J)
@@ -145,9 +150,7 @@ def test_sk_precompute(simclass):
 @pytest.mark.parametrize("simulator", simulators_to_run_names)
 def test_sk_maxcut_bruteforce(simulator):
     N = 10
-    J = rng.standard_normal((N, N))
-    J = (J + J.T) / 2
-    np.fill_diagonal(J, 0)
+    J = get_random_J(N=N)
 
     obj_maxcut = partial(maxcut_obj, w=J)
     optimal_maxcut, x_maxcut = brute_force(obj_maxcut, num_variables=N, function_takes="bits")
@@ -161,9 +164,7 @@ def test_sk_maxcut_bruteforce(simulator):
 @pytest.mark.parametrize("simulator", simulators_to_run_names)
 def test_overlap_sk(simulator):
     N = 4
-    J = rng.standard_normal((N, N))
-    J = (J + J.T) / 2
-    np.fill_diagonal(J, 0)
+    J = get_random_J(N=N)
     p = 1
     beta = [rng.uniform(0, 1)]
     gamma = [rng.uniform(0, 1)]
