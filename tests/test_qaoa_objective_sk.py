@@ -40,7 +40,7 @@ def test_sk_obj(N=5):
 def test_parameter_normalization(N=20):
     J = get_random_J(N=N)
 
-    f = get_qaoa_sk_objective(N, 1, J=J, parameterization="gamma beta", simulator="c", objective="expectation")
+    f = get_qaoa_sk_objective(N, 1, J=J, parameterization="gamma beta", simulator=simulators_to_run_names[0], objective="expectation")
     assert np.isclose(f([1], [np.pi / 8]) / N, 0.3, atol=1e-1)
 
 
