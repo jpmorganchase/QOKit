@@ -8,7 +8,7 @@ import networkx as nx
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from typing import Sequence
 from .maxcut import get_maxcut_terms
-from .qaoa_circuit_utils import get_qaoa_circuit_with_terms, get_parameterized_qaoa_circuit_with_terms
+from .qaoa_circuit import get_qaoa_circuit_from_terms, get_parameterized_qaoa_circuit_from_terms
 
 
 def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
@@ -38,7 +38,7 @@ def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statev
 
     terms = get_maxcut_terms(G)
     N = G.number_of_nodes()
-    return get_qaoa_circuit_with_terms(N=N, terms=terms[:-1], gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
+    return get_qaoa_circuit_from_terms(N=N, terms=terms[:-1], gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
 
 
 def get_parameterized_qaoa_circuit(
@@ -75,6 +75,6 @@ def get_parameterized_qaoa_circuit(
     """
     terms = get_maxcut_terms(G)
     N = G.number_of_nodes()
-    return get_parameterized_qaoa_circuit_with_terms(
+    return get_parameterized_qaoa_circuit_from_terms(
         N=N, terms=terms[:-1], p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors
     )

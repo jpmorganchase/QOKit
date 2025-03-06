@@ -8,7 +8,7 @@ import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from typing import Sequence
 from .sk import get_sk_terms
-from .qaoa_circuit_utils import get_qaoa_circuit_with_terms, get_parameterized_qaoa_circuit_with_terms
+from .qaoa_circuit import get_qaoa_circuit_from_terms, get_parameterized_qaoa_circuit_from_terms
 
 
 def get_qaoa_circuit(J: np.ndarray, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
@@ -37,7 +37,7 @@ def get_qaoa_circuit(J: np.ndarray, gammas: Sequence, betas: Sequence, save_stat
     """
     terms = get_sk_terms(J)
     N = J.shape[0]
-    return get_qaoa_circuit_with_terms(N=N, terms=terms, gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
+    return get_qaoa_circuit_from_terms(N=N, terms=terms, gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
 
 
 def get_parameterized_qaoa_circuit(
@@ -74,6 +74,6 @@ def get_parameterized_qaoa_circuit(
     """
     terms = get_sk_terms(J)
     N = J.shape[0]
-    return get_parameterized_qaoa_circuit_with_terms(
+    return get_parameterized_qaoa_circuit_from_terms(
         N=N, terms=terms, p=p, save_statevector=save_statevector, qr=qr, cr=cr, return_parameter_vectors=return_parameter_vectors
     )
