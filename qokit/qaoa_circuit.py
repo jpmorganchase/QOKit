@@ -22,7 +22,6 @@ def append_z_prod_term(qc: QuantumCircuit, term: Sequence, gamma: float) -> None
             evolution time for interaction
 
     """
-    # term_weight, term = term
     term_weight = len(term)
     if term_weight == 4:
         # in labs, four-body terms appear two times more than two-body

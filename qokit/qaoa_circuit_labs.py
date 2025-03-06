@@ -8,7 +8,7 @@ from qiskit import QuantumCircuit
 from .qaoa_circuit import get_qaoa_circuit_from_terms, get_parameterized_qaoa_circuit_from_terms
 
 
-def get_qaoa_circuit(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, save_statevector: bool = True) -> QuantumCircuit:
+def get_qaoa_circuit(N: int, terms: Sequence, gammas: Sequence, betas: Sequence, save_statevector: bool = True) -> QuantumCircuit:
     """Generates a circuit for Hamiltonian of the form \sum_{term \in terms} \prod_{j \in term} Z_j
 
     Parameters
@@ -30,7 +30,7 @@ def get_qaoa_circuit(N: int, terms: Sequence, gamma: Sequence, beta: Sequence, s
     qc : qiskit.QuantumCircuit
         Quantum circuit implementing QAOA
     """
-    return get_qaoa_circuit_from_terms(N=N, terms=terms, gammas=gamma, betas=beta, save_statevector=save_statevector)
+    return get_qaoa_circuit_from_terms(N=N, terms=terms, gammas=gammas, betas=betas, save_statevector=save_statevector)
 
 
 def get_parameterized_qaoa_circuit(N: int, terms: Sequence, p: int, save_statevector: bool = True, return_parameter_vectors: bool = False) -> QuantumCircuit:
