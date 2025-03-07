@@ -68,9 +68,12 @@ def append_mixer_operator_circuit(qc: QuantumCircuit, beta: float) -> None:
 def get_qaoa_circuit_from_terms(
     N: int, terms: Sequence, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None
 ):
-    """Generates a circuit for weighted MaxCut, or SK problem.
+    """Generates a Qiskit circuit for (weighted) MaxCut, SK model and LABS.
+
     Parameters
     ----------
+    N : int
+        Number of nodes (Maxcut), spins (SK model), or length of sequence (LABS problem).
     terms : list-like
         Each element corresponds to terms in the Hamiltonian
         and pair of spins or graph nodes.
@@ -124,11 +127,13 @@ def get_parameterized_qaoa_circuit_from_terms(
     cr: ClassicalRegister = None,
     return_parameter_vectors: bool = False,
 ):
-    """Generates a parameterized circuit for weighted MaxCut on graph G.
+    """Generates a parameterized Qiskit circuit for (weighted) MaxCut, SK model and LABS.
     This version is recommended for long circuits
 
     Parameters
     ----------
+    N : int
+        Number of nodes (Maxcut), spins (SK model), or length of sequence (LABS problem).
     terms : list-like
         Each element corresponds to terms in the Hamiltonian
         and pair of spins or graph nodes.
