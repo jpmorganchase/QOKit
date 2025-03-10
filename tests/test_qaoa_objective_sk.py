@@ -19,8 +19,6 @@ rng = np.random.default_rng(seed=42)
 
 SIMULATORS = get_available_simulators("x")
 simulators_to_run_names = get_available_simulator_names("x") + ["qiskit"]
-simulators_to_run_names_no_qiskit = get_available_simulator_names("x")
-
 
 def test_sk_obj(N=5):
     J = get_random_J(N=N)

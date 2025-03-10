@@ -68,15 +68,21 @@ def append_mixer_operator_circuit(qc: QuantumCircuit, beta: float) -> None:
 def get_qaoa_circuit_from_terms(
     N: int, terms: Sequence, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None
 ):
-    """Generates a Qiskit circuit for (weighted) MaxCut, SK model and LABS.
+    """Generates a Qiskit circuit from Hamiltonian terms
 
     Parameters
     ----------
     N : int
-        Number of nodes (Maxcut), spins (SK model), or length of sequence (LABS problem).
+        Number of qubits
     terms : list-like
-        Each element corresponds to terms in the Hamiltonian
-        and pair of spins or graph nodes.
+        A sequence of `term` or `(float, term)`, where `term` is a tuple of ints.
+        Each term corresponds to a summand in the cost Hamiltonian
+        and th float value is the coefficient of this term.
+        e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
+        the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
+        Unweighted Hamiltonians are supported as well: 
+        e.g. if terms = [(0,1), (0,1,2,3)]
+        the Hamiltonian is Z0Z1 + Z0Z1Z2Z3
     beta : list-like
         QAOA parameter beta
     gamma : list-like
@@ -127,7 +133,7 @@ def get_parameterized_qaoa_circuit_from_terms(
     cr: ClassicalRegister = None,
     return_parameter_vectors: bool = False,
 ):
-    """Generates a parameterized Qiskit circuit for (weighted) MaxCut, SK model and LABS.
+    """Generates a parameterized Qiskit circuit from Hamiltonian terms.
     This version is recommended for long circuits
 
     Parameters
@@ -135,8 +141,14 @@ def get_parameterized_qaoa_circuit_from_terms(
     N : int
         Number of nodes (Maxcut), spins (SK model), or length of sequence (LABS problem).
     terms : list-like
-        Each element corresponds to terms in the Hamiltonian
-        and pair of spins or graph nodes.
+        A sequence of `term` or `(float, term)`, where `term` is a tuple of ints.
+        Each term corresponds to a summand in the cost Hamiltonian
+        and th float value is the coefficient of this term.
+        e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
+        the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
+        Unweighted Hamiltonians are supported as well: 
+        e.g. if terms = [(0,1), (0,1,2,3)]
+        the Hamiltonian is Z0Z1 + Z0Z1Z2Z3
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
     save_statevector : bool, default True
