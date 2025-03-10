@@ -80,7 +80,7 @@ def get_qaoa_circuit_from_terms(
         and th float value is the coefficient of this term.
         e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
         the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
-        Unweighted Hamiltonians are supported as well: 
+        Unweighted Hamiltonians are supported as well:
         e.g. if terms = [(0,1), (0,1,2,3)]
         the Hamiltonian is Z0Z1 + Z0Z1Z2Z3
     beta : list-like
@@ -146,7 +146,7 @@ def get_parameterized_qaoa_circuit_from_terms(
         and th float value is the coefficient of this term.
         e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
         the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
-        Unweighted Hamiltonians are supported as well: 
+        Unweighted Hamiltonians are supported as well:
         e.g. if terms = [(0,1), (0,1,2,3)]
         the Hamiltonian is Z0Z1 + Z0Z1Z2Z3
     p : int
