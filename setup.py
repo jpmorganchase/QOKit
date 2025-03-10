@@ -31,7 +31,6 @@ if not QOKIT_PYTHON_ONLY:
     else:
         extensions.append(Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")]))
 
-
 class SimulatorBuild(build_ext):
     def run(self):
         subprocess.call(["make", "clean", "-C", path])
@@ -44,9 +43,7 @@ class SimulatorBuild(build_ext):
         except Exception as e:
             print("No C/C++ enviroment setup to compile the C simulator. Installing Python Simulator")
 
-
 with open("README.md", "r") as f:
     long_description = f.read()
-
 
 setup(ext_modules=extensions, cmdclass={"build_ext": SimulatorBuild})
