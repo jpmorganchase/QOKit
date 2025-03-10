@@ -27,7 +27,7 @@ if not QOKIT_PYTHON_ONLY:
     if sys.platform in ["win32"]:
         extensions.append(Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["/d2FH4-"]))
     elif sys.platform.startswith("darwin"):
-        extensions.append(Extension("simulator", language="c", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["-Xpreprocessor"]))
+        extensions.append(Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")], extra_compile_args=["-Xpreprocessor"]))
     else:
         extensions.append(Extension("simulator", sources=sources, include_dirs=[os.path.join(path, "")]))
 
