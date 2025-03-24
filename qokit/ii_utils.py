@@ -1,12 +1,10 @@
 import os
 import numpy as np
 import scipy
-from qokit.qaoa_objective_labs import get_qaoa_labs_objective
 import pandas as pd
 import sys
 import matplotlib.pyplot as plt
 import time
-from typing import Optional, Tuple
 from joblib import Parallel, delayed
 import nlopt
 
