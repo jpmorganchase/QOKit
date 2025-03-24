@@ -28,24 +28,29 @@ def func_with_gpu_id(func):
 
     return wrapper
 
+
 def parallel_execution(func, inputs, num_gpus):
     func_for_gpu = func_with_gpu_id(func)
     jobs = [delayed(func_for_gpu)(*given_input, gpu_id=i % num_gpus) for i, given_input in enumerate(inputs)]
     results = Parallel(n_jobs=num_gpus, backend="loky")(jobs)
     return results
 
+
 def stack_params(param1, param2):
     return np.hstack([param1, param2])
+
 
 def initialize_csv(filename: str):
     columns = ["N", "p", "num_coeffs", "gamma", "beta", "basis", "u", "v", "optimizer", "approx_ratio", "merit", "overlap", "evaluations"]
     df = pd.DataFrame(columns=columns)
     df.to_csv(filename, index=False)
 
+
 def generate_p_values(p0: int, pmax: int, step: int) -> np.ndarray:
     if step > p0:
         return np.concatenate(([p0], np.arange(step, pmax + 1, step, dtype=int)))
     return np.arange(p0, pmax + 1, step, dtype=int)
+
 
 def approx_ratio(merit, gs_energy, max_energy=0):
     approx_ratio = (max_energy - merit) / (max_energy - gs_energy)
@@ -57,6 +62,7 @@ def approx_ratio(merit, gs_energy, max_energy=0):
 def compute_merit(approx_ratio, gs_energy, max_energy=0):
     merit = max_energy - approx_ratio * (max_energy - gs_energy)
     return merit
+
 
 def to_basis(gamma, beta, num_coeffs, basis):
     """Convert gamma,beta angles in standard parameterizing QAOA to a basis of functions
@@ -146,6 +152,7 @@ def from_basis(u, v, p, basis):
 
     return gamma, beta
 
+
 def fine_tune_coeffs(f_overlap, f, gs_energy, N, p, num_coeffs, gamma, beta, basis, optimizer="bobyqa", rhobeg=None, maxiter=1000, max_energy=0):
     if rhobeg is None:
         rhobeg = 0.01 / N
@@ -184,6 +191,7 @@ def fine_tune_coeffs(f_overlap, f, gs_energy, N, p, num_coeffs, gamma, beta, bas
     print(res)
     res_gamma, res_beta = from_basis(u, v, p, basis)
     return res, res_gamma, res_beta
+
 
 def optimize_bobyqa(func, params, rhobeg=None, tol=None, maxiter=3000):
     def wrapped_func(x, grad):
@@ -252,6 +260,7 @@ def interpolation_basis(gamma, beta, p, num_coeffs, basis):
     u, v = to_basis(gamma, beta, num_coeffs, basis)
     gamma, beta = from_basis(u, v, p, basis)
     return gamma, beta
+
 
 def fine_tune_result(f_overlap, f, gs_energy, N, p, num_coeffs, gamma, beta, basis, optimizer="bobyqa", rhobeg=None, maxiter=1000, max_energy=0):
     res, res_gamma, res_beta = fine_tune_coeffs(
