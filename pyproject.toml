@@ -36,8 +36,6 @@ dependencies = [
     'seaborn>=0.12.2',
     'sympy>=1.12',
     'tqdm>=4.65.0',
-    'nlopt',
-    'joblib==1.4.2',
 ]
 
 [project.optional-dependencies]
