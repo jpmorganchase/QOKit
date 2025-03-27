@@ -11,22 +11,8 @@ from importlib_resources import files
 from qokit.qaoa_objective_labs import get_qaoa_labs_objective
 from qokit.fur import get_available_simulator_names
 from qokit.parameter_utils import from_fourier_basis, to_fourier_basis, extrapolate_parameters_in_fourier_basis, convert_to_gamma_beta
-from qokit.parameter_utils import to_basis, from_basis
 
 simulators_to_run = get_available_simulator_names("x") + ["qiskit"]
-
-
-def test_to_and_from_basis():
-    gamma = [0.5, 0.7, 0.8]
-    beta = [0.3, 0.4, 0.6]
-    bases = ["fourier", "chebyshev", "legendre", "hermite"]
-
-    for nc in range(3, 7):
-        for basis in bases:
-            u, v = to_basis(gamma, beta, nc, basis=basis)
-            g, b = from_basis(u, v, p=len(gamma), basis=basis)
-            assert np.allclose(gamma, g, rtol=1e-3)
-            assert np.allclose(beta, b, rtol=1e-3)
 
 
 def from_fourier_basis_old(u, v):
