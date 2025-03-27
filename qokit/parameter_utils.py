@@ -15,7 +15,7 @@ from functools import cache
 from scipy.fft import dct, dst, idct, idst
 
 
-def to_basis(gamma, beta, num_coeffs, basis):
+def to_basis(gamma, beta, num_coeffs, basis="fourier"):
     """Convert gamma,beta angles in standard parameterizing QAOA to a basis of functions
 
     Parameters
@@ -36,10 +36,11 @@ def to_basis(gamma, beta, num_coeffs, basis):
     except:
         p = 1
     fit_interval = np.linspace(-1, 1, p)
+    print("fit_interval from to_basis", fit_interval)
 
     if basis == "fourier":
-        u = 2 * scipy.fft.dst(gamma, type=4, norm="forward")  # difference of 2 due to normalization of dst
-        v = 2 * scipy.fft.dct(beta, type=4, norm="forward")  # difference of 2 due to normalization of dct
+        u = 2 * dst(gamma, type=4, norm="forward")  # difference of 2 due to normalization of dst
+        v = 2 * dct(beta, type=4, norm="forward")  # difference of 2 due to normalization of dct
     elif basis == "chebyshev":
         u = np.polynomial.chebyshev.chebfit(fit_interval, gamma, deg=num_coeffs - 1)  # offset of 1 due to fitting convention
         v = np.polynomial.chebyshev.chebfit(fit_interval, beta, deg=num_coeffs - 1)
@@ -56,7 +57,7 @@ def to_basis(gamma, beta, num_coeffs, basis):
     return u, v
 
 
-def from_basis(u, v, p, basis):
+def from_basis(u, v, p=None, basis="fourier"):
     """Convert u,v in a given basis of functions
     to gamma, beta angles of QAOA schedule
 
@@ -73,6 +74,8 @@ def from_basis(u, v, p, basis):
         QAOA angles parameters in standard parameterization
     """
     assert len(u) == len(v)
+    if p is None:
+        p = len(u)
     fit_interval = np.linspace(-1, 1, p)
 
     if basis == "fourier":
@@ -86,8 +89,8 @@ def from_basis(u, v, p, basis):
         u_padded[len(u) :] = 0
         v_padded[len(v) :] = 0
 
-        gamma = 0.5 * scipy.fft.idst(u_padded, type=4, norm="forward")  # difference of 1/2 due to normalization of idst
-        beta = 0.5 * scipy.fft.idct(v_padded, type=4, norm="forward")  # difference of 1/2 due to normalization of idct
+        gamma = 0.5 * idst(u_padded, type=4, norm="forward")  # difference of 1/2 due to normalization of idst
+        beta = 0.5 * idct(v_padded, type=4, norm="forward")  # difference of 1/2 due to normalization of idct
     elif basis == "chebyshev":
         gamma = np.polynomial.chebyshev.chebval(fit_interval, u)
         beta = np.polynomial.chebyshev.chebval(fit_interval, v)
