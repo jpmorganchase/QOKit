@@ -22,7 +22,9 @@ def get_qaoa_sk_objective(
     precomputed_optimal_bitstrings: np.ndarray | None = None,
     simulator: str = "auto",
 ):
-    """Return QAOA objective to be minimized
+    """Return QAOA objective for the Sherrington-Kirkpatrick model.
+    The convention we follow is that the goal is to find the ground state of SK
+    QAOA objective should be minimized.
 
     Parameters
     ----------
