@@ -21,6 +21,7 @@ requires-python = ">=3.10.0"
 dependencies = [
     'networkx==3.0.0',
     'importlib-resources>=5.2.2',
+    'numpy==1.26.4',
     'numba>=0.56.4,<1',
     'pandas>=2.0.1',
     'pathos>=0.3.0',
