@@ -14,8 +14,7 @@ from enum import Enum
 from functools import cache
 from scipy.fft import dct, dst, idct, idst
 
-
-def to_basis(gamma, beta, num_coeffs, basis="fourier"):
+def to_basis(gamma, beta, num_coeffs=None, basis="fourier"):
     """Convert gamma,beta angles in standard parameterizing QAOA to a basis of functions
 
     Parameters
@@ -30,29 +29,24 @@ def to_basis(gamma, beta, num_coeffs, basis="fourier"):
     u, v : np.array
         QAOA parameters in given basis
     """
-    # assert len(gamma) == len(beta)
-    try:
-        p = len(gamma)
-    except:
-        p = 1
-    fit_interval = np.linspace(-1, 1, p)
-    print("fit_interval from to_basis", fit_interval)
-
     if basis == "fourier":
         u = 2 * dst(gamma, type=4, norm="forward")  # difference of 2 due to normalization of dst
         v = 2 * dct(beta, type=4, norm="forward")  # difference of 2 due to normalization of dct
-    elif basis == "chebyshev":
-        u = np.polynomial.chebyshev.chebfit(fit_interval, gamma, deg=num_coeffs - 1)  # offset of 1 due to fitting convention
-        v = np.polynomial.chebyshev.chebfit(fit_interval, beta, deg=num_coeffs - 1)
-    elif basis == "hermite":
-        u = np.polynomial.hermite.hermfit(fit_interval, gamma, deg=num_coeffs - 1)
-        v = np.polynomial.hermite.hermfit(fit_interval, beta, deg=num_coeffs - 1)
-    elif basis == "legendre":
-        u = np.polynomial.legendre.legfit(fit_interval, gamma, deg=num_coeffs - 1)
-        v = np.polynomial.legendre.legfit(fit_interval, beta, deg=num_coeffs - 1)
-    elif basis == "laguerre":
-        u = np.polynomial.laguerre.lagfit(fit_interval, gamma, deg=num_coeffs - 1)
-        v = np.polynomial.laguerre.lagfit(fit_interval, beta, deg=num_coeffs - 1)
+    else:
+        assert num_coeffs is not None
+        fit_interval = np.linspace(-1, 1, len(gamma))
+        if basis == "chebyshev":
+            u = np.polynomial.chebyshev.chebfit(fit_interval, gamma, deg=num_coeffs - 1)  # offset of 1 due to fitting convention
+            v = np.polynomial.chebyshev.chebfit(fit_interval, beta, deg=num_coeffs - 1)
+        elif basis == "hermite":
+            u = np.polynomial.hermite.hermfit(fit_interval, gamma, deg=num_coeffs - 1)
+            v = np.polynomial.hermite.hermfit(fit_interval, beta, deg=num_coeffs - 1)
+        elif basis == "legendre":
+            u = np.polynomial.legendre.legfit(fit_interval, gamma, deg=num_coeffs - 1)
+            v = np.polynomial.legendre.legfit(fit_interval, beta, deg=num_coeffs - 1)
+        elif basis == "laguerre":
+            u = np.polynomial.laguerre.lagfit(fit_interval, gamma, deg=num_coeffs - 1)
+            v = np.polynomial.laguerre.lagfit(fit_interval, beta, deg=num_coeffs - 1)
 
     return u, v
 
@@ -65,7 +59,7 @@ def from_basis(u, v, p=None, basis="fourier"):
     ----------
     u : list-like
     v : list-like
-    p : int
+    p : int, the number of coefficients   
     basis : string
 
     Returns
@@ -74,13 +68,12 @@ def from_basis(u, v, p=None, basis="fourier"):
         QAOA angles parameters in standard parameterization
     """
     assert len(u) == len(v)
-    if p is None:
-        p = len(u)
-    fit_interval = np.linspace(-1, 1, p)
-
+    
     if basis == "fourier":
+        if p is None:
+            p = len(u)
         if p < len(u):
-            raise Exception("p must exceed the length of u and v ")
+            raise Exception("p must be greater or equal the length of u and v ")
 
         u_padded = np.zeros(p)
         v_padded = np.zeros(p)
@@ -91,7 +84,11 @@ def from_basis(u, v, p=None, basis="fourier"):
 
         gamma = 0.5 * idst(u_padded, type=4, norm="forward")  # difference of 1/2 due to normalization of idst
         beta = 0.5 * idct(v_padded, type=4, norm="forward")  # difference of 1/2 due to normalization of idct
-    elif basis == "chebyshev":
+    else:
+        assert p is not None
+        fit_interval = np.linspace(-1, 1, p)
+    
+    if basis == "chebyshev":
         gamma = np.polynomial.chebyshev.chebval(fit_interval, u)
         beta = np.polynomial.chebyshev.chebval(fit_interval, v)
     elif basis == "hermite":
@@ -105,52 +102,6 @@ def from_basis(u, v, p=None, basis="fourier"):
         beta = np.polynomial.laguerre.lagval(fit_interval, v)
 
     return gamma, beta
-
-
-def from_fourier_basis(u, v):
-    """Convert u,v parameterizing QAOA in the Fourier basis
-    to beta, gamma in standard parameterization
-    following https://arxiv.org/abs/1812.01041
-    Parameters
-    ----------
-    u : list-like
-    v : list-like
-        QAOA parameters in Fourier basis
-    Returns
-    -------
-    beta, gamma : np.array
-        QAOA parameters in standard parameterization
-        (used e.g. by qaoa_qiskit.py)
-    """
-    assert len(u) == len(v)
-
-    gamma = 0.5 * idst(u, type=4, norm="forward")  # difference of 1/2 due to normalization of idst
-    beta = 0.5 * idct(v, type=4, norm="forward")  # difference of 1/2 due to normalization of idct
-
-    return gamma, beta
-
-
-def to_fourier_basis(gamma, beta):
-    """Convert gamma,beta standard parameterizing QAOA to the Fourier basis
-    of u, v in standard parameterization
-    following https://arxiv.org/abs/1812.01041
-    Parameters
-    ----------
-    gamma : list-like
-    beta : list-like
-        QAOA parameters in standard basis
-    Returns
-    -------
-    u, v : np.array
-        QAOA parameters in fourier parameterization
-        (used e.g. by qaoa_qiskit.py)
-    """
-    assert len(gamma) == len(beta)
-    u = 2 * dst(gamma, type=4, norm="forward")  # difference of 2 due to normalization of dst
-    v = 2 * dct(beta, type=4, norm="forward")  # difference of 2 due to normalization of dct
-
-    return u, v
-
 
 def extrapolate_parameters_in_fourier_basis(u, v, p, step_size):
     """Extrapolate the parameters u, v from p-step_size to p
@@ -208,14 +159,14 @@ def convert_to_gamma_beta(*args, parameterization: QAOAParameterization | str):
         p = int(len(freq) / 2)
         u = freq[:p]
         v = freq[p:]
-        gamma, beta = from_fourier_basis(u, v)
+        gamma, beta = from_basis(u, v, p=None, basis="fourier") 
     elif parameterization == QAOAParameterization.GAMMA_BETA:
         assert len(args) == 2, "gamma beta parameterization requires two arguments"
         gamma, beta = args
     elif parameterization == QAOAParameterization.U_V:
         assert len(args) == 2, "u v parameterization requires two arguments"
         u, v = args
-        gamma, beta = from_fourier_basis(u, v)
+        gamma, beta = from_basis(u, v, p=None, basis="fourier")
     else:
         raise ValueError("Invalid parameterization")
     return gamma, beta
