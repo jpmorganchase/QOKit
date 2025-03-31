@@ -14,6 +14,7 @@ from enum import Enum
 from functools import cache
 from scipy.fft import dct, dst, idct, idst
 
+
 def to_basis(gamma, beta, num_coeffs=None, basis="fourier"):
     """Convert gamma,beta angles in standard parameterizing QAOA to a basis of functions
 
@@ -59,7 +60,7 @@ def from_basis(u, v, p=None, basis="fourier"):
     ----------
     u : list-like
     v : list-like
-    p : int, the number of coefficients   
+    p : int, the number of coefficients
     basis : string
 
     Returns
@@ -68,7 +69,7 @@ def from_basis(u, v, p=None, basis="fourier"):
         QAOA angles parameters in standard parameterization
     """
     assert len(u) == len(v)
-    
+
     if basis == "fourier":
         if p is None:
             p = len(u)
@@ -87,7 +88,7 @@ def from_basis(u, v, p=None, basis="fourier"):
     else:
         assert p is not None
         fit_interval = np.linspace(-1, 1, p)
-    
+
     if basis == "chebyshev":
         gamma = np.polynomial.chebyshev.chebval(fit_interval, u)
         beta = np.polynomial.chebyshev.chebval(fit_interval, v)
@@ -102,6 +103,7 @@ def from_basis(u, v, p=None, basis="fourier"):
         beta = np.polynomial.laguerre.lagval(fit_interval, v)
 
     return gamma, beta
+
 
 def extrapolate_parameters_in_fourier_basis(u, v, p, step_size):
     """Extrapolate the parameters u, v from p-step_size to p
@@ -159,7 +161,7 @@ def convert_to_gamma_beta(*args, parameterization: QAOAParameterization | str):
         p = int(len(freq) / 2)
         u = freq[:p]
         v = freq[p:]
-        gamma, beta = from_basis(u, v, p=None, basis="fourier") 
+        gamma, beta = from_basis(u, v, p=None, basis="fourier")
     elif parameterization == QAOAParameterization.GAMMA_BETA:
         assert len(args) == 2, "gamma beta parameterization requires two arguments"
         gamma, beta = args
