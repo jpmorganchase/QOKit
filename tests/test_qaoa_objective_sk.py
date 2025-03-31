@@ -87,16 +87,23 @@ def test_sk_qaoa_convergence_with_p(simulator, N=12):
     precomputed_energies = precompute_energies(obj, N)
     max_energy = np.max(precomputed_energies)
 
-    last_ar = [0.0]
+    last_objective = [0.0]
+    last_overlap = [0.0]
 
     for p in range(1, 18):
         gamma, beta = get_sk_gamma_beta(p)
-        qaoa_objectives = get_qaoa_sk_objective(
+        qaoa_objective = get_qaoa_sk_objective(
             N, p, J=J, precomputed_energies=precomputed_energies, simulator=simulator, parameterization="gamma beta", objective="expectation"
         )(2 * gamma / np.sqrt(N), beta)
-        current_ar = qaoa_objectives / max_energy
-        assert current_ar > last_ar
-        last_ar = current_ar
+        qaoa_overlap = get_qaoa_sk_objective(
+            N, p, J=J, precomputed_energies=precomputed_energies, simulator=simulator, parameterization="gamma beta", objective="overlap"
+        )(2 * gamma / np.sqrt(N), beta)
+        current_objective = qaoa_objective / max_energy
+        current_overlap = 1 - qaoa_overlap
+        assert current_objective < last_objective
+        assert current_overlap > last_overlap
+        last_objective = current_objective
+        last_overlap = current_overlap
 
 
 def test_sk_qaoa_obj_consistency_across_simulators(N=8):

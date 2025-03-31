@@ -40,7 +40,7 @@ jobs:
           
     - name: Run tests 
       run: |
-         pytest --cov=qokit --cov-fail-under=70 -rs tests 
+         pytest --cov=qokit --cov-fail-under=75 -rs tests 
     - name: License check
       run: |
         pip-licenses --format=markdown --order=license
