@@ -73,6 +73,7 @@ def from_basis(u, v, p=None, basis="fourier"):
     gamma, beta : np.array
         QAOA angles parameters in standard parameterization
     """
+
     assert len(u) == len(v)
     if p is None:
         p = len(u)
