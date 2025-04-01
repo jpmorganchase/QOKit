@@ -14,7 +14,6 @@ import numba.cuda
 from .fur import choose_simulator, choose_simulator_xyring, QAOAFastSimulatorBase
 import typing
 
-from .parameter_utils import from_fourier_basis
 import qokit.parameter_utils
 from qokit.parameter_utils import QAOAParameterization
 from .qaoa_circuit_portfolio import measure_circuit
