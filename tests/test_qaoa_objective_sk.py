@@ -178,3 +178,5 @@ def test_overlap_sk(simulator, N=4):
     assert len(bitstring_loc) == 1
     bitstring_loc = bitstring_loc[0]
     assert np.isclose(1 - f1([0], [0]), len(bitstring_loc) / len(precomputed_energies))
+
+
