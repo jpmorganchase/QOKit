@@ -80,7 +80,6 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
         self._local_index_start = self._rank << self.n_local_qubits
         self._local_index_end = (self._rank + 1) << self.n_local_qubits
 
-
         # proceed with normal initialization
         super().__init__(self.n_local_qubits, costs, terms)
 
