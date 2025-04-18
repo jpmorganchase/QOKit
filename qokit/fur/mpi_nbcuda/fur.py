@@ -14,6 +14,6 @@ def furx_all(x, theta: float, n_local_qubits: int, n_all_qubits: int, comm):
 
     if n_all_qubits > n_local_qubits:
         comm.Alltoall(MPI.IN_PLACE, x)
-        for i in range(2 * n_local_qubits - n_all_qubits, n_local_qubits):
-            furx_local(x, theta, i)
+#        for i in range(2 * n_local_qubits - n_all_qubits, n_local_qubits):
+        furx_local(x, theta, n_all_qubits-n_local_qubits)
         comm.Alltoall(MPI.IN_PLACE, x)
