@@ -87,8 +87,8 @@ def test_sk_qaoa_convergence_with_p(simulator, N=12):
     precomputed_energies = precompute_energies(obj, N)
     max_energy = np.max(precomputed_energies)
 
-    last_objective = [0.0]
-    last_overlap = [0.0]
+    last_objective = 0.0
+    last_overlap = 0.0
 
     for p in range(1, 18):
         gamma, beta = get_sk_gamma_beta(p)
