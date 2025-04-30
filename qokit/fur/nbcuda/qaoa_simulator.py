@@ -27,9 +27,9 @@ class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
     def _diag_from_costs(self, costs: CostsType) -> DeviceArray:
         return numba.cuda.to_device(costs)
 
-    def _diag_from_terms(self, terms: TermsType) -> DeviceArray:
+    def _diag_from_terms(self, terms: TermsType, rank: int = 0) -> DeviceArray:
         out = numba.cuda.device_array(self.n_states, dtype="float32")  # type: ignore
-        precompute_gpu(0, self.n_qubits, terms, out)
+        precompute_gpu(rank, self.n_qubits, terms, out)
         return out
 
     def _apply_qaoa(self, gammas: Sequence[float], betas: Sequence[float], **kwargs):

@@ -1,7 +1,7 @@
 import numba.cuda
 from .qaoa_simulator_base import QAOAFastSimulatorBase, ParamType, CostsType, TermsType
-from .c.qaoa_simulator import QAOAFURXSimulatorC, QAOAFURXYRingSimulatorC, QAOAFURXYCompleteSimulatorC
-from .python.qaoa_simulator import QAOAFURXSimulator, QAOAFURXYRingSimulator, QAOAFURXYCompleteSimulator
+from .c.qaoa_simulator import QAOAFURXSimulatorC, QAOAFURXZSimulatorC, QAOAFURXYRingSimulatorC, QAOAFURXYCompleteSimulatorC
+from .python.qaoa_simulator import QAOAFURXSimulator, QAOAFURXZSimulator, QAOAFURXYRingSimulator, QAOAFURXYCompleteSimulator
 from .nbcuda.qaoa_simulator import QAOAFURXSimulatorGPU, QAOAFURXYRingSimulatorGPU, QAOAFURXYCompleteSimulatorGPU
 from .mpi_nbcuda.qaoa_simulator import QAOAFURXSimulatorGPUMPI
 from .mpi_nbcuda.qaoa_simulator import mpi_available
@@ -15,6 +15,10 @@ SIMULATORS = {
         "python": QAOAFURXSimulator,
         "gpu": QAOAFURXSimulatorGPU,
         "gpumpi": QAOAFURXSimulatorGPUMPI,
+    },
+    "xz": {
+        "c": QAOAFURXZSimulatorC,
+        "python": QAOAFURXZSimulator,
     },
     "xyring": {
         "c": QAOAFURXYRingSimulatorC,
@@ -78,6 +82,11 @@ def choose_simulator(name="auto", **kwargs):
 
     return get_available_simulators("x")[0]
 
+def choose_simulator_xz(name="auto", **kwargs):
+    if name != "auto":
+        return SIMULATORS["xz"][name]
+
+    return get_available_simulators("xz")[0]
 
 def choose_simulator_xyring(name="auto", **kwargs):
     if name != "auto":
@@ -95,9 +104,11 @@ def choose_simulator_xycomplete(name="auto", **kwargs):
 __all__ = [
     "QAOAFastSimulatorBase",
     "QAOAFURXSimulatorC",
+    "QAOAFURXZSimulatorC",
     "QAOAFURXYRingSimulatorC",
     "QAOAFURXYCompleteSimulatorC",
     "QAOAFURXSimulator",
+    "QAOAFURXZSimulator",
     "QAOAFURXYRingSimulator",
     "QAOAFURXYCompleteSimulator",
     "QAOAFURXSimulatorGPU",

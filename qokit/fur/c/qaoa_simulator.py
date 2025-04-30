@@ -31,10 +31,43 @@ class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
             np.full(self.n_states, 1.0 / np.sqrt(self.n_states), dtype="float"),
             np.zeros(self.n_states, dtype="float"),
         )
+    
+    def warmstart_sv0(self, init_rots):
+        state = 1.0
+        
+        for init_rot in init_rots:
+            qubit_state = np.array([
+                np.cos(init_rot/2),
+                np.sin(init_rot/2)
+                # np.exp(-1j * np.pi/2) * np.sin(init_rot/2)
+            ])
+            # state = np.kron(state, qubit_state) #original as GW
+            state = np.kron(qubit_state, state)
+        
+        return ComplexArray(state.real.astype("float"), state.imag.astype("float"))
 
     def _apply_qaoa(self, sv: ComplexArray, gammas: Sequence[float], betas: Sequence[float], **kwargs):
         raise NotImplementedError
-
+    
+    def simulate_ws_qaoa(
+        self,
+        gammas: ParamType,
+        betas: ParamType,
+        init_rots: ParamType,
+        sv0: np.ndarray | None = None,
+        **kwargs,
+    ) -> ComplexArray:
+        """
+        simulator QAOA circuit using FUR
+        @param gammas parameters for the phase separating layers
+        @param betas parameters for the mixing layers
+        @param sv0 (optional) initial statevector, default is uniform superposition state
+        @return statevector or vector of probabilities
+        """
+        sv = ComplexArray(sv0.real.astype("float"), sv0.imag.astype("float")) if sv0 is not None else self.warmstart_sv0(init_rots)
+        self._apply_qaoa(sv, list(gammas), list(betas), init_rots, **kwargs)
+        return sv
+    
     def simulate_qaoa(
         self,
         gammas: ParamType,
@@ -58,7 +91,13 @@ class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
         if optimization_type == "max":
             costs = -1 * np.asarray(costs)
         return np.dot(costs, self.get_probabilities(result, **kwargs))
-
+    
+    def get_std(self, result: ComplexArray, costs: np.ndarray | None = None, **kwargs) -> float:
+        if costs is None:
+            costs = self._hc_diag
+        probs = self.get_probabilities(result)
+        return np.sqrt(max(np.dot(costs**2, probs) - np.dot(costs, probs) ** 2, 0))
+    
     def get_overlap(
         self, result: ComplexArray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs
     ) -> float:
@@ -96,6 +135,18 @@ class QAOAFURXSimulatorC(QAOAFastSimulatorCBase):
             self.n_qubits,
         )
 
+class QAOAFURXZSimulatorC(QAOAFastSimulatorCBase):
+    def _apply_qaoa(self, sv: ComplexArray, gammas: Sequence[float], betas: Sequence[float], init_rots: Sequence[float], **kwargs):
+        csim.apply_qaoa_furxz(
+            sv.real,
+            sv.imag,
+            gammas,
+            betas,
+            init_rots,
+            self._hc_diag,
+            self.n_qubits,
+        )
+        
 
 class QAOAFURXYRingSimulatorC(QAOAFastSimulatorCBase):
     def _apply_qaoa(self, sv: ComplexArray, gammas: Sequence[float], betas: Sequence[float], **kwargs):
