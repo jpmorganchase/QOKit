@@ -94,9 +94,101 @@ void furx_all(double* a_real, double* a_imag, double theta, unsigned int n_qubit
     }
 }
 
+void furxz_kernel(double* a_real, double* a_imag, const double theta, const double* init_rots, 
+    const int block_idx, const int n_q, const int q_offset, const int state_mask){
+
+    const unsigned int data_size = 1 << n_q;
+    const unsigned int stride_size = data_size >> 1;
+
+    const unsigned int stride = 1 << q_offset;
+    const unsigned int index_mask = stride - 1;
+    const unsigned int stride_mask = ~index_mask;
+    const unsigned int offset = ((stride_mask & block_idx) << n_q) | (index_mask & block_idx);
+    
+    const double cos_beta = cos(theta);
+    const double sin_beta = sin(theta);
+    
+    // temporary local arrays
+    double real[data_size], imag[data_size];
+
+    // load global data into local array
+    for(int idx = 0; idx < data_size; ++idx){
+        const unsigned int data_idx = offset + idx*stride;
+        real[idx] = a_real[data_idx];
+        imag[idx] = a_imag[data_idx];
+    }
+
+    // perform n_q steps
+    for(int q = 0; q < n_q; ++q){
+        const unsigned int mask1 = (1 << q) - 1;
+        const unsigned int mask2 = state_mask - mask1;
+        
+        const double cos_rot = cos(init_rots[q+q_offset]); /////
+        const double sin_rot = sin(init_rots[q+q_offset]); /////
+
+        for(int tid = 0; tid < stride_size; ++tid){
+            const unsigned int ia = ((tid & mask1) | ((tid & mask2) << 1));
+            const unsigned int ib = (ia | (1 << q));
+
+            const double ar = real[ia];
+            const double ai = imag[ia];
+            const double br = real[ib];
+            const double bi = imag[ib];
+
+            real[ia] = cos_beta*ar + cos_rot*sin_beta*ai + sin_rot*sin_beta*bi;
+            imag[ia] = cos_beta*ai - cos_rot*sin_beta*ar - sin_rot*sin_beta*br;
+            real[ib] = cos_beta*br - cos_rot*sin_beta*bi + sin_rot*sin_beta*ai;
+            imag[ib] = cos_beta*bi + cos_rot*sin_beta*br - sin_rot*sin_beta*ar;
+        }
+    }
+    
+    // load local data into global array
+    for(int idx = 0; idx < data_size; ++idx){
+        const unsigned int data_idx = offset + idx*stride;
+        a_real[data_idx] = real[idx];
+        a_imag[data_idx] = imag[idx];
+    }
+}
+
+/**
+ * apply to a statevector single-qubit Pauli-XZ rotations all all qubits with the
+ * same rotation angle, i.e.,
+ *      U(theta) = sum_{j} exp(-i*theta* (sin(init_rot)*X_j + cos(init_rot)*Z_j ) )
+ * where X_j and Z_j are the Pauli-X and Pauli-Z operator applied on the jth qubit.
+ * @param sv_real array of length n containing real parts of the statevector
+ * @param sv_imag array of length n containing imaginary parts of the statevector
+ * @param theta rotation angle
+ * @param n_qubits total number of qubits represented by the statevector
+ * @param n_states size of the statevector
+ */ 
+void furxz_all(double* a_real, double* a_imag, double theta, double* init_rots, unsigned int n_qubits, size_t n_states)
+{
+    const size_t state_mask = (n_states - 1) >> 1;
+
+    // const double a = cos(theta);
+    // const double b = -sin(theta);
+
+    const unsigned int group_size = 10;
+    const unsigned int group_blocks = n_states >> group_size;
+    const unsigned int last_group_size = n_qubits % group_size;
+    const unsigned int last_group_blocks = n_states >> last_group_size;
+
+    for(int q_offset = 0; q_offset < n_qubits - last_group_size; q_offset += group_size){
+        #pragma omp parallel for
+        for(int i = 0; i < group_blocks; ++i)
+            furxz_kernel(a_real, a_imag, theta, init_rots, i, group_size, q_offset, state_mask);
+    }
+
+    if(last_group_size > 0){
+        const unsigned int q_offset = n_qubits - last_group_size;
+        #pragma omp parallel for
+        for(int i = 0; i < last_group_blocks; ++i)
+            furxz_kernel(a_real, a_imag, theta, init_rots, i, last_group_size, q_offset, state_mask);
+    }
+}
 /**
  * apply to a statevector a two-qubit XX+YY rotation defined by
- * Rx(theta) = exp(-i*theta*(XX+YY)/2)
+ * Rxy(theta) = exp(-i*theta*(XX+YY)/2)
  * where X and Y are the Pauli-X and Pauli-Y operators, respectively.
  * @param sv_real array of length n containing real parts of the statevector
  * @param sv_imag array of length n containing imaginary parts of the statevector
@@ -174,7 +266,7 @@ void furxy_ring(double* a_real, double* a_imag, double theta, unsigned int n_qub
 
 /**
  * apply to a statevector two-qubit XX+YY rotations defined by
- * Rx(theta) = exp(-i*theta*(XX+YY)/2)
+ * Rxy(theta) = exp(-i*theta*(XX+YY)/2)
  * on all all adjacent pairs of qubits with wrap-around.
  * @param sv_real array of length n containing real parts of the statevector
  * @param sv_imag array of length n containing imaginary parts of the statevector
