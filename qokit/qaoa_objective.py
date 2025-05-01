@@ -5,14 +5,15 @@
 from __future__ import annotations
 from calendar import c
 import numpy as np
-from qiskit import Aer, execute
+from qiskit import transpile
+from qiskit.quantum_info import Statevector
+from qiskit_aer import Aer
 from functools import reduce
 import numba.cuda
 
 from .fur import choose_simulator, choose_simulator_xyring, QAOAFastSimulatorBase
 import typing
 
-from .parameter_utils import from_fourier_basis
 import qokit.parameter_utils
 from qokit.parameter_utils import QAOAParameterization
 from .qaoa_circuit_portfolio import measure_circuit
@@ -75,7 +76,7 @@ def _get_qiskit_objective(
         backend = Aer.get_backend("aer_simulator_statevector")
 
         def g(gamma, beta):
-            qc = parameterized_circuit.bind_parameters(list(np.hstack([beta, gamma])))
+            qc = parameterized_circuit.assign_parameters(list(np.hstack([beta, gamma])))
             sv = np.asarray(backend.run(qc).result().get_statevector())
             probs = np.abs(sv) ** 2
             return compute_objective_from_probabilities(probs)
@@ -84,9 +85,9 @@ def _get_qiskit_objective(
         backend = Aer.get_backend("statevector_simulator")
 
         def g(gamma, beta):
-            qc = parameterized_circuit.bind_parameters(np.hstack([np.asarray(beta) / 2, np.asarray(gamma) / 2]))
-            result = execute(qc, backend).result()
-            sv = reverse_array_index_bit_order(result.get_statevector())
+            qc = parameterized_circuit.assign_parameters(np.hstack([np.asarray(beta) / 2, np.asarray(gamma) / 2]))
+            circ = transpile(qc, backend)
+            sv = reverse_array_index_bit_order(Statevector(circ))
             probs = np.abs(sv) ** 2
             return compute_objective_from_probabilities(probs)
 
@@ -98,7 +99,6 @@ def _get_qiskit_objective(
 
 def get_qaoa_objective(
     N: int,
-    p: int | None = None,
     precomputed_diagonal_hamiltonian=None,
     precomputed_costs=None,
     terms=None,

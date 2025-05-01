@@ -7,7 +7,7 @@ import pandas as pd
 import networkx as nx
 from pathlib import Path
 from functools import partial
-from qiskit.providers.aer import AerSimulator
+from qiskit_aer import AerSimulator
 import pytest
 
 from qokit.maxcut import maxcut_obj, get_adjacency_matrix, get_maxcut_terms
@@ -125,7 +125,7 @@ def test_maxcut_weighted_qaoa_obj_qiskit_circuit():
     for _, row in df.iterrows():
         precomputed_cuts = precompute_energies(maxcut_obj, row["G"].number_of_nodes(), w=get_adjacency_matrix(row["G"]))
         qc = get_qaoa_circuit(row["G"], row["gamma"], row["beta"])
-        qc_param = get_parameterized_qaoa_circuit(row["G"], row["p"]).bind_parameters(np.hstack([row["beta"], row["gamma"]]))
+        qc_param = get_parameterized_qaoa_circuit(row["G"], row["p"]).assign_parameters(np.hstack([row["beta"], row["gamma"]]))
         sv = np.asarray(qiskit_backend.run(qc).result().get_statevector())
         sv_param = np.asarray(qiskit_backend.run(qc_param).result().get_statevector())
 
@@ -159,7 +159,7 @@ def test_sk_ini_maxcut(simulator):
         for p in range(1, max_p + 1):
             gamma, beta = get_sk_gamma_beta(p)
             f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
-            cur_ar = -f(gamma / np.sqrt(d), beta) / optimal_cut
+            cur_ar = -f(-gamma / np.sqrt(d), beta) / optimal_cut
             if p == 1:
                 assert cur_ar > np.mean(precomputed_energies) / optimal_cut
             else:

@@ -7,7 +7,7 @@ import typing
 import numpy as np
 from functools import partial
 from qiskit import QuantumCircuit
-from qiskit import Aer
+from qiskit_aer import Aer
 
 from qokit.qaoa_objective_labs import get_precomputed_labs_merit_factors
 from qokit.fur.lazy_import import MPI

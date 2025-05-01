@@ -5,9 +5,12 @@
 import qiskit
 import numpy as np
 from .portfolio_optimization import yield_all_indices_cosntrained, get_configuration_cost
-from qiskit import QuantumCircuit, execute, Aer, QuantumRegister
+from qiskit import QuantumCircuit, transpile, QuantumRegister
+from qiskit_aer import Aer
 from qiskit.circuit import ParameterVector
 from .utils import reverse_array_index_bit_order, state_to_ampl_counts
+
+from qiskit.quantum_info import Statevector
 
 
 def generate_dicke_state_fast(N, K):
@@ -58,7 +61,7 @@ def get_mixer_Txy(qc, beta, minus=False, T=None):
     """
     if minus == True:
         beta = -beta
-    N = len(qc._qubits)
+    N = len(qc.qubits)
     if T is None:
         T = 1
     beta = beta / T
@@ -200,14 +203,14 @@ def measure_circuit(circuit, n_trials=1024, save_state=True):
     """Get the output from circuit, either measured samples or full state vector"""
     if save_state is False:
         backend = Aer.get_backend("qasm_simulator")
-        job = execute(circuit, backend, shots=n_trials)
+        job = transpile(circuit, backend, shots=n_trials)
         result = job.result()
         bitstrings = invert_counts(result.get_counts())
         return bitstrings
     else:
         backend = Aer.get_backend("statevector_simulator")
-        result = execute(circuit, backend).result()
-        state = result.get_statevector()
+        circ = transpile(circuit, backend)
+        state = Statevector(circ)
         return reverse_array_index_bit_order(state)
 
 

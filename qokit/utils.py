@@ -13,10 +13,11 @@ from pytket.circuit import Circuit
 from pytket.extensions.quantinuum import QuantinuumBackend
 from pytket.extensions.qiskit import qiskit_to_tk
 from importlib_resources import files
+from qiskit.providers.basic_provider import BasicProvider
 
 from pytket.passes import (
     SequencePass,
-    auto_squash_pass,
+    AutoSquash,
     RemoveRedundancies,
     SimplifyInitial,
     FullPeepholeOptimise,
@@ -51,7 +52,7 @@ def get_all_best_known():
     return df1.merge(df2, left_index=True, right_index=True, how="outer").reset_index()
 
 
-def brute_force(obj_f, num_variables: int, minimize: bool = False, function_takes: str = "spins"):
+def brute_force(obj_f, num_variables: int, minimize: bool = False, function_takes: str = "spins", *args: object, **kwargs: object):
     """Get the maximum of a function by complete enumeration
     Returns the maximum value and the extremizing bit string
     """
@@ -64,9 +65,9 @@ def brute_force(obj_f, num_variables: int, minimize: bool = False, function_take
     bit_strings = (((np.array(range(2**num_variables))[:, None] & (1 << np.arange(num_variables)))) > 0).astype(int)
     for x in bit_strings:
         if function_takes == "spins":
-            cost = obj_f(1 - 2 * np.array(x))
+            cost = obj_f(1 - 2 * np.array(x), *args, **kwargs)
         elif function_takes == "bits":
-            cost = obj_f(np.array(x))
+            cost = obj_f(np.array(x), *args, **kwargs)
         if compare(cost, best_cost_brute):
             best_cost_brute = cost
             xbest_brute = x
@@ -206,8 +207,8 @@ def obj_from_statevector(sv, obj_f, precomputed_energies=None):
 
 
 def unitary_from_circuit(qc: QuantumCircuit):
-    backend = qiskit.BasicAer.get_backend("unitary_simulator")
-    job = qiskit.execute(qc, backend)
+    backend = BasicProvider().get_backend("unitary_simulator")
+    job = qiskit.transpile(qc, backend)
     U = job.result().get_unitary()
     return U
 

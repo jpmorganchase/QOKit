@@ -10,6 +10,8 @@ import itertools
 from typing import Any
 from qokit.parameter_utils import get_sk_gamma_beta
 
+from typing import Tuple, Optional, List, cast
+
 
 def convert_bitstring_to_int(config):
     """make configuration iterable"""
@@ -88,61 +90,54 @@ def get_data(N, seed=1, real=False) -> tuple[float, float]:
     https://github.com/Qiskit/qiskit-finance/blob/main/docs/tutorials/11_time_series.ipynb
     """
     import datetime
-    from qiskit_finance.data_providers import RandomDataProvider, YahooDataProvider
 
-    tickers = []
-    for i in range(N):
-        tickers.append("t" + str(i))
-    if real is False:
-        data = RandomDataProvider(tickers=tickers, start=datetime.datetime(2016, 1, 1), end=datetime.datetime(2016, 1, 30), seed=seed)
-    else:
-        stock_symbols = [
-            "AAPL",
-            "GOOGL",
-            "AMZN",
-            "MSFT",
-            "TSLA",
-            "NFLX",
-            "NVDA",
-            "JPM",
-            "V",
-            "JNJ",
-            "WMT",
-            "PG",
-            "MA",
-            "UNH",
-            "HD",
-            "DIS",
-            "BRK-B",
-            "VZ",
-            "KO",
-            "MRK",
-            "INTC",
-            "CMCSA",
-            "PEP",
-            "PFE",
-            "CSCO",
-            "XOM",
-            "BA",
-            "MCD",
-            "ABBV",
-            "IBM",
-            "GE",
-            "MMM",
-        ]
+    from qokit.yahoo import YahooDataProvider
 
-        data = YahooDataProvider(
-            tickers=stock_symbols[:N],
-            start=datetime.datetime(2020, 1, 1),
-            end=datetime.datetime(2020, 1, 30),
-            # end=datetime.datetime(2021, 1, 1),
-        )
+    stock_symbols = [
+        "AAPL",
+        "GOOGL",
+        "AMZN",
+        "MSFT",
+        "TSLA",
+        "NFLX",
+        "NVDA",
+        "JPM",
+        "V",
+        "JNJ",
+        "WMT",
+        "PG",
+        "MA",
+        "UNH",
+        "HD",
+        "DIS",
+        "BRK-B",
+        "VZ",
+        "KO",
+        "MRK",
+        "INTC",
+        "CMCSA",
+        "PEP",
+        "PFE",
+        "CSCO",
+        "XOM",
+        "BA",
+        "MCD",
+        "ABBV",
+        "IBM",
+        "GE",
+        "MMM",
+    ]
+
+    data = YahooDataProvider(
+        tickers=stock_symbols[:N],
+        start=datetime.datetime(2020, 1, 1),
+        end=datetime.datetime(2020, 1, 30),
+    )
 
     data.run()
-    # use get_period_return_mean_vector & get_period_return_covariance_matrix to get return!
-    # https://github.com/Qiskit/qiskit-finance/blob/main/docs/tutorials/01_portfolio_optimization.ipynb
-    means = data.get_period_return_mean_vector()
-    cov = data.get_period_return_covariance_matrix()
+    period_returns = np.array(data._data)[:, 1:] / np.array(data._data)[:, :-1] - 1
+    means = cast(np.ndarray, np.mean(period_returns, axis=1))
+    cov = np.cov(period_returns, rowvar=True)
     return means, cov
 
 
@@ -272,7 +267,7 @@ def get_sk_ini(p: int):
     """
     scaled the sk look-up table for the application of portfolio optimziation
     """
-    gamma_scale, beta_scale = -0.5, 1
+    gamma_scale, beta_scale = 0.5, 1
     gamma, beta = get_sk_gamma_beta(p, parameterization="gamma beta")
     scaled_gamma, scaled_beta = gamma_scale * gamma, beta_scale * beta
     X0 = np.concatenate((scaled_gamma, scaled_beta), axis=0)
