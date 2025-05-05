@@ -28,6 +28,29 @@ def test_furxz_backends():
     python_energy = sim.get_expectation(_result)
     
     assert np.isclose(c_energy, python_energy)
+
+def test_ws_degeneracy():
+
+    N = 10
+    d = 3
+    p = 1
+    seed = 1
+    G = nx.random_regular_graph(d,N,seed=seed)
+    terms = get_maxcut_terms(G)
+    gamma, beta = get_fixed_gamma_beta(d,p)
+    ini_rots = np.pi/2 * np.ones(N)
+
+    simclass = qokit.fur.choose_simulator_xz(name='python')
+    sim = simclass(N, terms=terms)
+    _result = sim.simulate_ws_qaoa(gamma, beta, ini_rots)
+    ws_energy = sim.get_expectation(_result)
+    
+    simclass = qokit.fur.choose_simulator(name='python')
+    sim = simclass(N, terms=terms)
+    _result = sim.simulate_qaoa(gamma, beta)
+    qaoa_energy = sim.get_expectation(_result)
+    
+    assert np.isclose(ws_energy, qaoa_energy)
     
 def test_qiskit_qokit():
     ##### qiskit circuit 
