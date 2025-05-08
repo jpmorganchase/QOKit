@@ -117,21 +117,12 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
         local_opt_overlap = sum(optimal_probs)
         opt_rank = np.array([local_opt_overlap, local_optimal_energy])
         global_opt = 0.0
-        if self._rank == 0:
-            opt_rank = np.array(opt_rank)
-            p_rank = opt_rank[:, 0]
-            e_rank = opt_rank[:, 1]
-            optimal_energy = np.min(e_rank)
-            optimal_probs = p_rank[e_rank == optimal_energy]
-            global_opt = np.sum(optimal_probs)
-            if broadcast:
-                # send to all ranks using broadcast
-                self._comm.Bcast(global_opt, root=0)
-        else:
-            if not broadcast:
-                global_opt = 0.0
-            else:
-                global_opt = self._comm.Bcast(global_opt, root=0)
+        p_rank = np.array([local_opt_overlap])
+        e_rank = np.array([local_optimal_energy])
+        optimal_energy = np.empty_like(e_rank)
+        self._comm.Allreduce(e_rank, optimal_energy, op=MPI.MIN)
+        optimal_probs = p_rank[e_rank == optimal_energy]
+        global_opt = np.sum(optimal_probs)
         return global_opt
 
     def _get_global_statevector_cpu(self):
@@ -217,7 +208,9 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
             costs_host = np.asarray(costs)
         if optimization_type == "max":
             costs_host = -1 * np.asarray(costs_host)
-        return self._get_optimum_overlap(probs, costs_host, broadcast=broadcast)
+        local_sum = self._get_optimum_overlap(probs, costs_host, broadcast=broadcast)
+        global_sum = self._comm.allreduce(local_sum, op=MPI.SUM)
+        return global_sum
 
 
 class QAOAFURXSimulatorGPUMPI(QAOAFastSimulatorGPUMPIBase):
