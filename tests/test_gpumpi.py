@@ -25,7 +25,7 @@ is_gpu = "gpu" in simulators
 
 @pytest.mark.skipif(not is_nvlink, reason="NVLINK not available.")
 def test_gpumpi(n_procs=n_gpumpi):
-    result = subprocess.run(["mpirun", "-n", str(n_procs), "python", "tests/gpumpi_tests.py"], capture_output=True, text=True, check=True)
+    result = subprocess.run(["mpirun", "-np", str(n_procs), "python", "tests/gpumpi_tests.py"], capture_output=True, text=True, check=True)
     output_lines = result.stdout.strip().split("\n")
     output = [item == "True" for item in output_lines]
     assert all(output)
@@ -33,7 +33,7 @@ def test_gpumpi(n_procs=n_gpumpi):
 
 @pytest.mark.skipif(not is_gpu, reason="GPU simulator not available.")
 def test_gpu(n_procs=1):
-    result = subprocess.run(["mpirun", "-n", str(n_procs), "python", "tests/gpumpi_tests.py"], capture_output=True, text=True, check=True)
+    result = subprocess.run(["mpirun", "-np", str(n_procs), "python", "tests/gpumpi_tests.py"], capture_output=True, text=True, check=True)
     output_lines = result.stdout.strip().split("\n")
     output = [item == "True" for item in output_lines]
     assert all(output)
