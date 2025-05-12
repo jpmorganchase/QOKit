@@ -20,6 +20,7 @@ if "gpu" in simulators:
     n_gpumpi = len(output_lines)
 else:
     is_nvlink = False
+    n_gpumpi = 0
 
 
 is_mpi_available = mpi_available()
