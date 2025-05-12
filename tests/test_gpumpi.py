@@ -12,11 +12,15 @@ import os, sys
 import pytest
 
 simulators = get_available_simulator_names("x")
-result = subprocess.run(["nvidia-smi", "nvlink", "-cBridge"], capture_output=True, text=True, check=True)
 
-output_lines = result.stdout.strip().split("\n")
+if "gpu" in simulators:
+    result = subprocess.run(["nvidia-smi", "nvlink", "-cBridge"], capture_output=True, text=True, check=True)
+    output_lines = result.stdout.strip().split("\n")
+    is_nvlink = output_lines is not [""] and len(output_lines) > 1
+else:
+    is_nvlink = False
 
-is_nvlink = output_lines is not [""] and len(output_lines) > 1
+
 is_mpi_available = mpi_available()
 is_gpumpi = "gpumpi" in simulators
 n_gpumpi = len(output_lines)
