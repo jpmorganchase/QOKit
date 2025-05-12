@@ -7,7 +7,6 @@ import typing
 from collections.abc import Sequence
 import numpy as np
 import math
-import cupy as cp
 import numba.cuda
 
 from qokit.fur.nbcuda.qaoa_simulator import DeviceArray
