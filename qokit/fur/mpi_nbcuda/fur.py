@@ -6,7 +6,6 @@ from ..lazy_import import MPI
 from ..nbcuda.fur import furx_all as furx_local
 from ..nbcuda.fur import furx
 import math
-import cupy as cp
 
 
 def furx_all(x, theta: float, n_local_qubits: int, n_all_qubits: int, comm):
@@ -16,6 +15,8 @@ def furx_all(x, theta: float, n_local_qubits: int, n_all_qubits: int, comm):
     furx_local(x, theta, n_local_qubits)
 
     if n_all_qubits > n_local_qubits:
+        import cupy as cp
+
         comm.Alltoall(MPI.IN_PLACE, x)
         a, b = math.cos(theta), -math.sin(theta)
         q_offset = 2 * n_local_qubits - n_all_qubits
