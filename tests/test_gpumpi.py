@@ -17,13 +17,13 @@ if "gpu" in simulators:
     result = subprocess.run(["nvidia-smi", "nvlink", "-cBridge"], capture_output=True, text=True, check=True)
     output_lines = result.stdout.strip().split("\n")
     is_nvlink = output_lines is not [""] and len(output_lines) > 1
+    n_gpumpi = len(output_lines)
 else:
     is_nvlink = False
 
 
 is_mpi_available = mpi_available()
 is_gpumpi = "gpumpi" in simulators
-n_gpumpi = len(output_lines)
 is_gpu = "gpu" in simulators
 
 
