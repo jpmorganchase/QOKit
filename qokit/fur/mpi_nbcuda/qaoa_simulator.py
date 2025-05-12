@@ -7,6 +7,7 @@ import typing
 from collections.abc import Sequence
 import numpy as np
 import math
+import cupy as cp
 import numba.cuda
 
 from qokit.fur.nbcuda.qaoa_simulator import DeviceArray
@@ -113,7 +114,7 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
         Get overlap from probabilites and costs using MPI
         """
         local_optimal_energy = np.min(costs_host)
-        optimal_probs = probs_host[costs_host == local_optimal_energy]
+        optimal_probs = probs_host[np.array(costs_host) == local_optimal_energy]
         local_opt_overlap = sum(optimal_probs)
         opt_rank = np.array([local_opt_overlap, local_optimal_energy])
         global_opt = 0.0
@@ -203,9 +204,9 @@ class QAOAFastSimulatorGPUMPIBase(QAOAFastSimulatorGPUBase):
         broadcast = kwargs.pop("mpi_broadcast_float", True)
         probs = self.get_probabilities(result, mpi_gather=False, **kwargs)
         if costs is None:
-            costs_host = self._hc_diag.copy_to_host()
+            costs_host = self._hc_diag  # .copy_to_host()
         else:
-            costs_host = np.asarray(costs)
+            costs_host = self._diag_from_costs(costs)
         if optimization_type == "max":
             costs_host = -1 * np.asarray(costs_host)
         local_sum = self._get_optimum_overlap(probs, costs_host, broadcast=broadcast)

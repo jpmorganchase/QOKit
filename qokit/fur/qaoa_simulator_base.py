@@ -62,7 +62,7 @@ class QAOAFastSimulatorBase(ABC):
                 raise ValueError("Either costs or terms must be provided")
             self._hc_diag = self._diag_from_terms(terms)
         else:
-            assert len(costs) == self.n_states
+            assert len(costs) == self.n_states * self._size
             self._hc_diag = self._diag_from_costs(costs)
 
     # -- Internal methods
