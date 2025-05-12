@@ -125,10 +125,10 @@ def extrapolate_parameters_in_fourier_basis(u, v, p, step_size):
 
     u_next = np.zeros(p)
     v_next = np.zeros(p)
-    u_next[: p - step_size] = u
-    v_next[: p - step_size] = v
-    u_next[p - step_size :] = 0
-    v_next[p - step_size :] = 0
+
+    p_k = min(p, len(u))
+    u_next[:p_k] = u[:p_k]
+    v_next[:p_k] = v[:p_k]
 
     return u_next, v_next
 
@@ -206,10 +206,23 @@ def _get_sk_gamma_beta(p):
     """
     df = _get_sk_gamma_beta_from_file()
     row = df[(df["p"] == p)]
+
+    # If the angles aren't in the database, we extrapolate from nearest p
     if len(row) != 1:
-        raise ValueError(f"p={p} not supported, try lower p")
-    row = row.squeeze()
-    return np.array(row["gammas"]), np.array(row["betas"])
+        p_list = np.array(df["p"].keys())
+        print(f"p_list = {p_list}")
+        p_closest = p_list[np.argmin(np.abs(p_list-p))]
+        row = df[(df["p"] == p_closest)].squeeze()
+        print(f"Extrapolating from p={p_closest}")
+        gamma, beta = np.array(row["gammas"]), np.array(row["betas"])
+        u, v = to_basis(gamma, beta)
+        u_next, v_next = extrapolate_parameters_in_fourier_basis(u, v, p, p-p_closest)
+        gamma, beta = from_basis(u_next, v_next)
+        #raise ValueError(f"p={p} not supported, try lower p")
+        return np.array(gamma), np.array(beta)
+    else:
+        row = row.squeeze()
+        return np.array(row["gammas"]), np.array(row["betas"])
 
 
 def get_sk_gamma_beta(p, parameterization: QAOAParameterization | str = "gamma beta"):
