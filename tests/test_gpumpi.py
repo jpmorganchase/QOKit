@@ -47,10 +47,6 @@ def test_gpu(N=22, p=4):
     gamma = row["gamma"].values[0]
     overlap_trans = float(row["overlap transferred"].values[0])
 
-    terms = get_terms(N)
-    simclass = choose_simulator(name="gpu")
-    mysim = simclass(N, terms=terms)
-
     f_gpu = get_qaoa_labs_objective(N, p, simulator="gpu", objective="overlap", parameterization="gamma beta")
     overlap_trans_computed = 1 - f_gpu(gamma, beta)
     assert np.isclose(overlap_trans_computed, overlap_trans)
