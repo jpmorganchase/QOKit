@@ -90,7 +90,8 @@ def test_sk_qaoa_convergence_with_p(simulator, N=12):
     last_objective = 0.0
     last_overlap = 0.0
 
-    for p in range(1, 18):
+    p_list = list(range(1, 21))+[22, 24, 27, 30, 34, 40, 60, 80]
+    for p in p_list:
         gamma, beta = get_sk_gamma_beta(p)
         qaoa_objective = get_qaoa_sk_objective(
             N, p, J=J, precomputed_energies=precomputed_energies, simulator=simulator, parameterization="gamma beta", objective="expectation"
@@ -109,7 +110,8 @@ def test_sk_qaoa_convergence_with_p(simulator, N=12):
 def test_sk_qaoa_obj_consistency_across_simulators(N=8):
     J = get_random_J(N=N)
 
-    for p in range(1, 18):
+    p_list = list(range(1, 21))+[22, 24, 27, 30, 34, 40, 60, 80]
+    for p in p_list:
         gamma, beta = get_sk_gamma_beta(p)
         for objective in ["expectation", "overlap"]:
             qaoa_objectives = [
@@ -121,11 +123,11 @@ def test_sk_qaoa_obj_consistency_across_simulators(N=8):
 
 @pytest.mark.parametrize("simulator", simulators_to_run_names)
 def test_sk_qaoa_obj_fixed_angles_and_precomputed_energies(simulator, N=10):
-    max_p = 11
     J = get_random_J(N=N)
     obj = partial(sk_obj, J=J)
     precomputed_energies = precompute_energies(obj, N)
-    for p in range(1, max_p + 1):
+    p_list = list(range(1, 21))+[22, 24, 27, 30, 34, 40, 60, 80]
+    for p in p_list:
         gamma, beta = get_sk_gamma_beta(p)
         f1 = get_qaoa_sk_objective(N, p, J=J, parameterization="gamma beta", simulator=simulator)
         f2 = get_qaoa_sk_objective(N, p, J=J, precomputed_energies=precomputed_energies, parameterization="gamma beta", simulator=simulator)
