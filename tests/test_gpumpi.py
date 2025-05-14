@@ -73,11 +73,11 @@ def test_gpu_maxcut(N=16, p=4, seed=1):
     o1_c_maxcut = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, simulator="c", parameterization="gamma beta", objective="overlap")(
         gamma, beta
     )
-    o1_gpumpi_maxcut = get_qaoa_maxcut_objective(
-        N, p, precomputed_cuts=precomputed_energies, simulator="gpumpi", parameterization="gamma beta", objective="overlap"
-    )(gamma, beta)
-    o2_gpumpi_maxcut = get_qaoa_maxcut_objective(N, p, G=G, simulator="gpumpi", parameterization="gamma beta", objective="overlap")(gamma, beta)
-    assert np.all([np.isclose(o1_c_maxcut, np.real(o1_gpumpi_maxcut)), np.isclose(o1_c_maxcut, np.real(o2_gpumpi_maxcut))])
+    o1_gpu = get_qaoa_maxcut_objective(N, p, precomputed_cuts=precomputed_energies, simulator="gpu", parameterization="gamma beta", objective="overlap")(
+        gamma, beta
+    )
+    o2_gpu = get_qaoa_maxcut_objective(N, p, G=G, simulator="gpu", parameterization="gamma beta", objective="overlap")(gamma, beta)
+    assert np.all([np.isclose(o1_c_maxcut, np.real(o1_gpu)), np.isclose(o1_c_maxcut, np.real(o2_gpu))])
 
 
 @pytest.mark.skipif(not is_gpu, reason="GPU simulator not available.")
@@ -90,9 +90,9 @@ def test_gpu_sk(N=16, p=4, seed=1):
     o1_c_sk = get_qaoa_sk_objective(N, p, J=J, precomputed_energies=precomputed_energies, simulator="c", parameterization="gamma beta", objective="overlap")(
         gamma, beta
     )
-    o1_gpumpi_sk = get_qaoa_sk_objective(
-        N, p, J=J, precomputed_energies=precomputed_energies, simulator="gpumpi", parameterization="gamma beta", objective="overlap"
-    )(gamma, beta)
-    o2_gpumpi_sk = get_qaoa_sk_objective(N, p, J=J, simulator="gpumpi", parameterization="gamma beta", objective="overlap")(gamma, beta)
+    o1_gpu = get_qaoa_sk_objective(N, p, J=J, precomputed_energies=precomputed_energies, simulator="gpu", parameterization="gamma beta", objective="overlap")(
+        gamma, beta
+    )
+    o2_gpu = get_qaoa_sk_objective(N, p, J=J, simulator="gpu", parameterization="gamma beta", objective="overlap")(gamma, beta)
 
-    assert np.all([np.isclose(o1_c_sk, np.real(o1_gpumpi_sk)), np.isclose(o1_c_sk, np.real(o2_gpumpi_sk))])
+    assert np.all([np.isclose(o1_c_sk, np.real(o1_gpu)), np.isclose(o1_c_sk, np.real(o2_gpu))])
