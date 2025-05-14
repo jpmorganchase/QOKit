@@ -15,6 +15,7 @@ from qokit.fur import get_available_simulator_names, choose_simulator
 
 
 def gpumpi_test(N=16, p=4, seed=1):
+    # LABS
     df = pd.read_json("./qokit/assets/QAOA_with_fixed_parameters_p_opt.json", orient="index")
     row = df[(df["N"] == N) & (df["p"] == p)]
     beta = row["beta"].values[0]
