@@ -159,7 +159,7 @@ def test_extrapolation(simulator):
     f_gammabeta = get_qaoa_labs_objective(N, p, parameterization="gamma beta")
     f_uv = get_qaoa_labs_objective(N, p, parameterization="u v")
     u, v = to_basis(gamma, beta, num_coeffs=None, basis="fourier")
-    gamma2, beta2 = from_basis(*extrapolate_parameters_in_fourier_basis(u, v, p + 1, 1), p=None, basis="fourier")
+    gamma2, beta2 = from_basis(*extrapolate_parameters_in_fourier_basis(u, v, p + 1), p=None, basis="fourier")
     gamma3, beta3 = from_basis(u, v, p=None, basis="fourier")
 
     e1 = f_gammabeta(gamma, beta)
