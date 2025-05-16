@@ -7,6 +7,7 @@ import numpy as np
 
 from ..nbcuda.diagonal import apply_diagonal
 from .fur import furx_all  # , furxy_ring, furxy_complete
+from ..nbcuda.fur import furx_all as furx_local
 
 
 def apply_qaoa_furx(sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], hc_diag: np.ndarray, n_local_qubits: int, n_all_qubits: int, comm) -> None:

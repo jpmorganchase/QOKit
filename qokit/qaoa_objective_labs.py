@@ -43,7 +43,7 @@ class PrecomputedLABSHandler:
             ens = np.load(fpath)
         else:
             # precompute
-            if N > 10 and N <= 24:
+            if N > 10 and N <= 22:
                 raise RuntimeError(
                     f"""
 Failed to load from {fpath}, attempting to recompute for N={N},
