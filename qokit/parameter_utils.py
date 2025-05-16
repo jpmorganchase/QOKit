@@ -105,8 +105,8 @@ def from_basis(u, v, p=None, basis="fourier"):
     return gamma, beta
 
 
-def extrapolate_parameters_in_fourier_basis(u, v, p, step_size):
-    """Extrapolate the parameters u, v from p-step_size to p
+def extrapolate_parameters_in_fourier_basis(u, v, p):
+    """Extrapolate the parameters u, v to p
     Parameters
     ----------
     u : list-like
@@ -114,13 +114,11 @@ def extrapolate_parameters_in_fourier_basis(u, v, p, step_size):
         QAOA parameters in Fourier basis
     p : int
         QAOA depth
-    step_size : int
-        Target QAOA depth for extrapolation
     Returns
     -------
     u, v : np.array
         QAOA parameters in Fourier basis
-        for depth p+step_size
+        for depth p.
     """
 
     u_next = np.zeros(p)
@@ -216,7 +214,7 @@ def _get_sk_gamma_beta(p):
         print(f"Extrapolating from p={p_closest}")
         gamma, beta = np.array(row["gammas"]), np.array(row["betas"])
         u, v = to_basis(gamma, beta)
-        u_next, v_next = extrapolate_parameters_in_fourier_basis(u, v, p, p - p_closest)
+        u_next, v_next = extrapolate_parameters_in_fourier_basis(u, v, p)
         gamma, beta = from_basis(u_next, v_next)
         # raise ValueError(f"p={p} not supported, try lower p")
         return np.array(gamma), np.array(beta)
