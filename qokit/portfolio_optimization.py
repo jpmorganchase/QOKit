@@ -165,6 +165,31 @@ def get_problem(N, K, q, seed=1, pre=False) -> dict[str, Any]:
 
     return po_problem
 
+def get_problem_vectorized(N, K, q, seed=1, pre=False) -> dict[str, Any]:
+    """generate the portofolio optimziation problem dict"""
+    po_problem = {}
+    po_problem["N"] = N
+    po_problem["K"] = K
+    po_problem["q"] = q
+    po_problem["seed"] = seed
+    po_problem["means"], po_problem["cov"] = get_data(N, seed=seed)
+    po_problem["pre"] = pre
+    if pre == "rule":
+        means_in_spins = po_problem["means"] - q * np.sum(po_problem["cov"], axis=1)
+        scale = 1 / np.sqrt(
+            np.mean((q * po_problem["cov"]) ** 2) + np.mean(means_in_spins ** 2)
+        )
+    elif np.isscalar(pre):
+        scale = pre
+    else:
+        scale = 1
+
+    po_problem["scale"] = scale
+    po_problem["means"] = scale * po_problem["means"]
+    po_problem["cov"] = scale * po_problem["cov"]
+
+    return po_problem
+
 
 def get_problem_H(po_problem):
     """
