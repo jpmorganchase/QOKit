@@ -35,6 +35,32 @@ def get_configuration_cost(po_problem, config):
 
     return po_problem["q"] * config.dot(cov).dot(config) - means.dot(config)
 
+def get_configuration_cost_vector(po_problem, config):
+    """
+    Compute energy for single sample configuration or batch of configurations
+    f(x) = q \sigma_ij x_i x_j - \mu_i x_i
+    Vectorized for 2D config input.
+    """
+    scale = po_problem["scale"]
+    means = po_problem["means"] / scale
+    cov = po_problem["cov"] / scale
+    q = po_problem["q"]
+
+    config = np.asarray(config)
+    if config.ndim == 1:
+        # Single bitstring
+        return q * config.dot(cov).dot(config) - means.dot(config)
+    elif config.ndim == 2:
+        # Batch of bitstrings
+        # config: (batch, N), cov: (N, N), means: (N,)
+        # quadratic term: (config @ cov) * config, sum over axis=1
+        quad = np.einsum('ij,jk,ik->i', config, cov, config)
+        linear = config.dot(means)
+        return q * quad - linear
+    else:
+        raise ValueError("config must be 1D or 2D array")
+
+
 
 def get_configuration_cost_kw(config, po_problem=None):
     """
@@ -43,12 +69,27 @@ def get_configuration_cost_kw(config, po_problem=None):
     """
     return get_configuration_cost(po_problem, config)
 
+def get_configuration_cost_kw_vector(config, po_problem=None):
+    """
+    Convenience function for functools.partial
+    e.g. po_obj = partial(get_configuration_cost, po_problem=po_problem)
+    Now supports vectorized (batch) config.
+    """
+    return get_configuration_cost_vector(po_problem, config)
+
 
 def po_obj_func(po_problem: dict) -> float:
     """
     Wrapper function for compute a portofolio value
     """
     return partial(get_configuration_cost_kw, po_problem=po_problem)
+
+def po_obj_func_vector(po_problem: dict) -> float:
+    """
+    Wrapper function for compute a portofolio value
+    Now supports vectorized (batch) config.
+    """
+    return partial(get_configuration_cost_kw_vector, po_problem=po_problem)
 
 
 def kbits(N, K):

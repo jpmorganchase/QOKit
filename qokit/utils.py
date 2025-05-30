@@ -14,6 +14,8 @@ from pytket.extensions.quantinuum import QuantinuumBackend
 from pytket.extensions.qiskit import qiskit_to_tk
 from importlib_resources import files
 from qiskit.providers.basic_provider import BasicProvider
+from functools import partial
+
 
 from pytket.passes import (
     SequencePass,
@@ -111,13 +113,11 @@ def state_to_ampl_counts(vec, eps: float = 1e-15):
     return counts
 
 
-def precompute_energies(obj_f, nbits: int, *args: object, **kwargs: object):
+def precompute_energies(obj_f, nbits: int, *args: object, chunk_size: int = 2**18, **kwargs: object):
     """
-    Precomputed a vector of objective function values
-    that accelerates the energy computation in obj_from_statevector
-
-    For LABS-specific, accelerated version see get_precomputed_labs_merit_factors in qaoa_objective_labs.py
-
+    Precompute a vector of objective function values efficiently, scalable for large nbits.
+    Processes bitstrings in chunks and stores results in memory (no file storage).
+    Uses vectorized obj_f if available.
 
     Parameters
     ----------
@@ -125,22 +125,35 @@ def precompute_energies(obj_f, nbits: int, *args: object, **kwargs: object):
         Objective function to precompute
     nbits : int
         Number of parameters obj_f takes
-    num_processes : int
-        Number of processes to use. Default: 1 (serial)
-        if num_processes > 1, pathos.Pool is used
-    *args, **kwargs : Objec
+    chunk_size : int, optional
+        Number of bitstrings to process at once (default: 2**18)
+    *args, **kwargs : object
         Parameters to be passed directly to obj_f
 
     Returns
     -------
     energies : np.array
-        vector of energies such that E = energies.dot(amplitudes)
+        Vector of energies such that E = energies.dot(amplitudes)
         where amplitudes are absolute values squared of qiskit statevector
-
     """
-    bit_strings = (((np.array(range(2**nbits))[:, None] & (1 << np.arange(nbits)))) > 0).astype(int)
+    total = 2 ** nbits
+    energies = np.empty(total, dtype=np.float64)
 
-    return np.array([obj_f(x, *args, **kwargs) for x in bit_strings])
+    def bitstring_chunk_generator(nbits, chunk_size):
+        for start in range(0, 2**nbits, chunk_size):
+            end = min(start + chunk_size, 2**nbits)
+            chunk = (((np.arange(start, end)[:, None] & (1 << np.arange(nbits))) > 0).astype(int))
+            yield start, end, chunk
+
+    for start, end, chunk in bitstring_chunk_generator(nbits, chunk_size):
+        # Try vectorized call, fallback to list comprehension if needed
+        try:
+            result = obj_f(chunk, *args, **kwargs)
+        except Exception:
+            result = [obj_f(x, *args, **kwargs) for x in chunk]
+        energies[start:end] = result
+
+    return energies
 
 
 def yield_all_bitstrings(nbits: int):

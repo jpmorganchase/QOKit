@@ -1,4 +1,5 @@
-from qokit.portfolio_optimization import get_problem, get_problem_H, get_problem_H_bf, po_obj_func, portfolio_brute_force, get_sk_ini
+from qokit.portfolio_optimization import get_problem, get_problem_H, get_problem_H_bf, po_obj_func, \
+    portfolio_brute_force, get_sk_ini, po_obj_func_vector
 from qokit.utils import precompute_energies, reverse_array_index_bit_order
 from qokit.qaoa_circuit_portfolio import (
     circuit_measurement_function,
@@ -37,6 +38,21 @@ def test_portfolio_precompute():
 
 
 ##################################################
+
+def test_portfolio_precompute_vector():
+    N = 6
+    K = 5
+    q = 0.5
+    seed = None
+    scale = 1
+    po_problem = get_problem(N=N, K=K, q=q, seed=seed, pre="rule")
+
+    po_obj = po_obj_func_vector(po_problem)
+    precomputed_energies = reverse_array_index_bit_order(precompute_energies(po_obj,N, ))
+
+    H_diag = np.diag(get_problem_H(po_problem))
+    np.allclose(precomputed_energies, H_diag)
+
 
 
 @pytest.mark.parametrize("simname_ring", simulators_to_run)
@@ -154,3 +170,31 @@ def test_best_bitstring():
     po_obj = po_obj_func(po_problem)
     precomputed_energies = reverse_array_index_bit_order(precompute_energies(po_obj, N)).real
     assert np.isclose(precomputed_energies[bitstring_loc[0]], bf_result[0])
+
+def test_qaoa_portfolio_objective_qiskit_simulator_vector():
+    K = 3
+    q = 0.5
+    seed = 2053
+    scale = 10
+    for N in [4, 5]:
+        po_problem = get_problem(N=N, K=K, q=q, seed=seed, pre=scale)
+        for p in [1, 2]:
+            for T in [1, 2]:
+                qaoa_obj = get_qaoa_portfolio_objective(po_problem=po_problem, p=p, ini="dicke", mixer="trotter_ring", T=T, simulator="python", precomputed_energies="vectorized")
+                qaoa_obj2 = get_qaoa_portfolio_objective(po_problem=po_problem, p=p, ini="dicke", mixer="trotter_ring", T=T, simulator="python")
+                x0 = np.random.rand(p * 2)
+                assert np.isclose(qaoa_obj(x0), qaoa_obj2(x0))
+
+def test_qaoa_portfolio_objective_qiskit_simulator_vector():
+    K = 3
+    q = 0.5
+    seed = 2053
+    scale = 10
+    for N in [4, 5]:
+        po_problem = get_problem(N=N, K=K, q=q, seed=seed, pre=scale)
+        for p in [1, 2]:
+            for T in [1, 2]:
+                qaoa_obj = get_qaoa_portfolio_objective(po_problem=po_problem, p=p, ini="dicke", mixer="trotter_ring", T=T, simulator="qiskit", precomputed_energies="vectorized")
+                qaoa_obj2 = get_qaoa_portfolio_objective(po_problem=po_problem, p=p, ini="dicke", mixer="trotter_ring", T=T, simulator="qiskit")
+                x0 = np.random.rand(p * 2)
+                assert np.isclose(qaoa_obj(x0), qaoa_obj2(x0))

@@ -10,7 +10,7 @@ def benchmark(func, N, K, q, seed, pre, repeat=3):
         times.append(time.perf_counter() - start)
     return min(times)
 
-Ns = list(range(4, 21, 2))
+Ns = list(range(4, 25, 2))
 q = 0.5
 seed = 1
 pre = 'rule'
