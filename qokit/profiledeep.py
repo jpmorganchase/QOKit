@@ -7,6 +7,7 @@ from qokit.utils import precompute_energies, reverse_array_index_bit_order
 import cProfile, pstats
 import multiprocessing
 import numpy as np
+import nlopt
 
 def profile_get_problem(N=22, pre='rule'):
     #first call to call get data and avoid connection issue
@@ -66,11 +67,45 @@ def profile_init(p=6):
     print(f"Cumulative stats length: {len(stats.stats)}")
     stats.sort_stats('cumulative').print_stats(20)
 
+def minimize_nlopt(f, x0, rhobeg=None, p=None):
+    def nlopt_wrapper(x, grad):
+        if grad.size > 0:
+            sys.exit("Shouldn't be calling a gradient!")
+        return f(x).real
+
+    opt = nlopt.opt(nlopt.LN_BOBYQA, 2 * p)
+    opt.set_min_objective(nlopt_wrapper)
+
+    opt.set_xtol_rel(1e-8)
+    opt.set_ftol_rel(1e-8)
+    opt.set_initial_step(rhobeg)
+    xstar = opt.optimize(x0)
+    minf = opt.last_optimum_value()
+
+    return xstar, minf
+
 if __name__ == '__main__':
     #profile_get_problem()
-    profile_get_objective(N=22)
+    #profile_get_objective(N=22)
     #profile_init(p=6)
+    N= 20
+    p=1
+    K, q, seed, pre = 3, 0.5, 1, 'rule'
+    po_problem = get_problem(N=N, K=K, q=q, seed=seed, pre=pre)
+    profiler = cProfile.Profile()
+    profiler.enable()
+    po_problem = get_problem(N=N, K=K, q=q, seed=seed, pre=pre)
 
+    qaoa_obj = get_qaoa_portfolio_objective(po_problem=po_problem, p=p, ini='dicke', mixer='trotter_ring', T=1,
+                                            simulator='python', precomputed_energies="vectorized")
+    x0 = get_sk_ini(p=p)
+
+    po_energy = qaoa_obj(x0).real
+    _, opt_energy = minimize_nlopt(qaoa_obj, x0, p=1, rhobeg=0.01 / 1)
+    profiler.disable()
+    stats = pstats.Stats(profiler)
+    print(f"Cumulative stats length: {len(stats.stats)}")
+    stats.sort_stats('cumulative').print_stats(50)
 
 
 

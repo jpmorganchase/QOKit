@@ -112,8 +112,39 @@ def state_to_ampl_counts(vec, eps: float = 1e-15):
             counts[format(kk, str_format)] = val
     return counts
 
+def precompute_energies(obj_f, nbits: int, *args: object, **kwargs: object):
+    """
+    Precomputed a vector of objective function values
+    that accelerates the energy computation in obj_from_statevector
 
-def precompute_energies(obj_f, nbits: int, *args: object, chunk_size: int = 2**18, **kwargs: object):
+    For LABS-specific, accelerated version see get_precomputed_labs_merit_factors in qaoa_objective_labs.py
+
+
+    Parameters
+    ----------
+    obj_f : callable
+        Objective function to precompute
+    nbits : int
+        Number of parameters obj_f takes
+    num_processes : int
+        Number of processes to use. Default: 1 (serial)
+        if num_processes > 1, pathos.Pool is used
+    *args, **kwargs : Objec
+        Parameters to be passed directly to obj_f
+
+    Returns
+    -------
+    energies : np.array
+        vector of energies such that E = energies.dot(amplitudes)
+        where amplitudes are absolute values squared of qiskit statevector
+
+    """
+    bit_strings = (((np.array(range(2**nbits))[:, None] & (1 << np.arange(nbits)))) > 0).astype(int)
+
+    return np.array([obj_f(x, *args, **kwargs) for x in bit_strings])
+
+
+def precompute_energies_vectorized(obj_f, nbits: int, *args: object, chunk_size: int = 2**18, **kwargs: object):
     """
     Precompute a vector of objective function values efficiently, scalable for large nbits.
     Processes bitstrings in chunks and stores results in memory (no file storage).
@@ -154,7 +185,6 @@ def precompute_energies(obj_f, nbits: int, *args: object, chunk_size: int = 2**1
         energies[start:end] = result
 
     return energies
-
 
 def yield_all_bitstrings(nbits: int):
     """

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import numpy as np
-from .utils import precompute_energies, reverse_array_index_bit_order
+from .utils import precompute_energies, reverse_array_index_bit_order, precompute_energies_vectorized
 from .portfolio_optimization import get_configuration_cost_kw, po_obj_func, portfolio_brute_force, po_obj_func_vector
 from qokit.qaoa_circuit_portfolio import generate_dicke_state_fast, get_parameterized_qaoa_circuit
 from .qaoa_objective import get_qaoa_objective
@@ -55,7 +55,7 @@ def get_qaoa_portfolio_objective(
         precomputed_energies = reverse_array_index_bit_order(precompute_energies(po_obj, N)).real
     elif precomputed_energies =="vectorized":
         po_obj = po_obj_func_vector(po_problem)
-        precomputed_energies = reverse_array_index_bit_order(precompute_energies(po_obj, N)).real
+        precomputed_energies = reverse_array_index_bit_order(precompute_energies_vectorized(po_obj, N)).real
     if simulator == "qiskit":
         parameterized_circuit = get_parameterized_qaoa_circuit(po_problem, depth=p, ini=ini, mixer=mixer, T=T)
     else:

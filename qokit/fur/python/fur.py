@@ -4,11 +4,19 @@
 ###############################################################################
 import math
 import numpy as np
+from numba import njit, prange
 
+from qokit.config import USE_NUMBA
+if USE_NUMBA:
+    from numba import njit
+else:
+    def njit(*args, **kwargs):
+        return lambda f: f
 
 ########################################
 # single-qubit X rotation
 ########################################
+@njit(fastmath=True, cache=True)
 def furx(x: np.ndarray, theta: float, q: int) -> np.ndarray:
     """
     Applies e^{-i theta X} on qubit indexed by q
@@ -25,11 +33,15 @@ def furx(x: np.ndarray, theta: float, q: int) -> np.ndarray:
     for i in range(n_groups):
         ia = (i & mask1) | ((i & mask2) << 1)
         ib = ia | (1 << q)
-        x[ia], x[ib] = wa * x[ia] + wb * x[ib], wb * x[ia] + wa * x[ib]
+        a = x[ia]
+        b = x[ib]
+        x[ia] = wa * a + wb * b
+        x[ib] = wb * a + wa * b
 
     return x
 
 
+@njit(fastmath=True, cache=True)
 def furx_all(x: np.ndarray, theta: float, n_qubits: int) -> np.ndarray:
     """
     Applies e^{-i theta X} on all qubits
@@ -42,6 +54,7 @@ def furx_all(x: np.ndarray, theta: float, n_qubits: int) -> np.ndarray:
 ########################################
 # two-qubit XX+YY rotation
 ########################################
+@njit(fastmath=True, cache=True)
 def furxy(x: np.ndarray, theta: float, q1: int, q2: int) -> np.ndarray:
     """
     Applies e^{-i theta (XX + YY)} on q1, q2
@@ -67,11 +80,15 @@ def furxy(x: np.ndarray, theta: float, q1: int, q2: int) -> np.ndarray:
         i0 = (i & mask1) | ((i & maskm) << 1) | ((i & mask2) << 2)
         ia = i0 | (1 << q1)
         ib = i0 | (1 << q2)
-        x[ia], x[ib] = wa * x[ia] + wb * x[ib], wb * x[ia] + wa * x[ib]
+        a = x[ia]
+        b = x[ib]
+        x[ia] = wa * a + wb * b
+        x[ib] = wb * a + wa * b
 
     return x
 
 
+@njit(fastmath=True, cache=True)
 def furxy_ring(x: np.ndarray, theta: float, n_qubits: int) -> np.ndarray:
     """
     Applies e^{-i theta (XX + YY)} on all adjacent pairs of qubits (with wrap-around)
@@ -84,6 +101,7 @@ def furxy_ring(x: np.ndarray, theta: float, n_qubits: int) -> np.ndarray:
     return x
 
 
+@njit(fastmath=True, cache=True)
 def furxy_complete(x: np.ndarray, theta: float, n_qubits: int) -> np.ndarray:
     """
     Applies e^{-i theta (XX + YY)} on all pairs of qubits
