@@ -11,7 +11,7 @@ from qiskit.circuit import ParameterVector
 from .utils import reverse_array_index_bit_order, state_to_ampl_counts
 
 from qiskit.quantum_info import Statevector
-
+from qiskit.circuit.library import RXXGate, RYYGate # Import if not already present
 
 def generate_dicke_state_fast(N, K):
     """
@@ -25,21 +25,38 @@ def generate_dicke_state_fast(N, K):
     return s
 
 
-def get_cost_circuit(po_problem, qc, gamma):
-    """
-    Construct the problem Hamiltonian layer for QAOA circuit
-    H = 0.5*q\sum_{i=1}^{n-1} \sum_{j=i+1}^n \sigma_{ij}Z_i Z_j + 0.5 \sum_i (-q\sum_{j=1}^n{\sigma_ij} + \mu_i) Z_i + Constant
-    """
-    q = po_problem["q"]
-    means = po_problem["means"]
-    cov = po_problem["cov"]
-    N = po_problem["N"]
-    for i in range(N):
-        qc.rz((means[i] - q * np.sum(cov[i, :])) * gamma, i)  # there is a 0.5 inside rz and rzz
-    for i in range(N - 1):
-        for j in range(i + 1, N):
-            qc.rzz(q * cov[i, j] * gamma, i, j)
-    return qc
+# def get_cost_circuit(po_problem, qc, gamma):
+#     """
+#     Construct the problem Hamiltonian layer for QAOA circuit
+#     H = 0.5*q\sum_{i=1}^{n-1} \sum_{j=i+1}^n \sigma_{ij}Z_i Z_j + 0.5 \sum_i (-q\sum_{j=1}^n{\sigma_ij} + \mu_i) Z_i + Constant
+#     """
+#     q = po_problem["q"]
+#     means = po_problem["means"]
+#     cov = po_problem["cov"]
+#     N = po_problem["N"]
+#     for i in range(N):
+#         qc.rz((means[i] - q * np.sum(cov[i, :])) * gamma, i)  # there is a 0.5 inside rz and rzz
+#     for i in range(N - 1):
+#         for j in range(i + 1, N):
+#             qc.rzz(q * cov[i, j] * gamma, i, j)
+#     return qc
+def get_cost_circuit(qr, J_coeffs, h_coeffs, gamma, T=1): # <<-- IMPORTANT: Change signature to take J_coeffs, h_coeffs
+    qc_cost = QuantumCircuit(qr)
+    # Apply RZ gates for linear terms (h_i Z_i)
+    for i in range(qr.size):
+        if i in h_coeffs and h_coeffs[i] != 0:
+            qc_cost.rz(2 * h_coeffs[i] * gamma * T, qr[i]) # Rz expects 2 * angle * time
+
+    # Apply RZZ gates for quadratic terms (J_ij Z_i Z_j)
+    for (i, j), val in J_coeffs.items():
+        if val != 0:
+            # Ensure i < j for consistency if J_coeffs only has (i,j) where i<j
+            # If J_coeffs might have (j,i) as well, normalize it or iterate appropriately
+            qc_cost.rzz(2 * val * gamma * T, qr[i], qr[j]) # Rzz expects 2 * angle * time
+    return qc_cost
+
+# The get_parameterized_qaoa_circuit should then call it like:
+# qc_qaoa.compose(get_cost_circuit(qr, po_problem["J"], po_problem["h"], gamma[layer], T=T), inplace=True)
 
 
 def get_dicke_init(N, K):
@@ -52,31 +69,45 @@ def get_dicke_init(N, K):
     return dicke_simple(N, K)
 
 
-def get_mixer_Txy(qc, beta, minus=False, T=None):
+def get_mixer_Txy(qubits, beta, T=1, mixer_topology='complete'):
     """
-    H_{even} = \sum_{i is even} (X_i X_{i+1} + Y_i Y_{i+1})
-    H_{odd} = \sum_{i is odd} (X_i X_{i+1} + Y_i Y_{i+1})
-    H_{last} = X_{end} X_0 + Y_{end} Y_0
-    U = {exp[-i*angle*H_{even}] exp[-i*angle*H_{odd}] exp[-i*angle*H_{last}]} ^ T  #repeat T times
+    Generates the Trotterized XY Mixer Hamiltonian circuit (e^{-i beta H_M T}).
+
+    Args:
+        qubits (list): List of Qiskit QuantumRegister qubits.
+        beta (float): Parameter for the mixer Hamiltonian.
+        T (float): Trotterization step (usually 1 for full Trotter step).
+        mixer_topology (str): Defines the connectivity for XY interactions.
+                              'complete': All-to-all connectivity (default, for small N).
+                              'linear': Linear chain connectivity (i, i+1).
+                              'ring': Ring connectivity (i, i+1 and N-1, 0).
+    Returns:
+        QuantumCircuit: Circuit for the mixer operation.
     """
-    if minus == True:
-        beta = -beta
-    N = len(qc.qubits)
-    if T is None:
-        T = 1
-    beta = beta / T
-    for _ in range(int(T)):
-        for i in range(0, N - 1, 2):
-            # even Exp[-j*angle*(XX+YY)]
-            # qc.append(qiskit.circuit.library.XXPlusYYGate(4 * beta), [i, i + 1])
-            qc.append(qiskit.circuit.library.XXPlusYYGate(4 * beta), [N - 2 - i, N - 1 - i])
-        for i in range(1, N - 1, 2):
-            # odd Exp[-j*angle*(XX+YY)]
-            # qc.append(qiskit.circuit.library.XXPlusYYGate(4 * beta), [i, i + 1])
-            qc.append(qiskit.circuit.library.XXPlusYYGate(4 * beta), [N - 2 - i, N - 1 - i])
-        # last uniary
-        qc.append(qiskit.circuit.library.XXPlusYYGate(4 * beta), [N - 1, 0])
-    return qc
+    qc_mixer = QuantumCircuit(qubits)
+    N = len(qubits)
+
+    if mixer_topology == 'complete':
+        # This is your current all-to-all implementation
+        for i in range(N):
+            for j in range(i + 1, N):
+                qc_mixer.rxx(2 * beta * T, qubits[i], qubits[j])
+                qc_mixer.ryy(2 * beta * T, qubits[i], qubits[j])
+    elif mixer_topology == 'linear':
+        # Linear chain: (0,1), (1,2), ..., (N-2, N-1)
+        for i in range(N - 1):
+            qc_mixer.rxx(2 * beta * T, qubits[i], qubits[i+1])
+            qc_mixer.ryy(2 * beta * T, qubits[i], qubits[i+1])
+    elif mixer_topology == 'ring':
+        # Ring: (0,1), ..., (N-2, N-1), (N-1, 0)
+        for i in range(N):
+            j = (i + 1) % N
+            qc_mixer.rxx(2 * beta * T, qubits[i], qubits[j])
+            qc_mixer.ryy(2 * beta * T, qubits[i], qubits[j])
+    else:
+        raise ValueError(f"Unknown mixer_topology: {mixer_topology}. Choose from 'complete', 'linear', 'ring'.")
+
+    return qc_mixer
 
 
 def get_mixer_RX(qc, beta):
@@ -131,45 +162,46 @@ def get_qaoa_circuit(
     return circuit
 
 
-def get_parameterized_qaoa_circuit(
-    po_problem, depth, ini="dicke", mixer="trotter_ring", T=1, ini_state=None, save_state=True, minus=False, return_parameter_vectors: bool = False
-):
+def get_parameterized_qaoa_circuit(po_problem, depth=1, ini_type='uniform', mixer_type='trotter_ring', T=1, simulator='qiskit', mixer_topology='complete', gamma=None, beta=None): # <--- ADD gamma and beta
     """
-    Put all ingredients together to build up a qaoa circuit parameterized by gamma & beta
-    Minus is for define mixer with a minus sign, for checking phase diagram
+    Returns the parameterized QAOA circuit for portfolio optimization.
+    # ... (rest of docstring) ...
     """
     N = po_problem["N"]
-    K = po_problem["K"]
-    if ini_state is not None:
-        q = QuantumRegister(N)
-        circuit = QuantumCircuit(q)
-        circuit.initialize(ini_state, [q[i] for i in range(N)])
+    qr = QuantumRegister(N, 'q') # <--- ADD THIS LINE! Define the quantum register
+    qc_qaoa = QuantumCircuit(qr) # <--- ADD/ENSURE THIS LINE! Initialize the quantum circuit
+
+    if ini_type == 'uniform':
+        # Apply Hadamard gates to all qubits for uniform superposition
+        for i in range(N):
+            qc_qaoa.h(qr[i])
+    elif ini_type == 'dicke':
+        # Use get_dicke_init to prepare the Dicke state
+        # K is needed for Dicke state, get it from po_problem
+        K = po_problem["K"] # <--- Ensure K is retrieved here if not already
+        qc_initial = get_dicke_init(N, K=K) # <<-- PASS N (the integer) instead of qr
+        qc_qaoa.compose(qc_initial, inplace=True)
     else:
-        if ini.lower() == "dicke":
-            circuit = get_dicke_init(N, K)
-        elif ini.lower() == "uniform":
-            circuit = get_uniform_init(N)
+        raise ValueError(f"Unknown initial state type: {ini_type}")
+    
+    
+    # QAOA layers
+    for layer in range(depth):
+        # Cost Hamiltonian (H_C)
+        # This part remains the same, as the DWE penalty is baked into po_problem['J'] and po_problem['h']
+        qc_qaoa.compose(get_cost_circuit(qr, po_problem["J"], po_problem["h"], gamma[layer], T=T), inplace=True)
+
+        # Mixer Hamiltonian (H_M)
+        if mixer_type == 'trotter_ring':
+            # Pass the new mixer_topology argument here
+            qc_qaoa.compose(get_mixer_Txy(qr, beta[layer], T=T, mixer_topology=mixer_topology), inplace=True) # Ensure beta[layer] is used
+        elif mixer_type == 'x_mixer':
+            qc_qaoa.compose(get_mixer_x(qr, beta[layer], T=T), inplace=True) # Ensure beta[layer] is used
         else:
-            raise ValueError("Undefined initial circuit")
+            raise ValueError(f"Unknown mixer type: {mixer_type}")
 
-    betas = ParameterVector("beta", depth)
-    gammas = ParameterVector("gamma", depth)
-
-    for i in range(depth):
-        circuit = get_cost_circuit(po_problem, circuit, gammas[i])
-        if mixer.lower() == "trotter_ring":
-            circuit = get_mixer_Txy(circuit, betas[i], minus=minus, T=T)  # minus should be false
-        elif mixer.lower() == "rx":
-            circuit = get_mixer_RX(circuit, betas[i])
-        else:
-            raise ValueError("Undefined mixer circuit")
-    if save_state is False:
-        circuit.measure_all()
-    if return_parameter_vectors:
-        return circuit, betas, gammas
-    else:
-        return circuit
-
+    return qc_qaoa
+    
 
 def get_energy_expectation(po_problem, samples):
     """Compute energy expectation from measurement samples"""
