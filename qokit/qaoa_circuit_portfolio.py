@@ -16,13 +16,14 @@ from qiskit.quantum_info import Statevector
 def generate_dicke_state_fast(N, K):
     """
     Generate the dicke state with yield function
+    Returns a contiguous np.complex128 array for performance.
     """
     index = yield_all_indices_cosntrained(N, K)
-    s = np.zeros(2**N)
+    s = np.zeros(2**N, dtype=np.complex128)
     for i in index:
-        s[i] = 1
+        s[i] = 1.0
     s = 1 / np.sqrt(np.sum(s)) * s
-    return s
+    return np.ascontiguousarray(s)
 
 
 def get_cost_circuit(po_problem, qc, gamma):

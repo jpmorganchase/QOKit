@@ -44,7 +44,7 @@ labels = []
 for use_numba in [False, True]:
     label = "With Numba" if use_numba else "Without Numba"
     print(f"Running benchmark: {label}")
-    elapsed = run_benchmark(use_numba)
+    elapsed = run_benchmark(use_numba, N=22)
     timings.append(elapsed)
     labels.append(label)
     print(f"{label}: {elapsed:.4f} seconds")

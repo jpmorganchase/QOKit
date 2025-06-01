@@ -8,10 +8,10 @@ from qokit.portfolio_optimization import get_problem, get_sk_ini
 from qokit.qaoa_objective_portfolio import get_qaoa_portfolio_objective
 import qokit.config
 
-N_values = list(range(6, 25,3))
-p_values = [1, 2,3]
-T_values = [1, 2]
-precomputed_energies_options = [None, "vectorized"]
+N_values = list(range(8, 25,3))
+p_values = [1,2]
+T_values = [1,2]
+precomputed_energies_options = ["vectorized",None]
 
 results = {}
 
@@ -19,7 +19,7 @@ for T in T_values:
     for p in p_values:
         for precomputed in precomputed_energies_options:
             if precomputed == "vectorized":
-                for use_numba in [False, True]:
+                for use_numba in [True, False]:
                     qokit.config.USE_NUMBA = use_numba
                     import qokit.fur.python.fur
                     importlib.reload(qokit.fur.python.fur)

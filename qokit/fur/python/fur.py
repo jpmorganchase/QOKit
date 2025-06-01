@@ -88,12 +88,13 @@ def furxy(x: np.ndarray, theta: float, q1: int, q2: int) -> np.ndarray:
     return x
 
 
-@njit(fastmath=True, cache=True)
+@njit(fastmath=True, cache=True, parallel=True)
 def furxy_ring(x: np.ndarray, theta: float, n_qubits: int) -> np.ndarray:
     """
     Applies e^{-i theta (XX + YY)} on all adjacent pairs of qubits (with wrap-around)
+    Parallelized with prange for speedup.
     """
-    for i in range(2):
+    for i in prange(2):
         for j in range(i, n_qubits - 1, 2):
             furxy(x, theta, j, j + 1)
     furxy(x, theta, 0, n_qubits - 1)
