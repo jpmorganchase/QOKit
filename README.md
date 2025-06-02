@@ -44,12 +44,6 @@ These enhancements were chosen due to their strong compatibility with Python-bas
 - **Domain Wall Encoding (DWE):**  
   We innovatively integrated Domain Wall Encoding with QAOA. DWE enables a more efficient and accurate representation of the portfolio selection problem by inherently enforcing the crucial constraint of selecting exactly K assets. This transforms the constrained problem into an unconstrained binary optimization problem (QUBO), ideally suited for QAOA. This leads to a specialized cost Hamiltonian, $H_C$, for our QAOA objective function:
 
-<!-- LaTeX (for math-aware renderers) -->
-$$
-  H_C = \sum_{i<j} J_{ij} \sigma_i^z \sigma_j^z + \sum_i h_i \sigma_i^z
-$$
-
-<!-- Fallback image for GitHub -->
 ![Cost Hamiltonian](https://latex.codecogs.com/svg.image?H_C%20%3D%20%5Csum_%7Bi%3Cj%7D%20J_%7Bij%7D%20%5Csigma_i%5Ez%20%5Csigma_j%5Ez%20&plus;%20%5Csum_i%20h_i%20%5Csigma_i%5Ez)
 
   Here, the coefficients $J_{ij}$ and $h_i$ are meticulously derived from the original portfolio optimization parameters (asset means $\mu$ and covariance matrix $\Sigma$) combined with a DWE-inspired penalty term $\lambda\sum$. This formulation cleverly embeds the portfolio size constraint directly into the energy landscape, ensuring that the lowest energy states correspond precisely to valid portfolios with K selected assets. A significant advantage of this DWE-penalty approach is its synergistic effect with the mixer Hamiltonian, guiding the quantum state evolution to predominantly explore only the valid subspace of solutions, thereby enhancing optimization efficiency.
