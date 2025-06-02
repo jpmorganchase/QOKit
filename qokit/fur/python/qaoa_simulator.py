@@ -54,7 +54,13 @@ class QAOAFastSimulatorPythonBase(QAOAFastSimulatorBase):
         @param sv0 (optional) initial statevector, default is uniform superposition state
         @return statevector or vector of probabilities
         """
-        sv = sv0.astype("complex") if sv0 is not None else self.default_sv0
+        if sv0 is not None:
+            if not (sv0.dtype == np.complex128 and sv0.flags['C_CONTIGUOUS']):
+                sv = np.ascontiguousarray(sv0, dtype=np.complex128)
+            else:
+                sv = sv0
+        else:
+            sv = self.default_sv0
         self._apply_qaoa(sv, list(gammas), list(betas), **kwargs)
         return sv
 

@@ -9,6 +9,7 @@ from functools import partial
 import itertools
 from typing import Any
 from qokit.parameter_utils import get_sk_gamma_beta
+from numba import njit
 
 from typing import Tuple, Optional, List, cast
 
@@ -245,18 +246,22 @@ def get_problem_H_bf(po_problem):
     return H_all2
 
 
-def hamming_weight(index: str) -> int:
+@njit(cache=True, fastmath=True)
+def hamming_weight(index: int) -> int:
     """
-    Calculate the hamming weight for a given bitstring
-    e.g. 107 == 1101011 --> 5
+    Calculate the hamming weight for a given integer using bitwise operations.
     """
-    binary = bin(index)[2:]
-    return binary.count("1")
+    count = 0
+    while index:
+        count += index & 1
+        index >>= 1
+    return count
 
 
+@njit(cache=True)
 def yield_all_indices_cosntrained(N: int, K: int):
     """
-    Helper function to avoid having to store all indices in memory
+    Numba-accelerated generator for indices with Hamming weight K.
     """
     for ind in range(2**N):
         if hamming_weight(ind) == K:
