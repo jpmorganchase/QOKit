@@ -5,37 +5,10 @@ import json
 from qokit.qaoa_circuit_portfolio import get_parameterized_qaoa_circuit
 from scipy.optimize import minimize
 from qiskit import QuantumCircuit, transpile
-
-# --- Qiskit Simulator Setup ---
-simulator = None
-try:
-    # Try importing AerSimulator directly from qiskit_aer (modern approach)
-    from qiskit_aer import AerSimulator
-
-    simulator = AerSimulator()
-    print("Using AerSimulator from qiskit_aer")
-except ImportError:
-    try:
-        # Fallback for older Qiskit versions or specific environments
-        # where Aer is in qiskit.providers.aer
-        from qiskit.providers.aer import Aer
-
-        simulator = Aer.get_backend('qasm_simulator')
-        print("Using Aer.get_backend('qasm_simulator') from qiskit.providers.aer")
-    except ImportError:
-        # If neither works, then qiskit-aer is likely not installed or accessible
-        print("Could not import AerSimulator or Aer from qiskit_aer or qiskit.providers.aer.")
-        print(
-            "Please ensure 'qiskit-aer' is installed (pip install qiskit-aer) or that your Qiskit installation is complete.")
-        # Re-raise the error to stop execution, as the simulator is critical
-        raise ImportError("Qiskit Aer backend not found. Please install qiskit-aer or check your Qiskit installation.")
-
-if simulator is None:
-    raise RuntimeError("Simulator backend could not be initialized. Check Qiskit Aer installation.")
-
+from qiskit_aer import AerSimulator # Import AerSimulator directly
 
 # --- Cost Function for QAOA ---
-def qaoa_cost_function(params, po_problem_arg, p_layers, num_shots_simulator, cost_function_calls):
+def qaoa_cost_function(params, po_problem_arg, p_layers, num_shots_simulator, transpilation_level, cost_function_calls, simulator_backend):
     """
     Computes the QAOA cost function for a given set of parameters (betas and gammas).
     This function will be minimized by scipy.optimize.
@@ -55,11 +28,11 @@ def qaoa_cost_function(params, po_problem_arg, p_layers, num_shots_simulator, co
     )
     qaoa_circuit.measure_all()  # Ensure measurements are added
 
-    # Transpile for the simulator
-    transpiled_circuit = transpile(qaoa_circuit, simulator, optimization_level=0)
+    # Transpile for the simulator with specified optimization_level
+    transpiled_circuit = transpile(qaoa_circuit, simulator_backend, optimization_level=transpilation_level)
 
     # Execute the circuit on the simulator
-    job = simulator.run(transpiled_circuit, shots=num_shots_simulator)  # Uses the passed num_shots_simulator
+    job = simulator_backend.run(transpiled_circuit, shots=num_shots_simulator)
     result = job.result()
     counts = result.get_counts(transpiled_circuit)
 
@@ -69,7 +42,6 @@ def qaoa_cost_function(params, po_problem_arg, p_layers, num_shots_simulator, co
 
     # Handle the case where total_shots is 0 (shouldn't happen with num_shots_simulator > 0 and no error)
     if total_shots == 0:
-        # This is an error condition, return a very high energy to penalize
         print(f"Warning: No shots recorded for bitstring counts in cost function. Counts: {counts}")
         return np.inf
 
@@ -77,8 +49,7 @@ def qaoa_cost_function(params, po_problem_arg, p_layers, num_shots_simulator, co
     h = po_problem_arg["h"]
 
     for bitstring, count in counts.items():
-        x = np.array([int(b) for b in
-                      bitstring[::-1]])  # Convert bitstring to numpy array (reversed to match Qiskit qubit order)
+        x = np.array([int(b) for b in bitstring[::-1]])  # Convert bitstring to numpy array (reversed to match Qiskit qubit order)
 
         # Calculate energy for this bitstring
         energy_for_bitstring = 0
@@ -103,7 +74,7 @@ def qaoa_cost_function(params, po_problem_arg, p_layers, num_shots_simulator, co
 
 # --- Worker Function for Parallel Processing ---
 def run_single_optimization(initial_point_tuple, po_problem_arg, p_layers, max_iterations_optimizer,
-                            num_shots_simulator, run_id):
+                            num_shots_simulator, run_id, transpilation_level):
     """
     Performs a single QAOA optimization run from a given initial point.
     This function is designed to be run in parallel processes.
@@ -111,24 +82,26 @@ def run_single_optimization(initial_point_tuple, po_problem_arg, p_layers, max_i
     start_time = time.perf_counter()
     initial_point = np.array(initial_point_tuple)
 
-    print(f"Run {run_id}: Starting optimization from initial point: {np.round(initial_point, 3)}")
-    print(f"Run {run_id}: Keys in po_problem_arg: {po_problem_arg.keys()}")
+    # Initialize simulator within the worker for robustness with multiprocessing
+    try:
+        simulator = AerSimulator()
+    except ImportError:
+        # Fallback for older Qiskit versions or specific environments
+        from qiskit.providers.aer import Aer
+        simulator = Aer.get_backend('qasm_simulator')
+
+    print(f"Run {run_id}: Starting optimization from initial point: {np.round(initial_point, 3)} with N={po_problem_arg['N']}, p={p_layers}, MaxIter={max_iterations_optimizer}, TL={transpilation_level}")
 
     cost_function_calls = [0]
 
     try:
         bounds = [(0, 2 * np.pi)] * p_layers + [(0, np.pi)] * p_layers
 
-        # --- DEBUG PRINT STATEMENT UPDATED TO REFLECT VARIABLE ---
-        print(
-            f"Run {run_id}: DEBUG - COBYLA optimizer options set to: {{'maxiter': {max_iterations_optimizer}, 'disp': False}}")
-        # --- END DEBUG PRINT ---
-
         result = minimize(qaoa_cost_function, initial_point,
-                          args=(po_problem_arg, p_layers, num_shots_simulator, cost_function_calls),
+                          args=(po_problem_arg, p_layers, num_shots_simulator, transpilation_level, cost_function_calls, simulator),
                           method='COBYLA', bounds=bounds,
                           options={'maxiter': max_iterations_optimizer,
-                                   'disp': False})  # Uses the passed max_iterations_optimizer
+                                   'disp': False})
 
         end_time = time.perf_counter()
         runtime = end_time - start_time
