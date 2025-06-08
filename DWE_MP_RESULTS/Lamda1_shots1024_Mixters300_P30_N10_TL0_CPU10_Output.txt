@@ -1,0 +1,112 @@
+--------------------------------------------------
+Starting 10 parallel QAOA optimization runs with p=30...
+Using AerSimulator from qiskit_aer
+Run 3: Starting optimization from initial point: [4.994 3.158 3.625 3.095 1.227 4.539 1.764 0.153 4.056 1.113 5.909 5.994
+ 5.748 2.326 0.097 5.833 2.69  6.074 6.055 5.36  1.85  2.42  5.348 1.991
+ 1.065 3.498 5.882 4.373 3.582 0.611 1.932 3.11  0.44  1.628 2.756 2.327
+ 2.19  2.207 1.129 0.922 2.543 2.545 2.724 2.869 1.606 1.576 2.508 2.042
+ 2.205 2.5   2.796 1.062 1.18  0.295 1.817 0.113 1.463 1.705 0.9   1.856]
+Run 3: Keys in po_problem_arg: dict_keys(['N', 'K', 'q', 'J', 'h', 'means', 'cov', 'q_orig', 'scale'])
+Run 3: DEBUG - COBYLA optimizer options set to: {'maxiter': 300, 'disp': False}
+Using AerSimulator from qiskit_aer
+Run 1: Starting optimization from initial point: [1.821 1.013 5.841 5.078 3.98  5.476 5.05  1.172 5.608 3.389 5.073 5.63
+ 1.998 0.691 1.432 2.684 5.14  5.408 0.044 3.209 2.623 1.396 0.753 2.121
+ 5.924 2.031 3.26  4.417 2.285 6.106 3.024 0.791 1.562 0.945 0.895 0.116
+ 1.915 1.579 0.162 0.875 2.853 0.753 0.455 1.538 3.097 0.76  2.112 2.393
+ 0.747 2.288 1.155 1.986 1.99  1.683 0.284 2.624 1.008 0.586 0.128 1.856]
+Run 1: Keys in po_problem_arg: dict_keys(['N', 'K', 'q', 'J', 'h', 'means', 'cov', 'q_orig', 'scale'])
+Run 1: DEBUG - COBYLA optimizer options set to: {'maxiter': 300, 'disp': False}
+Using AerSimulator from qiskit_aer
+Run 2: Starting optimization from initial point: [4.257 0.104 3.218 1.423 4.054 1.096 4.341 2.43  5.886 0.864 2.143 0.713
+ 5.81  5.512 1.621 4.147 5.135 3.488 3.328 1.52  0.585 5.637 5.657 3.978
+ 2.13  2.194 4.561 5.637 5.574 4.9   2.017 0.264 0.508 2.823 1.905 0.029
+ 0.319 2.084 0.016 0.505 1.724 2.174 2.048 0.705 2.237 0.745 1.022 2.345
+ 2.041 2.668 2.066 1.785 0.294 1.155 0.833 0.767 3.057 1.235 2.802 1.983]
+Run 2: Keys in po_problem_arg: dict_keys(['N', 'K', 'q', 'J', 'h', 'means', 'cov', 'q_orig', 'scale'])
+Run 2: DEBUG - COBYLA optimizer options set to: {'maxiter': 300, 'disp': False}
+Using AerSimulator from qiskit_aer
+Run 4: Starting optimization from initial point: [0.192 0.235 5.169 2.263 0.798 3.281 4.838 1.356 3.914 0.536 0.325 3.339
+ 3.397 4.005 4.562 6.131 3.244 2.029 4.996 1.702 2.758 0.493 0.159 6.048
+ 5.253 4.373 2.57  1.089 0.983 1.572 1.725 2.245 2.074 0.879 3.    2.318
+ 1.742 1.922 1.318 0.778 1.118 2.381 0.045 0.365 0.145 0.128 2.688 2.211
+ 1.49  0.307 1.544 1.487 0.544 1.363 1.252 1.935 1.995 0.142 1.177 1.966]
+Run 4: Keys in po_problem_arg: dict_keys(['N', 'K', 'q', 'J', 'h', 'means', 'cov', 'q_orig', 'scale'])
+Run 4: DEBUG - COBYLA optimizer options set to: {'maxiter': 300, 'disp': False}
+Using AerSimulator from qiskit_aer
+Run 7: Starting optimization from initial point: [0.076 6.094 0.271 5.599 3.316 6.239 0.464 3.48  6.09  3.287 3.955 4.372
+ 2.856 3.943 3.671 5.662 0.286 1.765 5.972 5.594 2.863 3.896 1.743 1.182
+ 2.914 2.22  3.667 0.488 6.122 6.197 2.193 1.684 0.972 2.557 2.151 0.511
+ 2.862 2.584 2.984 2.28  1.927 1.314 2.93  2.721 0.142 0.083 1.183 2.546
+ 3.102 0.473 1.867 1.197 3.047 2.646 2.634 1.472 1.303 0.859 0.177 2.717]
+Run 7: Keys in po_problem_arg: dict_keys(['N', 'K', 'q', 'J', 'h', 'means', 'cov', 'q_orig', 'scale'])
+Run 7: DEBUG - COBYLA optimizer options set to: {'maxiter': 300, 'disp': False}
+Using AerSimulator from qiskit_aer
+Run 10: Starting optimization from initial point: [0.546 3.375 3.687 4.684 2.712 0.802 1.783 2.281 4.058 3.586 2.237 6.198
+ 3.806 1.491 0.64  0.96  1.545 1.01  1.172 1.791 1.089 5.635 0.504 3.296
+ 2.579 6.172 0.704 2.5   6.091 5.438 2.567 0.81  0.537 2.101 2.92  1.749
+ 1.796 0.88  2.417 0.588 1.017 1.337 1.595 0.762 0.361 1.918 0.907 1.826
+ 0.485 1.512 1.673 0.163 1.057 0.422 0.199 3.11  1.013 2.544 0.8   2.141]
+Run 10: Keys in po_problem_arg: dict_keys(['N', 'K', 'q', 'J', 'h', 'means', 'cov', 'q_orig', 'scale'])
+Run 10: DEBUG - COBYLA optimizer options set to: {'maxiter': 300, 'disp': False}
+Using AerSimulator from qiskit_aer
+Run 9: Starting optimization from initial point: [0.872 4.027 1.143 2.172 5.635 2.978 4.194 1.083 1.208 0.257 1.061 1.75
+ 1.112 0.557 0.758 2.895 1.296 2.289 3.163 4.338 0.247 5.023 3.945 0.514
+ 5.489 5.786 0.384 1.74  5.066 4.701 0.58  0.658 1.164 1.522 1.942 1.159
+ 1.453 2.348 0.115 0.793 2.241 2.812 1.607 1.672 0.337 1.406 1.673 0.762
+ 0.846 1.185 0.063 1.012 0.664 1.029 0.376 2.798 1.865 2.133 2.479 1.566]
+Run 9: Keys in po_problem_arg: dict_keys(['N', 'K', 'q', 'J', 'h', 'means', 'cov', 'q_orig', 'scale'])
+Run 9: DEBUG - COBYLA optimizer options set to: {'maxiter': 300, 'disp': False}
+Using AerSimulator from qiskit_aer
+Run 5: Starting optimization from initial point: [3.161 5.381 4.139 1.024 0.443 4.036 0.167 3.681 5.908 3.616 2.439 4.042
+ 2.879 3.428 5.915 2.426 6.039 5.688 1.23  0.436 0.633 0.114 0.593 4.291
+ 0.447 2.004 5.309 0.146 5.117 1.771 0.371 2.189 1.976 2.757 2.309 2.524
+ 0.886 0.557 2.358 2.535 3.112 1.296 1.169 2.439 1.071 2.924 2.697 1.348
+ 2.359 2.37  0.324 2.835 1.587 2.596 1.005 2.813 1.223 0.034 2.844 0.287]
+Run 5: Keys in po_problem_arg: dict_keys(['N', 'K', 'q', 'J', 'h', 'means', 'cov', 'q_orig', 'scale'])
+Run 5: DEBUG - COBYLA optimizer options set to: {'maxiter': 300, 'disp': False}
+Using AerSimulator from qiskit_aer
+Run 6: Starting optimization from initial point: [2.006 5.969 5.973 3.603 3.97  2.818 1.842 2.065 4.226 4.727 4.974 4.961
+ 0.573 3.107 0.362 3.453 2.774 5.578 2.205 0.736 0.898 4.785 3.884 0.635
+ 0.528 4.404 0.457 5.164 4.437 0.511 0.267 3.1   1.176 1.164 2.553 2.976
+ 3.098 2.367 1.182 0.262 2.441 1.754 1.333 2.847 0.349 1.548 0.036 1.472
+ 0.177 0.373 0.369 2.04  2.344 1.833 3.023 1.178 0.898 2.729 0.702 3.026]
+Run 6: Keys in po_problem_arg: dict_keys(['N', 'K', 'q', 'J', 'h', 'means', 'cov', 'q_orig', 'scale'])
+Run 6: DEBUG - COBYLA optimizer options set to: {'maxiter': 300, 'disp': False}
+Using AerSimulator from qiskit_aer
+Run 8: Starting optimization from initial point: [5.108 6.281 6.262 3.49  4.832 5.936 5.338 1.554 2.831 0.812 5.994 3.809
+ 1.437 4.22  3.884 2.25  0.714 4.22  3.269 4.853 3.268 5.354 3.468 3.524
+ 5.508 2.535 0.842 0.181 4.745 3.898 2.212 0.669 0.428 0.046 1.101 1.853
+ 1.232 1.374 2.84  1.094 1.615 2.462 1.246 1.954 2.709 2.983 0.462 2.911
+ 1.546 0.811 1.442 3.079 1.548 1.033 1.99  0.754 0.238 0.405 0.402 0.477]
+Run 8: Keys in po_problem_arg: dict_keys(['N', 'K', 'q', 'J', 'h', 'means', 'cov', 'q_orig', 'scale'])
+Run 8: DEBUG - COBYLA optimizer options set to: {'maxiter': 300, 'disp': False}
+
+All parallel optimization runs completed in 68.92 seconds.
+
+--- Summary of All Individual Runs ---
+Run 2: Energy=-3.343279, Status=FAILED, Time=65.54s, NFEV=300, Message='Maximum number of function evaluations has been exceeded.'
+Run 5: Energy=-3.319110, Status=FAILED, Time=65.56s, NFEV=300, Message='Maximum number of function evaluations has been exceeded.'
+Run 10: Energy=-3.284675, Status=FAILED, Time=65.46s, NFEV=300, Message='Maximum number of function evaluations has been exceeded.'
+Run 6: Energy=-3.276642, Status=FAILED, Time=63.65s, NFEV=300, Message='Maximum number of function evaluations has been exceeded.'
+Run 7: Energy=-3.263937, Status=FAILED, Time=65.75s, NFEV=300, Message='Maximum number of function evaluations has been exceeded.'
+Run 3: Energy=-3.262480, Status=FAILED, Time=65.47s, NFEV=300, Message='Maximum number of function evaluations has been exceeded.'
+Run 4: Energy=-3.254991, Status=FAILED, Time=64.68s, NFEV=300, Message='Maximum number of function evaluations has been exceeded.'
+Run 8: Energy=-3.254492, Status=FAILED, Time=64.99s, NFEV=300, Message='Maximum number of function evaluations has been exceeded.'
+Run 1: Energy=-3.223261, Status=FAILED, Time=62.77s, NFEV=300, Message='Maximum number of function evaluations has been exceeded.'
+Run 9: Energy=-3.097935, Status=FAILED, Time=65.53s, NFEV=300, Message='Maximum number of function evaluations has been exceeded.'
+
+Total successful optimization runs: 0/10
+
+------------------------------------------------------------
+### Best Overall Result Found from Multi-Start (Lowest Energy) ###
+Best overall energy found: -3.343279
+Best overall parameters: [5.26  1.103 3.222 1.423 4.052 2.091 4.341 2.428 5.883 0.864 2.149 0.712
+ 5.811 5.512 1.622 4.15  5.132 3.487 3.327 1.519 0.584 5.639 5.668 4.
+ 2.132 2.195 4.559 5.639 5.569 4.897 2.015 0.263 0.506 2.821 1.904 0.021
+ 0.315 2.08  0.012 0.506 1.724 2.173 2.04  0.701 2.231 0.744 1.023 2.345
+ 2.035 2.665 2.076 1.837 0.29  1.154 0.834 0.768 3.055 1.237 2.803 1.983]
+This result came from Run ID: 2
+
+Classical Optimal Energy (E_min): -0.631253
+Classical Worst Energy (E_max): -0.240492
+Approximation Ratio (AR): -6.9404 (Closer to 0 is better)

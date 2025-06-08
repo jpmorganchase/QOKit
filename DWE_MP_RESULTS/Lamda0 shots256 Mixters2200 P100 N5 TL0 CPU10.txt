@@ -1,0 +1,75 @@
+--- Problem Parameters & Custom QUBO Defined for N=5 ---
+Number of assets (N): 5
+Assets to select (K): 2
+QAOA Layers (p): 100
+DWE Penalty Lambda_sum: 0
+Optimizer Max Iterations: 2200
+Simulator Shots: 256
+
+--- Calculated QUBO Coefficients ---
+
+Objective Hamiltonian (H_C^objective) Coefficients:
+  J_obj (Quadratic Terms):
+{
+  "(0, 1)": "0.000388",
+  "(0, 2)": "0.002087",
+  "(0, 3)": "0.002373",
+  "(0, 4)": "0.002863",
+  "(1, 2)": "0.002239",
+  "(1, 3)": "0.000866",
+  "(1, 4)": "0.000918",
+  "(2, 3)": "0.001517",
+  "(2, 4)": "0.001660",
+  "(3, 4)": "0.002085"
+}...
+  h_obj (Linear Terms):
+{
+  "0": "-0.052068",
+  "1": "-0.093856",
+  "2": "-0.078231",
+  "3": "-0.068508",
+  "4": "-0.035870"
+}
+
+Full Cost Hamiltonian (H_C = H_C^objective + H_C^DWE-penalty) Coefficients:
+  J_total (Quadratic Terms):
+{
+  "(0, 1)": "0.000388",
+  "(0, 2)": "0.002087",
+  "(0, 3)": "0.002373",
+  "(0, 4)": "0.002863",
+  "(1, 2)": "0.002239",
+  "(1, 3)": "0.000866",
+  "(1, 4)": "0.000918",
+  "(2, 3)": "0.001517",
+  "(2, 4)": "0.001660",
+  "(3, 4)": "0.002085"
+}...
+  h_total (Linear Terms):
+{
+  "0": "-0.052068",
+  "1": "-0.093856",
+  "2": "-0.078231",
+  "3": "-0.068508",
+  "4": "-0.035870"
+}
+--------------------------------------------------
+Calculating classical brute-force solution (may take time for N up to 20)...
+Brute-force classical optimal energy (E_min): -0.326987
+Brute-force classical worst energy (E_max): -0.160714
+--------------------------------------------------
+
+--- Example QAOA Circuit and Gate Operations ---
+
+Logical Circuit (before transpilation):
+  Circuit depth: 1804
+  Number of qubits: 5
+  Gate counts (logical gates):
+OrderedDict({'rzz': 1000, 'rxx': 1000, 'ryy': 1000, 'rz': 500, 'h': 5, 'measure': 5, 'barrier': 1})
+
+Transpiled Circuit (optimization_level=0):
+  Transpiled circuit depth: 1804
+  Transpiled gate counts:
+OrderedDict({'rzz': 1000, 'rxx': 1000, 'ryy': 1000, 'rz': 500, 'h': 5, 'measure': 5, 'barrier': 1})
+
+Visualizing an Example QAOA Circuit (with dummy parameters and measurements):

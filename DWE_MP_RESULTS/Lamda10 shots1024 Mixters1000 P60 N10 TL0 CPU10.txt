@@ -1,0 +1,104 @@
+--- Problem Parameters & Custom QUBO Defined for N=10 ---
+Number of assets (N): 10
+Assets to select (K): 4
+QAOA Layers (p): 60
+DWE Penalty Lambda_sum: 10
+Optimizer Max Iterations: 1000
+Simulator Shots: 1024
+
+--- Calculated QUBO Coefficients ---
+
+Objective Hamiltonian (H_C^objective) Coefficients:
+  J_obj (Quadratic Terms):
+{
+  "(0, 1)": "0.000755",
+  "(0, 2)": "0.000692",
+  "(0, 3)": "0.000209",
+  "(0, 4)": "0.000566",
+  "(0, 5)": "0.000313",
+  "(0, 6)": "0.000533",
+  "(0, 7)": "0.000670",
+  "(0, 8)": "0.000304",
+  "(0, 9)": "0.000204",
+  "(1, 2)": "0.000265",
+  "(1, 3)": "0.000439",
+  "(1, 4)": "0.000601",
+  "(1, 5)": "0.000525",
+  "(1, 6)": "0.000237",
+  "(1, 7)": "0.000560",
+  "(1, 8)": "0.000634",
+  "(1, 9)": "0.000361",
+  "(2, 3)": "0.000493",
+  "(2, 4)": "0.000896",
+  "(2, 5)": "0.000779",
+  "(2, 6)": "0.000...
+  h_obj (Linear Terms):
+{
+  "0": "-0.026349",
+  "1": "-0.047903",
+  "2": "-0.039734",
+  "3": "-0.034364",
+  "4": "-0.017902",
+  "5": "-0.017925",
+  "6": "-0.014153",
+  "7": "-0.044515",
+  "8": "-0.034843",
+  "9": "-0.038832"
+}
+
+Full Cost Hamiltonian (H_C = H_C^objective + H_C^DWE-penalty) Coefficients:
+  J_total (Quadratic Terms):
+{
+  "(0, 1)": "20.000755",
+  "(0, 2)": "20.000692",
+  "(0, 3)": "20.000209",
+  "(0, 4)": "20.000566",
+  "(0, 5)": "20.000313",
+  "(0, 6)": "20.000533",
+  "(0, 7)": "20.000670",
+  "(0, 8)": "20.000304",
+  "(0, 9)": "20.000204",
+  "(1, 2)": "20.000265",
+  "(1, 3)": "20.000439",
+  "(1, 4)": "20.000601",
+  "(1, 5)": "20.000525",
+  "(1, 6)": "20.000237",
+  "(1, 7)": "20.000560",
+  "(1, 8)": "20.000634",
+  "(1, 9)": "20.000361",
+  "(2, 3)": "20.000493",
+  "(2, 4)": "20.000896",
+  "(2, 5)": "20.000779"...
+  h_total (Linear Terms):
+{
+  "0": "-50.026349",
+  "1": "-50.047903",
+  "2": "-50.039734",
+  "3": "-50.034364",
+  "4": "-50.017902",
+  "5": "-50.017925",
+  "6": "-50.014153",
+  "7": "-50.044515",
+  "8": "-50.034843",
+  "9": "-50.038832"
+}
+--------------------------------------------------
+Calculating classical brute-force solution (may take time for N up to 20)...
+Brute-force classical optimal energy (E_min): -0.631253
+Brute-force classical worst energy (E_max): -0.240492
+--------------------------------------------------
+
+--- Example QAOA Circuit and Gate Operations ---
+
+Logical Circuit (before transpilation):
+  Circuit depth: 2289
+  Number of qubits: 10
+  Gate counts (logical gates):
+OrderedDict({'rzz': 2700, 'rxx': 2700, 'ryy': 2700, 'rz': 600, 'h': 10, 'measure': 10, 'barrier': 1})
+
+Transpiled Circuit (optimization_level=0):
+  Transpiled circuit depth: 2289
+  Transpiled gate counts:
+OrderedDict({'rzz': 2700, 'rxx': 2700, 'ryy': 2700, 'rz': 600, 'h': 10, 'measure': 10, 'barrier': 1})
+
+Visualizing an Example QAOA Circuit (with dummy parameters and measurements):
