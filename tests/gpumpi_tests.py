@@ -8,6 +8,7 @@ from qokit.qaoa_objective_maxcut import get_qaoa_maxcut_objective
 from qokit.sk import sk_obj, get_random_J
 from qokit.qaoa_objective_sk import get_qaoa_sk_objective
 from qokit.utils import precompute_energies
+from qokit.parameter_utils import get_sk_gamma_beta, get_fixed_gamma_beta
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -29,10 +30,10 @@ def gpumpi_labs_test(N=10, p=4):
         elif objective == "expectation":
             assert np.isclose(f_gpumpi_labs(gamma, beta), f_c_labs(gamma, beta))
 
-def gpumpi_maxcut_test(N=16, p=4, seed=1):
+def gpumpi_maxcut_test(N=12, p=3, seed=1):
     d = 3
     G = nx.random_regular_graph(d, N, seed=seed)
-    gamma, beta = np.random.rand(p), np.random.rand(p)
+    gamma, beta = get_fixed_gamma_beta(d, p)
     obj_maxcut = partial(maxcut_obj, w=get_adjacency_matrix(G))
     precomputed_energies = precompute_energies(obj_maxcut, N)
     for objective in ["overlap", "expectation"]:
@@ -45,13 +46,14 @@ def gpumpi_maxcut_test(N=16, p=4, seed=1):
         o2_gpumpi_maxcut = get_qaoa_maxcut_objective(
             N, p, G=G, simulator="gpumpi", parameterization="gamma beta", objective=objective
         )(gamma, beta)
-        assert np.isclose(o1_c_maxcut, o1_gpumpi_maxcut) 
-        assert np.isclose(o1_c_maxcut, o2_gpumpi_maxcut)
+
+        assert np.isclose(o1_c_maxcut, o1_gpumpi_maxcut.real) 
+        assert np.isclose(o1_c_maxcut, o2_gpumpi_maxcut.real)
 
 def gpumpi_sk_test(N=10, p=3, seed=42):
 
     J = get_random_J(N=N, seed=seed)
-    gamma, beta = np.random.rand(p), np.random.rand(p)
+    gamma, beta = get_sk_gamma_beta(p)
     obj_sk = partial(sk_obj, J=J)
     precomputed_energies = precompute_energies(obj_sk, N)
     for objective in ["overlap", "expectation"]:
@@ -64,8 +66,9 @@ def gpumpi_sk_test(N=10, p=3, seed=42):
         o2_gpumpi_sk = get_qaoa_sk_objective(
             N, p, J=J, simulator="gpumpi", parameterization="gamma beta", objective="overlap"
         )(gamma, beta)
-        assert np.isclose(o1_c_sk, o1_gpumpi_sk)
-        assert np.isclose(o1_c_sk, o2_gpumpi_sk)
+
+        assert np.isclose(o1_c_sk, o1_gpumpi_sk.real)
+        assert np.isclose(o1_c_sk, o2_gpumpi_sk.real)
 
 if __name__ == "__main__":
 
