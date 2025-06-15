@@ -33,13 +33,16 @@ is_gpumpi = "gpumpi" in simulators
 is_gpu = "gpu" in simulators
 SCRIPT_DIR = Path(__file__).resolve().parent
 
+
 @pytest.mark.skipif(not is_nvlink, reason="NVLINK not available.")
 def test_gpumpi(n_procs=n_gpumpi):
     result = subprocess.run(["mpirun", "-np", str(n_procs), "python", f"{SCRIPT_DIR}/gpumpi_tests.py"], capture_output=True, text=True, check=True)
 
+
 @pytest.mark.skipif(not is_gpu, reason="GPU simulator not available.")
 def test_gpumpi_singleprocs():
     result = subprocess.run(["python", f"{SCRIPT_DIR}/gpumpi_tests.py"], capture_output=True, text=True, check=True)
+
 
 @pytest.mark.skipif(not is_gpu, reason="GPU simulator not available.")
 def test_gpu_labs(N=16, p=4, seed=1):
