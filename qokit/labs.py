@@ -86,6 +86,7 @@ true_optimal_energy = {
     35: 73,
 }
 
+
 def get_terms_offset(N: int):
     """
     Retrun `offset` for QAOA LABS problem
@@ -105,6 +106,7 @@ def get_terms_offset(N: int):
     """
     terms, offset = get_energy_term_indices_offset(N)
     return offset
+
 
 def get_term_indices(N: int) -> list:
     """Return indices of Pauli Zs in the LABS problem definition
@@ -363,7 +365,6 @@ def negative_merit_factor_from_bitstring(x, N: int | None = None) -> float:
         negative merit factor of s
     """
     return -merit_factor(1 - 2 * x, N=N)
-
 
 
 def get_depth_optimized_terms(N: int) -> list:

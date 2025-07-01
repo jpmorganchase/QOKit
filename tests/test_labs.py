@@ -67,5 +67,6 @@ def test_energy_vals():
         _energy_vals_general = energy_vals_general(s, terms=terms, offset=offset, check_parameters=True)
         _energy_vals = energy_vals(s, N=N)
         assert np.isclose(
-            _energy_vals_general, _energy_vals,
+            _energy_vals_general,
+            _energy_vals,
         )
