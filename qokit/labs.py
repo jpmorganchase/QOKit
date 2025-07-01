@@ -86,10 +86,9 @@ true_optimal_energy = {
     35: 73,
 }
 
-
 def get_terms_offset(N: int):
     """
-    Retrun `terms` and `offset` for QAOA LABS problem
+    Retrun `offset` for QAOA LABS problem
 
     Parameters
     ----------
@@ -98,23 +97,16 @@ def get_terms_offset(N: int):
 
     Returns
     -------
-    terms : Sequence of `(float, term)`, where `term` is a tuple of ints.
-        Each term corresponds to a summand in the cost Hamiltonian
-        and th float value is the coefficient of this term.
-        e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
-        the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
 
     offset : int
         energy offset required due to constant factors (identity terms)
         not included in the Hamiltonian
 
     """
-    terms, offset = get_energy_term_indices(N)
-    print("terms:", terms)
-    return terms, offset
+    terms, offset = get_energy_term_indices_offset(N)
+    return offset
 
-
-def get_energy_term_indices(N: int):
+def get_term_indices(N: int) -> list:
     """Return indices of Pauli Zs in the LABS problem definition
 
     Parameters
@@ -125,9 +117,52 @@ def get_energy_term_indices(N: int):
     Returns
     -------
     terms : list of tuples
-        List of tuples, where each tuple defines a summand
+        List of ordered tuples, where each tuple defines a summand
         and contains indices of the Pauli Zs in the product
         e.g. if terms = [(0,1), (0,1,2,3), (1,2)]
+        the Hamiltonian is Z0Z1 + Z0Z1Z2Z3 + Z1Z2
+    """
+    terms_with_weight, offset = get_energy_term_indices_offset(N)
+    terms = [term[1] for term in terms_with_weight]
+    return terms
+
+
+def get_terms(N: int) -> TermsType:
+    """Return terms definition of the LABS problem
+
+    Parameters
+    ----------
+    N : int
+        Problem size (number of spins)
+
+    Returns
+    -------
+    terms : TermsType
+        List of tuples (number, tuple) where the
+        tuple determines the location of Z operators
+        and the number is a scaling factor for the product.
+
+        e.g. if terms = [(2, (0,1)), (4, (0,1,2,3)), (2, (1,2))]
+        the Hamiltonian is 2*Z0Z1 + 4*Z0Z1Z2Z3 + 2*Z1Z2
+    """
+    terms, offset = get_energy_term_indices_offset(N)
+    return terms
+
+
+def get_energy_term_indices_offset(N: int):
+    """Return terms with indices and offset of Pauli Zs in the LABS problem definition
+
+    Parameters
+    ----------
+    N : int
+        Problem size (number of spins)
+
+    Returns
+    -------
+    terms : list of tuples
+        List of tuples, where each tuple defines a summand
+        and contains weight and indices of the Pauli Zs in the product
+        e.g. if terms = [(2, (0,1)), (4, (0,1,2,3)), (2, (1,2))]
         the Hamiltonian is Z0Z1 + Z0Z1Z2Z3 + Z1Z2
 
     offset : int
@@ -147,7 +182,7 @@ def get_energy_term_indices(N: int):
                 all_terms.append((2, tuple(sorted((i - 1, j + k - 1)))))
             else:
                 all_terms.append((4, tuple(sorted((i - 1, i + k - 1, j - 1, j + k - 1)))))
-    return all_terms, offset
+    return list(set(all_terms)), offset
 
 
 @njit()
@@ -208,8 +243,8 @@ def energy_vals_general(s: Sequence, terms: Iterable | None = None, offset: floa
         set(s) \in {+1, -1}
     terms : list-like, default None
     offset : float, default None
-        precomputed output of get_energy_term_indices
-        terms, offset = get_energy_term_indices(N)
+        precomputed output of get_energy_term_indices_offset
+        terms, offset = get_energy_term_indices_offset(N)
     check_parameters : bool, default True
         if set to False, no input validation is performed
     Returns
@@ -223,14 +258,10 @@ def energy_vals_general(s: Sequence, terms: Iterable | None = None, offset: floa
         assert set(s).issubset(set([-1, 1]))
     N = len(s)
     if terms is None or offset is None:
-        terms, offset = get_energy_term_indices(N)
+        terms, offset = get_energy_term_indices_offset(N)
     E_s = offset
-    print("s from energy_vals_general:", s)
-    print("terms:", terms)
     for term in terms:
         len_term, val_term = term
-        #E_s += len_term * reduce(mul, [s[idx] for idx in val_term])
-        print("val_term:", val_term)
         E_s += (4 if len(val_term) == 4 else 2) * reduce(mul, [s[idx] for idx in val_term])
     return E_s
 
@@ -245,8 +276,8 @@ def energy_vals_from_bitstring_general(x, terms: Sequence | None = None, offset:
         set(s) \in {0, 1}
     terms : list-like, default None
     offset : float, default None
-        precomputed output of get_energy_term_indices
-        terms, offset = get_energy_term_indices(N)
+        precomputed output of get_energy_term_indices_offset
+        terms, offset = get_energy_term_indices_offset(N)
     check_parameters : bool, default True
         if set to False, no input validation is performed
     Returns
@@ -267,8 +298,8 @@ def slow_merit_factor(s: Sequence, terms: Iterable | None = None, offset: float 
         set(s) \in {-1, +1}
     terms : list-like, default None
     offset : float, default None
-        precomputed output of get_energy_term_indices
-        terms, offset = get_energy_term_indices(N)
+        precomputed output of get_energy_term_indices_offset
+        terms, offset = get_energy_term_indices_offset(N)
     check_parameters : bool, default True
         if set to False, no input validation is performed
 
@@ -283,7 +314,7 @@ def slow_merit_factor(s: Sequence, terms: Iterable | None = None, offset: float 
         assert set(s).issubset(set([-1, 1]))
     N = len(s)
     if terms is None or offset is None:
-        terms, offset = get_energy_term_indices(N)
+        terms, offset = get_energy_term_indices_offset(N)
     E_s = offset
     for term in terms:
         len_term, val_term = term
@@ -333,46 +364,6 @@ def negative_merit_factor_from_bitstring(x, N: int | None = None) -> float:
     """
     return -merit_factor(1 - 2 * x, N=N)
 
-
-def get_term_indices(N: int) -> list:
-    """Return indices of Pauli Zs in the LABS problem definition
-
-    Parameters
-    ----------
-    N : int
-        Problem size (number of spins)
-
-    Returns
-    -------
-    terms : list of tuples
-        List of ordered tuples, where each tuple defines a summand
-        and contains indices of the Pauli Zs in the product
-        e.g. if terms = [(0,1), (0,1,2,3), (1,2)]
-        the Hamiltonian is Z0Z1 + Z0Z1Z2Z3 + Z1Z2
-    """
-    terms = [term[1] for term in list(get_energy_term_indices(N)[0])]
-    return terms
-
-
-def get_terms(N: int) -> TermsType:
-    """Return terms definition of the LABS problem
-
-    Parameters
-    ----------
-    N : int
-        Problem size (number of spins)
-
-    Returns
-    -------
-    terms : TermsType
-        List of tuples (number, tuple) where the
-        tuple determines the location of Z operators
-        and the number is a scaling factor for the product.
-
-        e.g. if terms = [(2, (0,1)), (4, (0,1,2,3)), (2, (1,2))]
-        the Hamiltonian is 2*Z0Z1 + 4*Z0Z1Z2Z3 + 2*Z1Z2
-    """
-    return [(len(x), x) for x in get_term_indices(N)]
 
 
 def get_depth_optimized_terms(N: int) -> list:

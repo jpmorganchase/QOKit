@@ -27,7 +27,6 @@ def append_z_prod_term(qc: QuantumCircuit, term: Sequence, gamma: float) -> None
         # in labs, four-body terms appear two times more than two-body
         # there is also a global scaling factor of 2 for all terms (four and two), which is ignored here
         assert all(term[i] < term[i + 1] for i in range(len(term) - 1))
-#        _gamma = 2 * gamma
         qc.cx(term[0], term[1])
         qc.cx(term[3], term[2])
         qc.rzz(2 * gamma, term[1], term[2])

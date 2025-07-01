@@ -3,14 +3,14 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 import numpy as np
-from qokit.labs import get_energy_term_indices, negative_merit_factor_from_bitstring
+from qokit.labs import get_energy_term_indices_offset, negative_merit_factor_from_bitstring
 from qokit.utils import precompute_energies_parallel, precompute_energies
 from qokit.utils import reverse_array_index_bit_order
 
 
 def test_precompute_energies():
     N = 5
-    terms, offset = get_energy_term_indices(N)
+    terms, offset = get_energy_term_indices_offset(N)
     ens1 = precompute_energies(negative_merit_factor_from_bitstring, N, N)
     ens2 = precompute_energies_parallel(negative_merit_factor_from_bitstring, N, 2)
 

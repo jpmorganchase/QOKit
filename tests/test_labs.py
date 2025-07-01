@@ -15,14 +15,14 @@ from qokit.labs import (
     get_gate_optimized_terms_greedy,
     true_optimal_energy,
     energy_vals,
-    get_energy_term_indices,
+    get_energy_term_indices_offset,
     energy_vals_general,
 )
 
 
 def test_slow_merit_factor():
     for N in range(3, 12):
-        terms, offset = get_energy_term_indices(N)
+        terms, offset = get_energy_term_indices_offset(N)
         s = np.random.choice([-1, 1], size=N)
         assert np.isclose(
             slow_merit_factor(s, terms=terms, offset=offset, check_parameters=True),
@@ -62,12 +62,10 @@ def test_energy_vals():
         mf_from_en = N**2 / (2 * true_optimal_energy[N])
         assert np.around(mf_from_en, decimals=3) == true_optimal_mf[N]
     for N in range(5, 12):
-        terms, offset = get_energy_term_indices(N)
+        terms, offset = get_energy_term_indices_offset(N)
         s = np.random.choice([-1, 1], size=N)
-        print("s:", s)
         _energy_vals_general = energy_vals_general(s, terms=terms, offset=offset, check_parameters=True)
         _energy_vals = energy_vals(s, N=N)
-        print("values:", N, _energy_vals_general, _energy_vals)
         assert np.isclose(
             _energy_vals_general, _energy_vals,
         )
