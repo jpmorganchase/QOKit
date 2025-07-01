@@ -111,6 +111,7 @@ def get_qaoa_objective(
     initial_state: np.ndarray | None = None,
     n_trotters: int = 1,
     optimization_type="min",
+    simulator_kw: dict | None = None,
 ) -> typing.Callable:
     """Return QAOA objective to be minimized
 
@@ -176,7 +177,7 @@ def get_qaoa_objective(
     else:
         raise ValueError(f"Unknown mixer type passed to get_qaoa_objective: {mixer}, allowed ['x', 'xy']")
 
-    sim = simulator_cls(N, terms=terms, costs=precomputed_diagonal_hamiltonian)
+    sim = simulator_cls(N, terms=terms, costs=precomputed_diagonal_hamiltonian, **(simulator_kw or {}))
     if precomputed_costs is None:
         precomputed_costs = sim.get_cost_diagonal()
 
@@ -185,9 +186,9 @@ def get_qaoa_objective(
         bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
 
     # -- Final function
-    def f(*args):
+    def f(*args, **kw):
         gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
-        result = sim.simulate_qaoa(gamma, beta, initial_state, n_trotters=n_trotters)
+        result = sim.simulate_qaoa(gamma, beta, initial_state, n_trotters=n_trotters,  **kw)
         if objective == "expectation":
             return sim.get_expectation(result, costs=precomputed_costs, preserve_state=False, optimization_type=optimization_type)
         elif objective == "overlap":

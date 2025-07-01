@@ -3,6 +3,11 @@ LIBCSIM_1.0 {
     apply_diagonal;
     furx; furx_all; furxy; furxy_ring; furxy_complete;
     apply_qaoa_furx; apply_qaoa_furxy_ring; apply_qaoa_furxy_complete;  
+    
+    quantise_fp_block;
+    dequantise_fp_block;
+    furx_int8;  furx_int16;
+    furxy_int8; furxy_int16;
 
   local:
     *;

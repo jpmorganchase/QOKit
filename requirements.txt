@@ -1,0 +1,14 @@
+# QOKit dependencies for Phase 3 benchmarking and quantization
+
+qiskit
+qiskit-aer
+numba
+numpy<=2.2
+importlib_resources
+memory-profiler
+scipy
+pytket
+pytket-qiskit
+pytket-quantinuum
+
+
