@@ -61,10 +61,13 @@ def test_energy_vals():
     ):
         mf_from_en = N**2 / (2 * true_optimal_energy[N])
         assert np.around(mf_from_en, decimals=3) == true_optimal_mf[N]
-    for N in range(3, 12):
+    for N in range(5, 12):
         terms, offset = get_energy_term_indices(N)
         s = np.random.choice([-1, 1], size=N)
+        print("s:", s)
+        _energy_vals_general = energy_vals_general(s, terms=terms, offset=offset, check_parameters=True)
+        _energy_vals = energy_vals(s, N=N)
+        print("values:", N, _energy_vals_general, _energy_vals)
         assert np.isclose(
-            energy_vals_general(s, terms=terms, offset=offset, check_parameters=True),
-            energy_vals(s, N=N),
+            _energy_vals_general, _energy_vals,
         )

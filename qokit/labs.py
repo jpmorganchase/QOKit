@@ -109,8 +109,8 @@ def get_terms_offset(N: int):
         not included in the Hamiltonian
 
     """
-    term_indices, offset = get_energy_term_indices(N)
-    terms = [(len(t), t) for t in term_indices]
+    terms, offset = get_energy_term_indices(N)
+    print("terms:", terms)
     return terms, offset
 
 
@@ -144,10 +144,10 @@ def get_energy_term_indices(N: int):
             # -1 because we index from 1
             # Drop duplicate terms, e.g. Z1Z2Z2Z3 should be just Z1Z3
             if i + k == j:
-                all_terms.append(tuple(sorted((i - 1, j + k - 1))))
+                all_terms.append((2, tuple(sorted((i - 1, j + k - 1)))))
             else:
-                all_terms.append(tuple(sorted((i - 1, i + k - 1, j - 1, j + k - 1))))
-    return set(all_terms), offset
+                all_terms.append((4, tuple(sorted((i - 1, i + k - 1, j - 1, j + k - 1)))))
+    return all_terms, offset
 
 
 @njit()
@@ -225,8 +225,13 @@ def energy_vals_general(s: Sequence, terms: Iterable | None = None, offset: floa
     if terms is None or offset is None:
         terms, offset = get_energy_term_indices(N)
     E_s = offset
+    print("s from energy_vals_general:", s)
+    print("terms:", terms)
     for term in terms:
-        E_s += (4 if len(term) == 4 else 2) * reduce(mul, [s[idx] for idx in term])
+        len_term, val_term = term
+        #E_s += len_term * reduce(mul, [s[idx] for idx in val_term])
+        print("val_term:", val_term)
+        E_s += (4 if len(val_term) == 4 else 2) * reduce(mul, [s[idx] for idx in val_term])
     return E_s
 
 
@@ -281,7 +286,8 @@ def slow_merit_factor(s: Sequence, terms: Iterable | None = None, offset: float 
         terms, offset = get_energy_term_indices(N)
     E_s = offset
     for term in terms:
-        E_s += (4 if len(term) == 4 else 2) * reduce(mul, [s[idx] for idx in term])
+        len_term, val_term = term
+        E_s += len_term * reduce(mul, [s[idx] for idx in val_term])
     return N**2 / (2 * E_s)
 
 
@@ -344,7 +350,8 @@ def get_term_indices(N: int) -> list:
         e.g. if terms = [(0,1), (0,1,2,3), (1,2)]
         the Hamiltonian is Z0Z1 + Z0Z1Z2Z3 + Z1Z2
     """
-    return list(get_energy_term_indices(N)[0])
+    terms = [term[1] for term in list(get_energy_term_indices(N)[0])]
+    return terms
 
 
 def get_terms(N: int) -> TermsType:

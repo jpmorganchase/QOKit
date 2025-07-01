@@ -27,10 +27,10 @@ def append_z_prod_term(qc: QuantumCircuit, term: Sequence, gamma: float) -> None
         # in labs, four-body terms appear two times more than two-body
         # there is also a global scaling factor of 2 for all terms (four and two), which is ignored here
         assert all(term[i] < term[i + 1] for i in range(len(term) - 1))
-        _gamma = 2 * gamma
+#        _gamma = 2 * gamma
         qc.cx(term[0], term[1])
         qc.cx(term[3], term[2])
-        qc.rzz(2 * _gamma, term[1], term[2])
+        qc.rzz(2 * gamma, term[1], term[2])
         qc.cx(term[3], term[2])
         qc.cx(term[0], term[1])
     elif term_weight == 2:
@@ -52,8 +52,8 @@ def append_x_term(qc: QuantumCircuit, q1: int, beta: float) -> None:
 def append_cost_operator_circuit(qc: QuantumCircuit, terms: Sequence, gamma: float) -> None:
     for term in terms:
         if len(term) == 2 and isinstance(term[1], tuple):
-            coeff, (i, j) = term
-            append_z_prod_term(qc, (i, j), gamma * coeff / 2)
+            coeff, term_tuple = term
+            append_z_prod_term(qc, term_tuple, gamma * coeff / 2)
         elif any([isinstance(i, tuple) for i in term]):
             raise ValueError(f"Invalid term received: {term}")
         else:

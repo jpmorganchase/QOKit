@@ -86,7 +86,7 @@ def test_phase_operator(N, p, simclass):
     terms = [(3, [0, 1, 2]), (1, [0])]
     terms_without_weights = [t[1] for t in terms]
     offset = 2
-    f = partial(energy_vals_from_bitstring_general, terms=terms_without_weights, offset=offset)
+    f = partial(energy_vals_from_bitstring_general, terms=terms, offset=offset)
     precomputed_energies = precompute_energies(f, N) - offset
 
     sim = simclass(N, costs=precomputed_energies)
@@ -141,8 +141,8 @@ def test_against_qiskit_p_3(simclass):
 def test_terms_api(simclass: typing.Type[QAOAFastSimulatorBase], N):
     """Test that simulator can precompute energies when given wegihted Terms"""
     p = 1
-    terms, offset = get_terms_offset(N)
-    terms_ix, _ = get_energy_term_indices(N)
+    #terms, offset = get_terms_offset(N)
+    terms, offset = get_energy_term_indices(N)
 
     sim = simclass(N, terms=terms)
     precomputed_energies = -(N**2) / (2 * get_precomputed_labs_merit_factors(N)) - offset
@@ -152,4 +152,4 @@ def test_terms_api(simclass: typing.Type[QAOAFastSimulatorBase], N):
         betas = np.random.uniform(0, np.pi, p)
         gammas = np.random.uniform(0, np.pi, p)
 
-        _check_simulator_against_qiskit(sim, N, terms_ix, gammas, betas)
+        _check_simulator_against_qiskit(sim, N, terms, gammas, betas)
