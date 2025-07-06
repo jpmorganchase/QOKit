@@ -13,7 +13,7 @@ from .gates import ComplexArray
 from . import csim
 
 # fixed-point helpers (Python-only)
-from .quant_utils import quantise_fp, dequantise_fp, _BLOCK_DEF
+from qokit.fur.c.quant_utils import quantise_fp, dequantise_fp, _BLOCK_DEF
 
 
 class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
@@ -50,7 +50,6 @@ class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
     ):
         raise NotImplementedError
 
-
     def simulate_qaoa(
         self,
         gammas: ParamType,
@@ -63,50 +62,25 @@ class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
         renorm: bool              = False,
         **kwargs,
     ) -> ComplexArray:
-        """
-        Same signature as the Python FUR simulator.
-
-        Extra kwargs
-        ------------
-        sv_dtype   : 'complex64' or 'complex128' for the working FP copy
-        quant_bits : if int → fixed-point round-trip on the *input* statevec
-        block_size : length of each block for per-block scaling
-        renorm     : whether to re-normalize after dequantisation
-        """
         work_dtype = np.dtype(sv_dtype)
 
         # 1) build / cast initial state
         if sv0 is None:
-            # uniform superposition in desired precision
             base = np.full(self.n_states, 1.0/np.sqrt(self.n_states), dtype=work_dtype)
             real = base.real.astype("float")
             imag = base.imag.astype("float")
-            sv   = ComplexArray(real, imag)
+            sv = ComplexArray(real, imag)
         else:
-            # user-supplied statevector
             real = sv0.real.astype(work_dtype).real.astype("float")
             imag = sv0.imag.astype(work_dtype).real.astype("float")
-            sv   = ComplexArray(real, imag)
+            sv = ComplexArray(real, imag)
 
-        # 2) optional fixed-point round-trip on input
-        if quant_bits is not None:
-            full = sv.get_complex()
-            rq, iq, scales = quantise_fp(full,
-                                          bits=quant_bits,
-                                          block_size=block_size)
-            deq = dequantise_fp(rq,
-                                iq,
-                                scales,
-                                bits=quant_bits,
-                                block_size=block_size,
-                                renorm=renorm)
-            sv = ComplexArray(deq.real.astype("float"),
-                              deq.imag.astype("float"))
-
-        # 3) run the FUR circuit in-place
-        self._apply_qaoa(sv, list(gammas), list(betas), **kwargs)
+        # 2) run the FUR circuit in-place
+        self._apply_qaoa(sv, list(gammas), list(betas),
+                         quant_bits=quant_bits,
+                         block_size=block_size,
+                         renorm=renorm)
         return sv
-
 
     def get_statevector(self, result: ComplexArray, **kwargs) -> np.ndarray:
         return result.get_complex()
@@ -148,7 +122,6 @@ class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
         return probs[indices].sum()
 
 
-
 class QAOAFURXSimulatorC(QAOAFastSimulatorCBase):
     def _apply_qaoa(
         self,
@@ -157,14 +130,40 @@ class QAOAFURXSimulatorC(QAOAFastSimulatorCBase):
         betas: Sequence[float],
         **kwargs,
     ):
-        csim.apply_qaoa_furx(
-            sv.real,
-            sv.imag,
-            gammas,
-            betas,
-            self._hc_diag,
-            self.n_qubits,
-        )
+        quant_bits = kwargs.get("quant_bits", 0)
+        if quant_bits:
+            block_size = kwargs.get("block_size", 1024)
+            full = sv.get_complex().astype(np.complex64)
+            rq, iq, scale = quantise_fp(full, bits=quant_bits, block_size=block_size)
+            rq = rq.astype(np.int16, copy=False)
+            iq = iq.astype(np.int16, copy=False)
+
+
+            csim._apply_qaoa_furx_int(
+                rq,
+                iq,
+                scale,
+                quant_bits,
+                np.asarray(gammas, dtype="float"),
+                np.asarray(betas, dtype="float"),
+                self._hc_diag,
+                self.n_qubits,
+                self.n_states,
+                len(gammas),
+            )
+
+            deq = dequantise_fp(rq, iq, scale, bits=quant_bits, block_size=block_size)
+            sv.real[:] = deq.real.astype("float")
+            sv.imag[:] = deq.imag.astype("float")
+        else:
+            csim.apply_qaoa_furx(
+                sv.real,
+                sv.imag,
+                gammas,
+                betas,
+                self._hc_diag,
+                self.n_qubits,
+            )
 
 
 class QAOAFURXYRingSimulatorC(QAOAFastSimulatorCBase):

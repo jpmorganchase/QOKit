@@ -193,3 +193,10 @@ void furxy_complete(double* a_real, double* a_imag, double theta, unsigned int n
         }
     }
 }
+
+
+// Expose furx as a standalone exported symbol
+void furx(double* a_real, double* a_imag, double theta, unsigned q, size_t n_states) {
+    furx_all(a_real, a_imag, theta, q, n_states);
+}
+

@@ -5,6 +5,7 @@ try:
     from .wrapper import (
         furx_int8,
         apply_qaoa_furx_int8,
+         _apply_qaoa_furx_int, 
         furxy_int8,
         apply_qaoa_furxy_ring_int8,
         apply_qaoa_furxy_complete_int8,
@@ -12,6 +13,7 @@ try:
 
     _EXTRA = [
         "furx_int8",
+        "_apply_qaoa_furx_int",
         "apply_qaoa_furx_int8",
         "furxy_int8",
         "apply_qaoa_furxy_ring_int8",
@@ -28,6 +30,7 @@ from .wrapper import (
     furxy,
     apply_qaoa_furxy_ring,
     apply_qaoa_furxy_complete,
+    _apply_qaoa_furx_int,
 )
 from .libpath import is_available
 
@@ -38,4 +41,5 @@ __all__ = [
     "apply_qaoa_furxy_ring",
     "apply_qaoa_furxy_complete",
     "is_available",
+    "_apply_qaoa_furx_int",
 ] + _EXTRA        # ← export the extra symbols if present

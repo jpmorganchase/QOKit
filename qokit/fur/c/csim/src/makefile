@@ -1,21 +1,19 @@
 # ─────────────────────────  build options  ──────────────────────────────
-CC      ?= gcc            # allows: make CC=gcc-15 (Homebrew GCC-15 with OMP)
+CC      ?= gcc
 CFLAGS  = -fopenmp -fPIC -Wall
 LDFLAGS = -fopenmp -shared
-
-# Linux-only version-script
-VERSION_SCRIPT = libcsim.map
-ifeq ($(shell uname),Linux)
-    LDFLAGS += -Wl,--version-script=$(VERSION_SCRIPT)
-endif
-
-INC_DIRS  := .
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
-
 TARGET_DIR := ..
 SRCS   := $(wildcard *.c)
 OBJS   := $(SRCS:.c=.o)
 TARGET := $(TARGET_DIR)/libcsim.so
+
+# Linux-only version script
+ifeq ($(shell uname),Linux)
+    LDFLAGS += -Wl,--version-script=libcsim.map
+endif
+
+INC_DIRS  := .
+INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 # ─────────────────────────  build rules  ────────────────────────────────
 all: $(TARGET)

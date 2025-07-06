@@ -2,7 +2,7 @@ LIBCSIM_1.0 {
   global:
     apply_diagonal;
     furx; furx_all; furxy; furxy_ring; furxy_complete;
-    apply_qaoa_furx; apply_qaoa_furxy_ring; apply_qaoa_furxy_complete;  
+    apply_qaoa_furx; apply_qaoa_furxy_ring; apply_qaoa_furx_int; apply_qaoa_furxy_complete;  
     
     quantise_fp_block;
     dequantise_fp_block;
