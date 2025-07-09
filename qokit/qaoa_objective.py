@@ -5,6 +5,8 @@
 from __future__ import annotations
 from calendar import c
 import numpy as np
+from itertools import combinations
+from qiskit import QuantumCircuit
 from qiskit import transpile
 from qiskit.quantum_info import Statevector
 from qiskit_aer import Aer
@@ -20,6 +22,39 @@ from .qaoa_circuit_portfolio import measure_circuit
 from .utils import reverse_array_index_bit_order
 
 from .fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
+
+
+def generate_k_hot_superposition(n, k):
+    """
+    Create a uniform superposition statevector
+    over all bitstrings of Hamming weight k.
+    """
+    indices = list(combinations(range(n), k))
+    dim = 2 ** n
+    state = np.zeros(dim, dtype=complex)
+    
+    for idx in indices:
+        bitstring = ['0'] * n
+        for i in idx:
+            bitstring[i] = '1'
+        bin_index = int(''.join(bitstring), 2)
+        state[bin_index] = 1.0 / np.sqrt(len(indices))
+    
+    return state
+
+
+def build_swap_mixer_layer(n_qubits, beta_value):
+    """
+    Build a single SWAP-based mixer layer circuit:
+    exp(-i beta * (X_i X_j + Y_i Y_j))
+    for all unique pairs (i,j).
+    """
+    qc = QuantumCircuit(n_qubits)
+    for i in range(n_qubits):
+        for j in range(i+1, n_qubits):
+            qc.rxx(2 * beta_value, i, j)
+            qc.ryy(2 * beta_value, i, j)
+    return qc
 
 
 def _get_qiskit_objective(
@@ -112,6 +147,7 @@ def get_qaoa_objective(
     n_trotters: int = 1,
     optimization_type="min",
     simulator_kw: dict | None = None,
+    k_hot: int | None = None,
 ) -> typing.Callable:
     """Return QAOA objective to be minimized
 
@@ -137,10 +173,13 @@ def get_qaoa_objective(
     mixer : str
         If mixer == 'x', then uses the default Pauli X as the mixer
         If mixer == 'xy', then uses the ring-XY as the mixer
+        If mixer == 'swap' than uses SWAP-based Hamming-weight preserving mixer
     initial_state : np.ndarray
         The initial state for QAOA, default is the uniform superposition state (corresponding to the X mixer)
     n_trotters : int
         Number of Trotter steps in each mixer layer for the xy mixer
+    k_hot : int, optional
+        If set, builds uniform superposition of all bitstrings of Hamming weight k as initial state
 
     Returns
     -------
@@ -172,10 +211,10 @@ def get_qaoa_objective(
 
     if mixer == "x":
         simulator_cls = choose_simulator(name=simulator)
-    elif mixer == "xy":
+    elif mixer in ["xy", "swap"]:
         simulator_cls = choose_simulator_xyring(name=simulator)
     else:
-        raise ValueError(f"Unknown mixer type passed to get_qaoa_objective: {mixer}, allowed ['x', 'xy']")
+        raise ValueError(f"Unknown mixer type passed to get_qaoa_objective: {mixer}, allowed ['x', 'xy', 'swap']")
 
     sim = simulator_cls(N, terms=terms, costs=precomputed_diagonal_hamiltonian, **(simulator_kw or {}))
     if precomputed_costs is None:
@@ -185,10 +224,26 @@ def get_qaoa_objective(
     if precomputed_optimal_bitstrings is not None and objective != "expectation":
         bitstring_loc = np.array([reduce(lambda a, b: 2 * a + b, x) for x in precomputed_optimal_bitstrings])
 
+    # Prepare initial state
+    if k_hot is not None:
+        psi0 = generate_k_hot_superposition(N, k_hot)
+    elif initial_state is None:
+        psi0 = np.zeros(2 ** N, dtype=complex)
+        psi0[0] = 1
+    else:
+        psi0 = initial_state
+
     # -- Final function
     def f(*args, **kw):
         gamma, beta = qokit.parameter_utils.convert_to_gamma_beta(*args, parameterization=parameterization)
-        result = sim.simulate_qaoa(gamma, beta, initial_state, n_trotters=n_trotters,  **kw)
+        # Build custom mixers for SWAP
+        if mixer == "swap":
+            mixers = []
+            for b in beta:
+                mixers.append(build_swap_mixer_layer(N, b))
+        else:
+            mixers = None
+        result = sim.simulate_qaoa(gamma,beta,psi0,mixer_circuits=mixers,n_trotters=n_trotters, **kw)
         if objective == "expectation":
             return sim.get_expectation(result, costs=precomputed_costs, preserve_state=False, optimization_type=optimization_type)
         elif objective == "overlap":
