@@ -15,7 +15,7 @@ from qokit.fur import QAOAFURXSimulatorGPUMPI, get_available_simulators
 from qokit.fur import QAOAFURXSimulatorC, QAOAFURXSimulator, QAOAFURXSimulatorGPU, QAOAFastSimulatorBase
 from qokit.labs import energy_vals_from_bitstring_general, get_energy_term_indices, get_terms_offset
 from qokit.utils import precompute_energies
-from qokit.qaoa_circuit_labs import get_qaoa_circuit
+from qokit.qaoa_circuit import get_qaoa_circuit_from_terms as get_qaoa_circuit
 
 SIMULATORS = get_available_simulators("x")
 print(SIMULATORS)

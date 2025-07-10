@@ -43,7 +43,7 @@ class PrecomputedLABSHandler:
             ens = np.load(fpath)
         else:
             # precompute
-            if N > 10 and N <= 24:
+            if N > 10 and N <= 22:
                 raise RuntimeError(
                     f"""
 Failed to load from {fpath}, attempting to recompute for N={N},
@@ -190,8 +190,7 @@ def get_qaoa_labs_objective(
 
     if simulator == "qiskit":
         assert p is not None, "p must be passed if simulator == 'qiskit'"
-        terms, _ = get_energy_term_indices(N)
-        parameterized_circuit = get_parameterized_qaoa_circuit(N, terms, p)
+        parameterized_circuit = get_parameterized_qaoa_circuit(N, p)
         precomputed_diagonal_hamiltonian = None
     else:
         parameterized_circuit = None
