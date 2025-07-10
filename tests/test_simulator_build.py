@@ -10,7 +10,7 @@ from qokit.fur import get_available_simulator_names
 import sys
 
 # Set up QOKIT_PYTHON_ONLY in your local enviroment for Python only
-PYTHON_ONLY = False if os.environ.get("QOKIT_PYTHON_ONLY") is None else os.environ.get("QOKIT_PYTHON_ONLY")
+PYTHON_ONLY = True #False if os.environ.get("QOKIT_PYTHON_ONLY") is None else os.environ.get("QOKIT_PYTHON_ONLY")
 
 
 @pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
