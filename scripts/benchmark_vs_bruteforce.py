@@ -32,7 +32,7 @@ def enhanced_qaoa(po, p, x0):
     )
     from scipy.optimize import minimize
     #fun = lambda t: (obj(t)[0], obj(t, grad=True)[1].astype(float))
-    minimize(fun, x0, method="L-BFGS-B", jac=False,
+    minimize(obj, x0, method="L-BFGS-B", jac=False,
              options={"maxiter": 200})
 
 def timed(fn):
