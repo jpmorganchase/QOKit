@@ -188,7 +188,8 @@ def get_qaoa_portfolio_objective(
     return f
 
 
-def get_qaoa_portfolio_objectivev2(po_problem, p=1, ini='uniform', mixer='trotter_ring', T=1, simulator='python', mixer_topology='complete'): # <<-- ADD mixer_topology here with a default
+def get_qaoa_portfolio_objectivev2(po_problem, p=1, ini='uniform', mixer='trotter_ring', T=1, simulator='python',
+                                   mixer_topology='complete'):  # <<-- ADD mixer_topology here with a default
     """
     Returns a function that evaluates the QAOA objective for portfolio optimization.
 
@@ -208,9 +209,8 @@ def get_qaoa_portfolio_objectivev2(po_problem, p=1, ini='uniform', mixer='trotte
     K = po_problem["K"]
     J = po_problem["J"]
     h = po_problem["h"]
-    gamma = ParameterVector('gamma', p) # p is the number of QAOA layers
+    gamma = ParameterVector('gamma', p)  # p is the number of QAOA layers
     beta = ParameterVector('beta', p)
-
 
     if simulator == 'python':
         # ... (existing python simulator logic) ...
@@ -222,7 +222,7 @@ def get_qaoa_portfolio_objectivev2(po_problem, p=1, ini='uniform', mixer='trotte
         pass
 
 
-    elif simulator == 'qiskit' or isinstance(simulator, Backend): # Assuming Backend is imported from qiskit.providers
+    elif simulator == 'qiskit' or isinstance(simulator, Backend):  # Assuming Backend is imported from qiskit.providers
         # get_parameterized_qaoa_circuit creates the Qiskit circuit
         parameterized_circuit = get_parameterized_qaoa_circuit(
             po_problem=po_problem,
@@ -232,18 +232,17 @@ def get_qaoa_portfolio_objectivev2(po_problem, p=1, ini='uniform', mixer='trotte
             T=T,
             simulator='qiskit',
             mixer_topology=mixer_topology,
-            gamma=gamma, # Pass gamma
-            beta=beta      # Pass beta
+            gamma=gamma,  # Pass gamma
+            beta=beta  # Pass beta
         )
-
 
         # ... (rest of the qiskit execution logic using Estimator or custom energy calculation) ...
         # This part should be consistent with how qokit handles qiskit backends.
         # Assuming qokit uses a Qiskit Estimator for execution:
-        if isinstance(simulator, Backend): # If a Backend object is passed
+        if isinstance(simulator, Backend):  # If a Backend object is passed
             qiskit_backend = simulator
-        else: # If 'qiskit' string is passed
-            qiskit_backend = Aer.get_backend('aer_simulator') # Default Qiskit Aer simulator
+        else:  # If 'qiskit' string is passed
+            qiskit_backend = Aer.get_backend('aer_simulator')  # Default Qiskit Aer simulator
 
         # This is a conceptual representation of how qokit would then evaluate the circuit
         # It might use Estimator or a custom execution loop
@@ -260,30 +259,29 @@ def get_qaoa_portfolio_objectivev2(po_problem, p=1, ini='uniform', mixer='trotte
             # Get the shots from the backend's options that were set earlier.
             # This assumes qiskit_backend is a Qiskit Backend object (like AerSimulator)
             # and that you set its shots using simulator_backend.set_options(shots=shots)
-            execution_shots = qiskit_backend.options.get('shots', None) # Get shots from the backend's options
+            execution_shots = qiskit_backend.options.get('shots', None)  # Get shots from the backend's options
 
             # Convert J and h to Pauli strings for the Estimator
             # (This part should be existing in your file, ensuring N is accessible here)
             # For example, N would be available from po_problem in the outer function's scope.
-            N = po_problem["N"] # Make sure N is available in this scope
+            N = po_problem["N"]  # Make sure N is available in this scope
 
             pauli_list = []
             # Add quadratic terms (J_ij Z_i Z_j)
-            for (i, j), val in J.items(): # J and h are defined in the outer get_qaoa_portfolio_objective function
+            for (i, j), val in J.items():  # J and h are defined in the outer get_qaoa_portfolio_objective function
                 if val != 0:
                     z_op = ['I'] * N
                     z_op[i] = 'Z'
                     z_op[j] = 'Z'
                     # pauli_list.append((Pauli(''.join(z_op)), val))
-                    pauli_list.append((''.join(z_op), val)) # <<-- CORRECTED: Pass the string directly
-
+                    pauli_list.append((''.join(z_op), val))  # <<-- CORRECTED: Pass the string directly
 
             # Add linear terms (h_i Z_i)
             for i, val in h.items():
                 if val != 0:
                     z_op = ['I'] * N
                     z_op[i] = 'Z'
-                    pauli_list.append((''.join(z_op), val)) # <<-- CORRECTED: Pass the string directly
+                    pauli_list.append((''.join(z_op), val))  # <<-- CORRECTED: Pass the string directly
                     # pauli_list.append((Pauli(''.join(z_op)), val))
 
             # Convert to an observable for the Estimator

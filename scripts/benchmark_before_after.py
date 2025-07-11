@@ -11,6 +11,11 @@ Profile switches:
 from __future__ import annotations
 import argparse, itertools, csv, pathlib, time, os, numpy as np
 import sys
+import qokit.config as config_numba
+import importlib
+
+from qokit.qaoa_circuit_portfolio import generate_dicke_state_fast
+
 # Add project root to sys.path
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -52,16 +57,31 @@ def timed(fn):
 def one_case(N, p, q, Kfac, profile):
     po  = get_problem(N=N, K=int(Kfac*N), q=q, pre="rule")
     x0  = np.random.default_rng(0).random(2*p)
+    #x0= generate_dicke_state_fast(N, int(Kfac*N))
 
     if profile == "baseline":
+        qokit.config.USE_NUMBA = False
+        import qokit.fur.python.fur
+        importlib.reload(qokit.fur.python.fur)
+        import qokit.fur.python.qaoa_fur
+        importlib.reload(qokit.fur.python.qaoa_fur)
+        import qokit.fur.python.qaoa_simulator
+        importlib.reload(qokit.fur.python.qaoa_simulator)
         os.environ["QOKIT_DISABLE_VECTOR"] = "1"
         os.environ["QOKIT_DISABLE_CACHE"] = "1"
-        obj = get_qaoa_portfolio_objective(po, p=p, precomputed_energies=None)
+        obj = get_qaoa_portfolio_objective(po, p=p,ini="dicke", precomputed_energies=None,simulator="python")
         t = timed(lambda: run_bobyqa(obj, x0))
     else:
         os.environ.pop("QOKIT_DISABLE_VECTOR", None)
         os.environ.pop("QOKIT_DISABLE_CACHE", None)
-        obj = get_qaoa_portfolio_objective(po, p=p, precomputed_energies="vectorized")
+        config_numba.USE_NUMBA = True
+        import qokit.fur.python.fur
+        importlib.reload(qokit.fur.python.fur)
+        import qokit.fur.python.qaoa_fur
+        importlib.reload(qokit.fur.python.qaoa_fur)
+        import qokit.fur.python.qaoa_simulator
+        importlib.reload(qokit.fur.python.qaoa_simulator)
+        obj = get_qaoa_portfolio_objective(po, p=p, ini="dicke",precomputed_energies="vectorized",simulator="python")
         t = timed(lambda: run_lbfgs(obj, x0))
     return t
 

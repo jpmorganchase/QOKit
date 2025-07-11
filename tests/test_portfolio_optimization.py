@@ -9,7 +9,7 @@ from qokit.qaoa_circuit_portfolio import (
     get_parameterized_qaoa_circuit,
 )
 from qokit.fur import get_available_simulator_names, choose_simulator_xyring
-from qokit.qaoa_objective_portfolio import get_qaoa_portfolio_objective
+from qokit.qaoa_objective_portfolio import get_qaoa_portfolio_objective, get_qaoa_portfolio_objectivev2
 import numpy as np
 import pytest
 from qiskit import transpile
