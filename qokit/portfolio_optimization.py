@@ -41,7 +41,7 @@ def brute_force_cost_vector(po_problem: dict) -> np.ndarray:
     Return all 2^N energies for the given portfolio instance using
     the parallel-SIMD Numba kernel (N ≤ 20 recommended).
     """
-    return _bruteforce_costs(po_problem["mu"],
+    return _bruteforce_costs(po_problem["means"],
                              po_problem["cov"],
                              po_problem["q"])
 
@@ -51,11 +51,10 @@ def _bruteforce_costs(mu, cov, q):
     N = mu.size
     costs = np.empty(1 << N, dtype=np.float64)
     for b in prange(1 << N):
-        # unpack bits into 0/1 vector
-        x = np.unpackbits(
-            np.array([b], dtype=np.uint32).view(np.uint8),
-            bitorder="little"
-        )[:N].astype(np.float64)
+        # Manual bit extraction
+        x = np.empty(N, dtype=np.float64)
+        for k in range(N):
+            x[k] = (b >> k) & 1
         costs[b] = q * x @ cov @ x - mu @ x
     return costs
 
@@ -77,7 +76,7 @@ def get_configuration_cost_vector(po_problem: dict[str, Any], config:np.ndarray)
         A dictionary returned by :func:`get_problem`.  It must contain
 
         * ``"cov"`` – the :math:`\Sigma` covariance matrix *(N×N)*,
-        * ``"mu"``  – the expected-return vector :math:`\mu` *(N,)*,
+        * ``"means"``  – the expected-return vector :matrix` *(N,)*,
         * ``"q"``   – the risk-aversion scalar :math:`q`.
 
     config
