@@ -8,6 +8,13 @@ CSV columns:
 """
 from __future__ import annotations
 import argparse, itertools, csv, pathlib, time, numpy as np
+import sys
+import pathlib
+
+# Add project root to sys.path
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
 from qokit.portfolio_optimization import get_problem, brute_force_cost_vector
 from qokit.qaoa_objective_portfolio import get_qaoa_portfolio_objective
 
