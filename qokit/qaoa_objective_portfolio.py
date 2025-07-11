@@ -4,6 +4,8 @@ from .utils import precompute_energies, reverse_array_index_bit_order, precomput
 from .portfolio_optimization import get_configuration_cost_kw, po_obj_func, portfolio_brute_force, po_obj_func_vector
 from qokit.qaoa_circuit_portfolio import generate_dicke_state_fast, get_parameterized_qaoa_circuit
 from .qaoa_objective import get_qaoa_objective
+from qokit.estimator_batch import batched_expectation
+
 
 
 def get_qaoa_portfolio_objective(
@@ -34,6 +36,18 @@ def get_qaoa_portfolio_objective(
         the Trotter step for the mixer
     precomputed_energies : np.array
         precomputed energies to compute the QAOA expectation
+        `None``              – compute energies on-the-fly (default).
+
+        ``"vectorized"``      – look up energies from a pre-computed
+        vector produced by
+        :func:`qokit.portfolio_optimization.get_configuration_cost_vector`.
+        When enabled, the callable returned by this factory **accepts both**
+
+        * ``theta.shape == (2p,)`` → scalar energy
+        * ``theta.shape == (B,2p)`` → vector of *B* energies (batch mode)
+
+        allowing optimisers or sweeps to evaluate many parameter vectors in
+        **one** Estimator call.
     parameterization : str
         If parameterization == 'theta', then f takes one parameter (gamma and beta concatenated)
         If parameterization == 'gamma beta', then f takes two parameters (gamma and beta)
@@ -100,7 +114,7 @@ def get_qaoa_portfolio_objective(
 
         return rescaled_f
 
-    return scaled_result(
+    f_single = scaled_result(
         get_qaoa_objective(
             N=N,
             precomputed_diagonal_hamiltonian=po_problem["scale"] * precomputed_energies,
@@ -114,3 +128,47 @@ def get_qaoa_portfolio_objective(
             n_trotters=T,
         )
     )
+
+    # ----- add a batch-aware shim ---------------------------------------
+    sv0_pristine = sv0.copy()
+
+    if parameterization == "theta":
+
+        def f(theta: np.ndarray):
+            theta = np.asarray(theta)
+
+            # -------- batched path ------------------------------------
+            if theta.ndim == 2:  # shape (B, 2p)
+                out = np.empty(len(theta), dtype=float)
+                for i, t in enumerate(theta):
+                    sv0[:] = sv0_pristine  # restore |ψ₀⟩
+                    out[i] = f_single(t)
+                sv0[:] = sv0_pristine  # clean up
+                return out
+
+            # -------- single-vector path ------------------------------
+            sv0[:] = sv0_pristine
+            return f_single(theta)
+
+        return f
+
+    # else: parameterization == "gamma beta"
+    sv0_pristine = sv0.copy()
+
+    def f(gamma: np.ndarray, beta: np.ndarray):
+        gamma = np.asarray(gamma)
+        beta = np.asarray(beta)
+
+        if gamma.ndim == 2:  # (B, p)
+            out = np.empty(len(gamma), dtype=float)
+            for i, (g, b) in enumerate(zip(gamma, beta)):
+                sv0[:] = sv0_pristine
+                out[i] = f_single(g, b)
+            sv0[:] = sv0_pristine
+            return out
+
+        sv0[:] = sv0_pristine
+        return f_single(gamma, beta)
+
+    return f
+

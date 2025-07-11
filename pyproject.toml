@@ -3,8 +3,7 @@ name = "qokit"
 description="Quantum Optimization Toolkit"
 readme = "README.md"
 authors = [ 
-   {name = "JP Morgan Chase & Co"},
-   {email = "OmniQ_Support@jpmchase.com"}
+   {name = "Global Quantum Group"}
    ]
 license = {file = "LICENSE"}
 classifiers=[
@@ -16,7 +15,7 @@ classifiers=[
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
-version = "0.1.4"
+version = "0.2.0"
 requires-python = ">=3.10.0"
 dependencies = [
     'networkx==3.0.0',
@@ -47,6 +46,8 @@ solvers = [
   'docplex>=2.18.200',
   'gurobipy>=9.1.2'
 ]
+test = ["pytest", "pyright", "ruff", "black", "nlopt","scipy"]
+optim = ["scipy>=1.12"]
 
 [build-system]
 requires = ["setuptools>=45",
@@ -85,7 +86,8 @@ omit = [
     ]
 [tool.setuptools.packages.find]
 where = ["."]
-exclude = ["tests*"]    
+exclude = ["tests*"]
+include = ["QOKit*"]
 
 
 [tool.setuptools.package-data]

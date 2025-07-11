@@ -1,3 +1,19 @@
+## 90-second test-drive
+
+```bash
+# clone and install (CPU-only)
+git clone https://github.com/jerome79/QOKit.git
+cd QOKit
+pip install -e .[optim]          # pulls SciPy for L-BFGS-B
+
+# run a 2-layer sweep on analytic-gradient path
+python scripts/run_sweep.py 12 4 0.7 --p 1 2 --optim lbfgs
+
+### Benchmark vs brute force
+
+```bash
+python scripts/benchmark_vs_bruteforce.py --Ns 16 20 24 --ps 1 5 10
+
 # Quantum Optimization Toolkit
 
 ![Tests](https://github.com/jpmorganchase/QOKit/actions/workflows/qokit-package.yml/badge.svg)

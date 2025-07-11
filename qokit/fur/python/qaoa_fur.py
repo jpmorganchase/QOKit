@@ -6,6 +6,18 @@ from collections.abc import Sequence
 import numpy as np
 from .fur import furx_all, furxy_ring, furxy_complete
 
+_phase_cache: dict[tuple[float, int], np.ndarray] = {}
+
+def _cached_diag_phase(gamma: float, hc_diag: np.ndarray) -> np.ndarray:
+    """
+    Return exp(-0.5j * gamma * hc_diag) with memoisation keyed by
+    (gamma, id_of_array).
+    """
+    key = (gamma, hc_diag.ctypes.data)
+    if key not in _phase_cache:
+        _phase_cache[key] = np.exp(-0.5j * gamma * hc_diag)
+    return _phase_cache[key]
+
 
 def apply_qaoa_furx(sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], hc_diag: np.ndarray, n_qubits: int) -> None:
     """
@@ -37,7 +49,7 @@ def apply_qaoa_furxy_ring(sv: np.ndarray, gammas: Sequence[float], betas: Sequen
     @param n_trotters number of Trotter steps in each XY mixer layer
     """
     for gamma, beta in zip(gammas, betas):
-        sv *= np.exp(-0.5j * gamma * hc_diag)
+        sv *= _cached_diag_phase(gamma, hc_diag)
         for _ in range(n_trotters):
             furxy_ring(sv, beta / n_trotters, n_qubits)
 
