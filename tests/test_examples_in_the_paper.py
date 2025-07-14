@@ -28,7 +28,7 @@ def test_listing_2():
 
     simclass = qokit.fur.choose_simulator_xycomplete()
     n = 8
-    terms = qokit.labs.get_terms(n)
+    terms, _ = qokit.labs.get_energy_term_indices_offset(n)
     sim = simclass(n, terms=terms)
     result = sim.simulate_qaoa(gamma, beta)
     E = sim.get_expectation(result)
@@ -40,7 +40,7 @@ def test_listing_3():
 
     simclass = qokit.fur.choose_simulator(name="cusvmpi")
     n = 40
-    terms = qokit.labs.get_terms(n)
+    terms, _ = qokit.labs.get_energy_term_indices_offset(n)
     sim = simclass(n, terms=terms)
     result = sim.simulate_qaoa(gamma, beta)
     E = sim.get_expectation(result, preserve_state=False)

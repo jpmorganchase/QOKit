@@ -88,70 +88,6 @@ true_optimal_energy = {
 
 
 def get_terms_offset(N: int):
-    """
-    Retrun `offset` for QAOA LABS problem
-
-    Parameters
-    ----------
-    N : int
-        Problem size (number of spins)
-
-    Returns
-    -------
-
-    offset : int
-        energy offset required due to constant factors (identity terms)
-        not included in the Hamiltonian
-
-    """
-    terms, offset = get_energy_term_indices_offset(N)
-    return offset
-
-
-def get_term_indices(N: int) -> list:
-    """Return indices of Pauli Zs in the LABS problem definition
-
-    Parameters
-    ----------
-    N : int
-        Problem size (number of spins)
-
-    Returns
-    -------
-    terms : list of tuples
-        List of ordered tuples, where each tuple defines a summand
-        and contains indices of the Pauli Zs in the product
-        e.g. if terms = [(0,1), (0,1,2,3), (1,2)]
-        the Hamiltonian is Z0Z1 + Z0Z1Z2Z3 + Z1Z2
-    """
-    terms_with_weight, offset = get_energy_term_indices_offset(N)
-    terms = [term[1] for term in terms_with_weight]
-    return terms
-
-
-def get_terms(N: int) -> TermsType:
-    """Return terms definition of the LABS problem
-
-    Parameters
-    ----------
-    N : int
-        Problem size (number of spins)
-
-    Returns
-    -------
-    terms : TermsType
-        List of tuples (number, tuple) where the
-        tuple determines the location of Z operators
-        and the number is a scaling factor for the product.
-
-        e.g. if terms = [(2, (0,1)), (4, (0,1,2,3)), (2, (1,2))]
-        the Hamiltonian is 2*Z0Z1 + 4*Z0Z1Z2Z3 + 2*Z1Z2
-    """
-    terms, offset = get_energy_term_indices_offset(N)
-    return terms
-
-
-def get_energy_term_indices_offset(N: int):
     """Return terms with indices and offset of Pauli Zs in the LABS problem definition
 
     Parameters
@@ -245,8 +181,8 @@ def energy_vals_general(s: Sequence, terms: Iterable | None = None, offset: floa
         set(s) \in {+1, -1}
     terms : list-like, default None
     offset : float, default None
-        precomputed output of get_energy_term_indices_offset
-        terms, offset = get_energy_term_indices_offset(N)
+        precomputed output of get_terms_offset
+        terms, offset = get_terms_offset(N)
     check_parameters : bool, default True
         if set to False, no input validation is performed
     Returns
@@ -260,7 +196,7 @@ def energy_vals_general(s: Sequence, terms: Iterable | None = None, offset: floa
         assert set(s).issubset(set([-1, 1]))
     N = len(s)
     if terms is None or offset is None:
-        terms, offset = get_energy_term_indices_offset(N)
+        terms, offset = get_terms_offset(N)
     E_s = offset
     for term in terms:
         len_term, val_term = term
@@ -278,8 +214,8 @@ def energy_vals_from_bitstring_general(x, terms: Sequence | None = None, offset:
         set(s) \in {0, 1}
     terms : list-like, default None
     offset : float, default None
-        precomputed output of get_energy_term_indices_offset
-        terms, offset = get_energy_term_indices_offset(N)
+        precomputed output of get_terms_offset
+        terms, offset = get_terms_offset(N)
     check_parameters : bool, default True
         if set to False, no input validation is performed
     Returns
@@ -300,8 +236,8 @@ def slow_merit_factor(s: Sequence, terms: Iterable | None = None, offset: float 
         set(s) \in {-1, +1}
     terms : list-like, default None
     offset : float, default None
-        precomputed output of get_energy_term_indices_offset
-        terms, offset = get_energy_term_indices_offset(N)
+        precomputed output of get_terms_offset
+        terms, offset = get_terms_offset(N)
     check_parameters : bool, default True
         if set to False, no input validation is performed
 
@@ -316,7 +252,7 @@ def slow_merit_factor(s: Sequence, terms: Iterable | None = None, offset: float 
         assert set(s).issubset(set([-1, 1]))
     N = len(s)
     if terms is None or offset is None:
-        terms, offset = get_energy_term_indices_offset(N)
+        terms, offset = get_terms_offset(N)
     E_s = offset
     for term in terms:
         len_term, val_term = term
