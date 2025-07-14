@@ -200,7 +200,7 @@ def energy_vals_general(s: Sequence, terms: Iterable | None = None, offset: floa
     E_s = offset
     for term in terms:
         len_term, val_term = term
-        E_s += (4 if len(val_term) == 4 else 2) * reduce(mul, [s[idx] for idx in val_term])
+        E_s += len_term * reduce(mul, [s[idx] for idx in val_term])
     return E_s
 
 
