@@ -51,7 +51,6 @@ def append_x_term(qc: QuantumCircuit, q1: int, beta: float) -> None:
 def append_cost_operator_circuit(qc: QuantumCircuit, terms: Sequence, gamma: float) -> None:
     for term in terms:
         if len(term) == 2 and (isinstance(term[1], tuple) or isinstance(term[1], list)):
-            print("Here!")
             coeff, term_tuple = term
             append_z_prod_term(qc, term_tuple, gamma * coeff / 2)
         elif any([isinstance(i, tuple) for i in term]):
