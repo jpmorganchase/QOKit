@@ -48,7 +48,6 @@ def test_variance_normalization(N=1000):
     terms = get_sk_terms(J)
     terms_0 = [x[0] for x in terms]
     var = np.var(terms_0)
-    print("var: ", var)
 
     assert np.isclose(N * var, 1, atol=1e-2)
 
@@ -100,7 +99,6 @@ def test_sk_qaoa_convergence_with_p(simulator, N=12, threshold=0.00):
         )(2 * gamma / np.sqrt(N), beta)
         current_objective = qaoa_objective / max_energy
         current_overlap = 1 - qaoa_overlap
-        print("p = ", p)
         assert current_objective < last_objective + threshold
         assert current_overlap > last_overlap - threshold
         last_objective = current_objective

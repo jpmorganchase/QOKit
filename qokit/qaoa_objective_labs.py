@@ -183,7 +183,7 @@ def get_qaoa_labs_objective(
     # TODO: needs to generate parameterized circuit and check that the precomputed stuff is loaded correctly
     # Otherwise pass directly to get_qaoa_objective
 
-    terms_ix, offset = get_terms_offset(N)
+    _, offset = get_terms_offset(N)
 
     if precomputed_negative_merit_factors is None:
         precomputed_negative_merit_factors = get_precomputed_labs_merit_factors(N)

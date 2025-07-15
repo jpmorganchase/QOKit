@@ -84,13 +84,12 @@ def test_phase_operator(N, p, simclass):
     gammas = np.random.uniform(0, np.pi, p)
     betas = [0] * p
     terms = [(3, [0, 1, 2]), (1, [0])]
-    terms_without_weights = [t[1] for t in terms]
     offset = 2
     f = partial(energy_vals_from_bitstring_general, terms=terms, offset=offset)
     precomputed_energies = precompute_energies(f, N) - offset
 
     sim = simclass(N, costs=precomputed_energies)
-    _check_simulator_against_qiskit(sim, N, terms_without_weights, gammas, betas)
+    _check_simulator_against_qiskit(sim, N, terms, gammas, betas)
 
 
 @pytest.mark.parametrize("simclass", SIMULATORS)
