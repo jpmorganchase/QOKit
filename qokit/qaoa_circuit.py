@@ -49,11 +49,11 @@ def append_x_term(qc: QuantumCircuit, q1: int, beta: float) -> None:
 
 
 def append_cost_operator_circuit(qc: QuantumCircuit, terms: Sequence, gamma: float) -> None:
-    ''' In the following, `gamma` is divided by factor of 2 in order 
-     to preserve the convention of (2 * gamma) in applying `rz` gates 
-     in `append_z_prod_term(...)` and that of (2 * beta) in applying `rx` 
-     gates in `append_x_term(...)`, which orginates from  different conventions 
-     used between `QOKit` and `Qiskit`.'''
+    """In the following, `gamma` is divided by factor of 2 in order
+    to preserve the convention of (2 * gamma) in applying `rz` gates
+    in `append_z_prod_term(...)` and that of (2 * beta) in applying `rx`
+    gates in `append_x_term(...)`, which orginates from  different conventions
+    used between `QOKit` and `Qiskit`."""
     for term in terms:
         if len(term) == 2 and (isinstance(term[1], tuple) or isinstance(term[1], list)):
             coeff, term_tuple = term
