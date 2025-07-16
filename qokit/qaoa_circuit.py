@@ -56,7 +56,7 @@ def append_cost_operator_circuit(qc: QuantumCircuit, terms: Sequence, gamma: flo
         elif any([isinstance(i, tuple) for i in term]):
             raise ValueError(f"Invalid term received: {term}")
         else:
-            append_z_prod_term(qc, term, gamma / 2)
+            append_z_prod_term(qc, term, gamma)
 
 
 def append_mixer_operator_circuit(qc: QuantumCircuit, beta: float) -> None:
