@@ -66,7 +66,7 @@ def test_energy_vals():
     ):
         mf_from_en = N**2 / (2 * true_optimal_energy[N])
         assert np.around(mf_from_en, decimals=3) == true_optimal_mf[N]
-    for N in range(5, 12):
+    for N in range(3, 12):
         terms, offset = get_terms_offset(N)
         s = np.random.choice([-1, 1], size=N)
         _energy_vals_general = energy_vals_general(s, terms=terms, offset=offset, check_parameters=True)
@@ -75,3 +75,9 @@ def test_energy_vals():
             _energy_vals_general,
             _energy_vals,
         )
+
+
+def test_no_duplicated_terms():
+    for N in range(40, 60):
+        t, _ = get_terms_offset(N)
+        assert len(set(x[1] for x in t)) == len(t)
