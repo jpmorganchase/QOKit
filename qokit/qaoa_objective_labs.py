@@ -9,7 +9,7 @@ import numpy as np
 from pathlib import Path
 
 from .labs import (
-    get_energy_term_indices,
+    get_terms_offset,
     negative_merit_factor_from_bitstring,
     true_optimal_energy,
     energy_vals_from_bitstring,
@@ -183,7 +183,7 @@ def get_qaoa_labs_objective(
     # TODO: needs to generate parameterized circuit and check that the precomputed stuff is loaded correctly
     # Otherwise pass directly to get_qaoa_objective
 
-    terms_ix, offset = get_energy_term_indices(N)
+    _, offset = get_terms_offset(N)
 
     if precomputed_negative_merit_factors is None:
         precomputed_negative_merit_factors = get_precomputed_labs_merit_factors(N)

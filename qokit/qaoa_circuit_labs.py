@@ -5,7 +5,7 @@
 # QAOA circuit for some Z objective
 from collections.abc import Sequence
 from qiskit import QuantumCircuit
-from qokit.labs import get_energy_term_indices
+from qokit.labs import get_terms_offset
 from .qaoa_circuit import get_qaoa_circuit_from_terms, get_parameterized_qaoa_circuit_from_terms
 
 
@@ -27,7 +27,7 @@ def get_qaoa_circuit(N: int, gammas: Sequence, betas: Sequence, save_statevector
     qc : qiskit.QuantumCircuit
         Quantum circuit implementing QAOA
     """
-    terms, _ = get_energy_term_indices(N)
+    terms, _ = get_terms_offset(N)
     return get_qaoa_circuit_from_terms(N=N, terms=terms, gammas=gammas, betas=betas, save_statevector=save_statevector)
 
 
@@ -67,7 +67,7 @@ def get_parameterized_qaoa_circuit(N: int, p: int, save_statevector: bool = True
         (beta first, then gamma). To bind:
         qc.bind_parameters(np.hstack([angles['beta'], angles['gamma']]))
     """
-    terms, _ = get_energy_term_indices(N)
+    terms, _ = get_terms_offset(N)
     return get_parameterized_qaoa_circuit_from_terms(
         N=N,
         terms=terms,
