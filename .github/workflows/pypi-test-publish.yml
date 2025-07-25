@@ -15,11 +15,11 @@ on:
 
 jobs:
   release-build:
-    name: Build wheels on ${{ matrix.python }} - ${{matrix.os}}
+    name: Build wheels on ${{matrix.os}}
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         python: ["cp311"]
 
     steps:
@@ -29,16 +29,16 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Build release distributions
+      - name: Build release distributions ${{matrix.os}}
         run: |
           # NOTE: put your own distribution build steps here.
           python -m pip install build
           python -m build
 
-      - name: Upload distributions
+      - name: Upload distributions ${{matrix.os}}
         uses: actions/upload-artifact@v4
         with:
-          name: release-dists
+          name: release-dists ${{matrix.os}}
           path: dist/
 
   pypi-publish:
