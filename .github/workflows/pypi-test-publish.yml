@@ -15,6 +15,7 @@ on:
 
 jobs:
   release-build:
+    name: Build wheels on ${{ matrix.python }} - ${{matrix.os}}
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
