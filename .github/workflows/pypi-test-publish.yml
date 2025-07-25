@@ -64,7 +64,7 @@ jobs:
       - name: Retrieve release distributions
         uses: actions/download-artifact@v4
         with:
-          name: release-dists
+          name: release-dists ${{matrix.os}}
           path: dist/
 
       - name: Publish release distributions to PyPI
