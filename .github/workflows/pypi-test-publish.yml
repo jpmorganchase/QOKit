@@ -15,7 +15,11 @@ on:
 
 jobs:
   release-build:
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["cp311"]
 
     steps:
       - uses: actions/checkout@v4
