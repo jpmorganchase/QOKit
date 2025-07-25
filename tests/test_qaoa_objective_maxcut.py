@@ -159,7 +159,7 @@ def test_sk_ini_maxcut(simulator):
         for p in range(1, max_p + 1):
             gamma, beta = get_sk_gamma_beta(p)
             f = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator)
-            cur_ar = -f(gamma / np.sqrt(d), beta) / optimal_cut
+            cur_ar = -f(-gamma / np.sqrt(d), beta) / optimal_cut
             if p == 1:
                 assert cur_ar > np.mean(precomputed_energies) / optimal_cut
             else:

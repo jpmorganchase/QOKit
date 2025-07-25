@@ -15,7 +15,7 @@ from functools import cache
 from scipy.fft import dct, dst, idct, idst
 
 
-def to_basis(gamma, beta, num_coeffs, basis="fourier"):
+def to_basis(gamma, beta, num_coeffs=None, basis="fourier"):
     """Convert gamma,beta angles in standard parameterizing QAOA to a basis of functions
 
     Parameters
@@ -30,29 +30,24 @@ def to_basis(gamma, beta, num_coeffs, basis="fourier"):
     u, v : np.array
         QAOA parameters in given basis
     """
-    # assert len(gamma) == len(beta)
-    try:
-        p = len(gamma)
-    except:
-        p = 1
-    fit_interval = np.linspace(-1, 1, p)
-    print("fit_interval from to_basis", fit_interval)
-
     if basis == "fourier":
         u = 2 * dst(gamma, type=4, norm="forward")  # difference of 2 due to normalization of dst
         v = 2 * dct(beta, type=4, norm="forward")  # difference of 2 due to normalization of dct
-    elif basis == "chebyshev":
-        u = np.polynomial.chebyshev.chebfit(fit_interval, gamma, deg=num_coeffs - 1)  # offset of 1 due to fitting convention
-        v = np.polynomial.chebyshev.chebfit(fit_interval, beta, deg=num_coeffs - 1)
-    elif basis == "hermite":
-        u = np.polynomial.hermite.hermfit(fit_interval, gamma, deg=num_coeffs - 1)
-        v = np.polynomial.hermite.hermfit(fit_interval, beta, deg=num_coeffs - 1)
-    elif basis == "legendre":
-        u = np.polynomial.legendre.legfit(fit_interval, gamma, deg=num_coeffs - 1)
-        v = np.polynomial.legendre.legfit(fit_interval, beta, deg=num_coeffs - 1)
-    elif basis == "laguerre":
-        u = np.polynomial.laguerre.lagfit(fit_interval, gamma, deg=num_coeffs - 1)
-        v = np.polynomial.laguerre.lagfit(fit_interval, beta, deg=num_coeffs - 1)
+    else:
+        assert num_coeffs is not None
+        fit_interval = np.linspace(-1, 1, len(gamma))
+        if basis == "chebyshev":
+            u = np.polynomial.chebyshev.chebfit(fit_interval, gamma, deg=num_coeffs - 1)  # offset of 1 due to fitting convention
+            v = np.polynomial.chebyshev.chebfit(fit_interval, beta, deg=num_coeffs - 1)
+        elif basis == "hermite":
+            u = np.polynomial.hermite.hermfit(fit_interval, gamma, deg=num_coeffs - 1)
+            v = np.polynomial.hermite.hermfit(fit_interval, beta, deg=num_coeffs - 1)
+        elif basis == "legendre":
+            u = np.polynomial.legendre.legfit(fit_interval, gamma, deg=num_coeffs - 1)
+            v = np.polynomial.legendre.legfit(fit_interval, beta, deg=num_coeffs - 1)
+        elif basis == "laguerre":
+            u = np.polynomial.laguerre.lagfit(fit_interval, gamma, deg=num_coeffs - 1)
+            v = np.polynomial.laguerre.lagfit(fit_interval, beta, deg=num_coeffs - 1)
 
     return u, v
 
@@ -65,7 +60,7 @@ def from_basis(u, v, p=None, basis="fourier"):
     ----------
     u : list-like
     v : list-like
-    p : int
+    p : int, the number of coefficients
     basis : string
 
     Returns
@@ -74,13 +69,12 @@ def from_basis(u, v, p=None, basis="fourier"):
         QAOA angles parameters in standard parameterization
     """
     assert len(u) == len(v)
-    if p is None:
-        p = len(u)
-    fit_interval = np.linspace(-1, 1, p)
 
     if basis == "fourier":
+        if p is None:
+            p = len(u)
         if p < len(u):
-            raise Exception("p must exceed the length of u and v ")
+            raise Exception("p must be greater or equal the length of u and v ")
 
         u_padded = np.zeros(p)
         v_padded = np.zeros(p)
@@ -91,7 +85,11 @@ def from_basis(u, v, p=None, basis="fourier"):
 
         gamma = 0.5 * idst(u_padded, type=4, norm="forward")  # difference of 1/2 due to normalization of idst
         beta = 0.5 * idct(v_padded, type=4, norm="forward")  # difference of 1/2 due to normalization of idct
-    elif basis == "chebyshev":
+    else:
+        assert p is not None
+        fit_interval = np.linspace(-1, 1, p)
+
+    if basis == "chebyshev":
         gamma = np.polynomial.chebyshev.chebval(fit_interval, u)
         beta = np.polynomial.chebyshev.chebval(fit_interval, v)
     elif basis == "hermite":
@@ -107,53 +105,8 @@ def from_basis(u, v, p=None, basis="fourier"):
     return gamma, beta
 
 
-def from_fourier_basis(u, v):
-    """Convert u,v parameterizing QAOA in the Fourier basis
-    to beta, gamma in standard parameterization
-    following https://arxiv.org/abs/1812.01041
-    Parameters
-    ----------
-    u : list-like
-    v : list-like
-        QAOA parameters in Fourier basis
-    Returns
-    -------
-    beta, gamma : np.array
-        QAOA parameters in standard parameterization
-        (used e.g. by qaoa_qiskit.py)
-    """
-    assert len(u) == len(v)
-
-    gamma = 0.5 * idst(u, type=4, norm="forward")  # difference of 1/2 due to normalization of idst
-    beta = 0.5 * idct(v, type=4, norm="forward")  # difference of 1/2 due to normalization of idct
-
-    return gamma, beta
-
-
-def to_fourier_basis(gamma, beta):
-    """Convert gamma,beta standard parameterizing QAOA to the Fourier basis
-    of u, v in standard parameterization
-    following https://arxiv.org/abs/1812.01041
-    Parameters
-    ----------
-    gamma : list-like
-    beta : list-like
-        QAOA parameters in standard basis
-    Returns
-    -------
-    u, v : np.array
-        QAOA parameters in fourier parameterization
-        (used e.g. by qaoa_qiskit.py)
-    """
-    assert len(gamma) == len(beta)
-    u = 2 * dst(gamma, type=4, norm="forward")  # difference of 2 due to normalization of dst
-    v = 2 * dct(beta, type=4, norm="forward")  # difference of 2 due to normalization of dct
-
-    return u, v
-
-
-def extrapolate_parameters_in_fourier_basis(u, v, p, step_size):
-    """Extrapolate the parameters u, v from p-step_size to p
+def extrapolate_parameters_in_fourier_basis(u, v, p):
+    """Extrapolate the parameters u, v to p
     Parameters
     ----------
     u : list-like
@@ -161,21 +114,19 @@ def extrapolate_parameters_in_fourier_basis(u, v, p, step_size):
         QAOA parameters in Fourier basis
     p : int
         QAOA depth
-    step_size : int
-        Target QAOA depth for extrapolation
     Returns
     -------
     u, v : np.array
         QAOA parameters in Fourier basis
-        for depth p+step_size
+        for depth p.
     """
 
     u_next = np.zeros(p)
     v_next = np.zeros(p)
-    u_next[: p - step_size] = u
-    v_next[: p - step_size] = v
-    u_next[p - step_size :] = 0
-    v_next[p - step_size :] = 0
+
+    p_k = min(p, len(u))
+    u_next[:p_k] = u[:p_k]
+    v_next[:p_k] = v[:p_k]
 
     return u_next, v_next
 
@@ -208,86 +159,80 @@ def convert_to_gamma_beta(*args, parameterization: QAOAParameterization | str):
         p = int(len(freq) / 2)
         u = freq[:p]
         v = freq[p:]
-        gamma, beta = from_fourier_basis(u, v)
+        gamma, beta = from_basis(u, v, p=None, basis="fourier")
     elif parameterization == QAOAParameterization.GAMMA_BETA:
         assert len(args) == 2, "gamma beta parameterization requires two arguments"
         gamma, beta = args
     elif parameterization == QAOAParameterization.U_V:
         assert len(args) == 2, "u v parameterization requires two arguments"
         u, v = args
-        gamma, beta = from_fourier_basis(u, v)
+        gamma, beta = from_basis(u, v, p=None, basis="fourier")
     else:
         raise ValueError("Invalid parameterization")
     return gamma, beta
 
 
+@cache
+def _get_sk_gamma_beta_from_file():
+    """
+    Caches the dataframe after the first call to load JSon, subsequent calls will get from cache and save I/O
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    df: Pandas Dataframe
+    """
+    return pd.read_json(str(files("qokit.assets").joinpath("best_SK_QAOA_parameters.json")), orient="index")
+
+
+def _get_sk_gamma_beta(p):
+    """
+    Returns the parameters for QAOA for infinite-sized SK model
+
+    Parameters
+    ----------
+    p : int
+        QAOA depth
+
+    Returns
+    -------
+    gamma, beta : (list, list)
+        Parameters as two separate lists in a tuple
+    """
+    df = _get_sk_gamma_beta_from_file()
+    row = df[(df["p"] == p)]
+
+    # If the angles aren't in the database, we extrapolate from nearest p
+    if len(row) != 1:
+        p_list = np.array(df["p"].keys())
+        print(f"p_list = {p_list}")
+        p_closest = p_list[np.argmin(np.abs(p_list - p))]
+        row = df[(df["p"] == p_closest)].squeeze()
+        print(f"Extrapolating from p={p_closest}")
+        gamma, beta = np.array(row["gammas"]), np.array(row["betas"])
+        u, v = to_basis(gamma, beta)
+        u_next, v_next = extrapolate_parameters_in_fourier_basis(u, v, p)
+        gamma, beta = from_basis(u_next, v_next)
+        # raise ValueError(f"p={p} not supported, try lower p")
+        return np.array(gamma), np.array(beta)
+    else:
+        row = row.squeeze()
+        return np.array(row["gammas"]), np.array(row["betas"])
+
+
 def get_sk_gamma_beta(p, parameterization: QAOAParameterization | str = "gamma beta"):
     """
-    Load the look-up table for initial points from
-    https://arxiv.org/pdf/2110.14206.pdf
+    Load the look-up table for initial points from json file
     """
-    if p == 1:
-        gamma = np.array([0.5])
-        beta = np.array([np.pi / 8])
-    elif p == 2:
-        gamma = np.array([0.3817, 0.6655])
-        beta = np.array([0.4960, 0.2690])
-    elif p == 3:
-        gamma = np.array([0.3297, 0.5688, 0.6406])
-        beta = np.array([0.5500, 0.3675, 0.2109])
-    elif p == 4:
-        gamma = np.array([0.2949, 0.5144, 0.5586, 0.6429])
-        beta = np.array([0.5710, 0.4176, 0.3028, 0.1729])
-    elif p == 5:
-        gamma = np.array([0.2705, 0.4804, 0.5074, 0.5646, 0.6397])
-        beta = np.array([0.5899, 0.4492, 0.3559, 0.2643, 0.1486])
-    elif p == 6:
-        gamma = np.array([0.2528, 0.4531, 0.4750, 0.5146, 0.5650, 0.6392])
-        beta = np.array([0.6004, 0.4670, 0.3880, 0.3176, 0.2325, 0.1291])
-    elif p == 7:
-        gamma = np.array([0.2383, 0.4327, 0.4516, 0.4830, 0.5147, 0.5686, 0.6393])
-        beta = np.array([0.6085, 0.4810, 0.4090, 0.3534, 0.2857, 0.2080, 0.1146])
-    elif p == 8:
-        gamma = np.array([0.2268, 0.4162, 0.4332, 0.4608, 0.4818, 0.5179, 0.5717, 0.6393])
-        beta = np.array([0.6151, 0.4906, 0.4244, 0.3780, 0.3224, 0.2606, 0.1884, 0.1030])
-    elif p == 9:
-        gamma = np.array([0.2172, 0.4020, 0.4187, 0.4438, 0.4592, 0.4838, 0.5212, 0.5754, 0.6398])
-        beta = np.array([0.6196, 0.4973, 0.4354, 0.3956, 0.3481, 0.2973, 0.2390, 0.1717, 0.0934])
-    elif p == 10:
-        gamma = np.array([0.2089, 0.3902, 0.4066, 0.4305, 0.4423, 0.4604, 0.4858, 0.5256, 0.5789, 0.6402])
-        beta = np.array([0.6235, 0.5029, 0.4437, 0.4092, 0.3673, 0.3246, 0.2758, 0.2208, 0.1578, 0.0855])
-    elif p == 11:
-        gamma = np.array([0.2019, 0.3799, 0.3963, 0.4196, 0.4291, 0.4431, 0.4611, 0.4895, 0.5299, 0.5821, 0.6406])
-        beta = np.array([0.6268, 0.5070, 0.4502, 0.4195, 0.3822, 0.3451, 0.3036, 0.2571, 0.2051, 0.1459, 0.0788])
-    elif p == 12:
-        gamma = np.array([0.1958, 0.3708, 0.3875, 0.4103, 0.4185, 0.4297, 0.4430, 0.4639, 0.4933, 0.5343, 0.5851, 0.6410])
-        beta = np.array([0.6293, 0.5103, 0.4553, 0.4275, 0.3937, 0.3612, 0.3248, 0.2849, 0.2406, 0.1913, 0.1356, 0.0731])
-    elif p == 13:
-        gamma = np.array([0.1903, 0.3627, 0.3797, 0.4024, 0.4096, 0.4191, 0.4290, 0.4450, 0.4668, 0.4975, 0.5385, 0.5878, 0.6414])
-        beta = np.array([0.6315, 0.5130, 0.4593, 0.4340, 0.4028, 0.3740, 0.3417, 0.3068, 0.2684, 0.2260, 0.1792, 0.1266, 0.0681])
-    elif p == 14:
-        gamma = np.array([0.1855, 0.3555, 0.3728, 0.3954, 0.4020, 0.4103, 0.4179, 0.4304, 0.4471, 0.4703, 0.5017, 0.5425, 0.5902, 0.6418])
-        beta = np.array([0.6334, 0.5152, 0.4627, 0.4392, 0.4103, 0.3843, 0.3554, 0.3243, 0.2906, 0.2535, 0.2131, 0.1685, 0.1188, 0.0638])
-    elif p == 15:
-        gamma = np.array([0.1811, 0.3489, 0.3667, 0.3893, 0.3954, 0.4028, 0.4088, 0.4189, 0.4318, 0.4501, 0.4740, 0.5058, 0.5462, 0.5924, 0.6422])
-        beta = np.array([0.6349, 0.5169, 0.4655, 0.4434, 0.4163, 0.3927, 0.3664, 0.3387, 0.3086, 0.2758, 0.2402, 0.2015, 0.1589, 0.1118, 0.0600])
-    elif p == 16:
-        gamma = np.array([0.1771, 0.3430, 0.3612, 0.3838, 0.3896, 0.3964, 0.4011, 0.4095, 0.4197, 0.4343, 0.4532, 0.4778, 0.5099, 0.5497, 0.5944, 0.6425])
-        beta = np.array([0.6363, 0.5184, 0.4678, 0.4469, 0.4213, 0.3996, 0.3756, 0.3505, 0.3234, 0.2940, 0.2624, 0.2281, 0.1910, 0.1504, 0.1056, 0.0566])
-    elif p == 17:
-        gamma = np.array(
-            [0.1735, 0.3376, 0.3562, 0.3789, 0.3844, 0.3907, 0.3946, 0.4016, 0.4099, 0.4217, 0.4370, 0.4565, 0.4816, 0.5138, 0.5530, 0.5962, 0.6429]
-        )
-        beta = np.array(
-            [0.6375, 0.5197, 0.4697, 0.4499, 0.4255, 0.4054, 0.3832, 0.3603, 0.3358, 0.3092, 0.2807, 0.2501, 0.2171, 0.1816, 0.1426, 0.1001, 0.0536]
-        )
-    else:
-        raise ValueError(f"p={p} not supported, try lower p")
+    gamma, beta = _get_sk_gamma_beta(p)
     parameterization = QAOAParameterization(parameterization)
     if parameterization == QAOAParameterization.THETA:
-        return np.concatenate((2 * gamma, beta), axis=0)
+        return np.concatenate((-2 * gamma, beta), axis=0)
     elif parameterization == QAOAParameterization.GAMMA_BETA:
-        return 2 * gamma, beta
+        return -2 * gamma, beta
 
 
 @cache

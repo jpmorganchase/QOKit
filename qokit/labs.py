@@ -88,34 +88,7 @@ true_optimal_energy = {
 
 
 def get_terms_offset(N: int):
-    """
-    Retrun `terms` and `offset` for QAOA LABS problem
-
-    Parameters
-    ----------
-    N : int
-        Problem size (number of spins)
-
-    Returns
-    -------
-    terms : Sequence of `(float, term)`, where `term` is a tuple of ints.
-        Each term corresponds to a summand in the cost Hamiltonian
-        and th float value is the coefficient of this term.
-        e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
-        the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
-
-    offset : int
-        energy offset required due to constant factors (identity terms)
-        not included in the Hamiltonian
-
-    """
-    term_indices, offset = get_energy_term_indices(N)
-    terms = [(len(t), t) for t in term_indices]
-    return terms, offset
-
-
-def get_energy_term_indices(N: int):
-    """Return indices of Pauli Zs in the LABS problem definition
+    """Return terms with indices and offset of Pauli Zs in the LABS problem definition
 
     Parameters
     ----------
@@ -126,8 +99,8 @@ def get_energy_term_indices(N: int):
     -------
     terms : list of tuples
         List of tuples, where each tuple defines a summand
-        and contains indices of the Pauli Zs in the product
-        e.g. if terms = [(0,1), (0,1,2,3), (1,2)]
+        and contains weight and indices of the Pauli Zs in the product
+        e.g. if terms = [(2, (0,1)), (4, (0,1,2,3)), (2, (1,2))]
         the Hamiltonian is Z0Z1 + Z0Z1Z2Z3 + Z1Z2
 
     offset : int
@@ -144,10 +117,10 @@ def get_energy_term_indices(N: int):
             # -1 because we index from 1
             # Drop duplicate terms, e.g. Z1Z2Z2Z3 should be just Z1Z3
             if i + k == j:
-                all_terms.append(tuple(sorted((i - 1, j + k - 1))))
+                all_terms.append((2, tuple(sorted((i - 1, j + k - 1)))))
             else:
-                all_terms.append(tuple(sorted((i - 1, i + k - 1, j - 1, j + k - 1))))
-    return set(all_terms), offset
+                all_terms.append((4, tuple(sorted((i - 1, i + k - 1, j - 1, j + k - 1)))))
+    return list(set(all_terms)), offset
 
 
 @njit()
@@ -208,8 +181,8 @@ def energy_vals_general(s: Sequence, terms: Iterable | None = None, offset: floa
         set(s) \in {+1, -1}
     terms : list-like, default None
     offset : float, default None
-        precomputed output of get_energy_term_indices
-        terms, offset = get_energy_term_indices(N)
+        precomputed output of get_terms_offset
+        terms, offset = get_terms_offset(N)
     check_parameters : bool, default True
         if set to False, no input validation is performed
     Returns
@@ -223,10 +196,11 @@ def energy_vals_general(s: Sequence, terms: Iterable | None = None, offset: floa
         assert set(s).issubset(set([-1, 1]))
     N = len(s)
     if terms is None or offset is None:
-        terms, offset = get_energy_term_indices(N)
+        terms, offset = get_terms_offset(N)
     E_s = offset
     for term in terms:
-        E_s += (4 if len(term) == 4 else 2) * reduce(mul, [s[idx] for idx in term])
+        len_term, val_term = term
+        E_s += len_term * reduce(mul, [s[idx] for idx in val_term])
     return E_s
 
 
@@ -240,8 +214,8 @@ def energy_vals_from_bitstring_general(x, terms: Sequence | None = None, offset:
         set(s) \in {0, 1}
     terms : list-like, default None
     offset : float, default None
-        precomputed output of get_energy_term_indices
-        terms, offset = get_energy_term_indices(N)
+        precomputed output of get_terms_offset
+        terms, offset = get_terms_offset(N)
     check_parameters : bool, default True
         if set to False, no input validation is performed
     Returns
@@ -262,8 +236,8 @@ def slow_merit_factor(s: Sequence, terms: Iterable | None = None, offset: float 
         set(s) \in {-1, +1}
     terms : list-like, default None
     offset : float, default None
-        precomputed output of get_energy_term_indices
-        terms, offset = get_energy_term_indices(N)
+        precomputed output of get_terms_offset
+        terms, offset = get_terms_offset(N)
     check_parameters : bool, default True
         if set to False, no input validation is performed
 
@@ -278,10 +252,11 @@ def slow_merit_factor(s: Sequence, terms: Iterable | None = None, offset: float 
         assert set(s).issubset(set([-1, 1]))
     N = len(s)
     if terms is None or offset is None:
-        terms, offset = get_energy_term_indices(N)
+        terms, offset = get_terms_offset(N)
     E_s = offset
     for term in terms:
-        E_s += (4 if len(term) == 4 else 2) * reduce(mul, [s[idx] for idx in term])
+        len_term, val_term = term
+        E_s += len_term * reduce(mul, [s[idx] for idx in val_term])
     return N**2 / (2 * E_s)
 
 
@@ -326,46 +301,6 @@ def negative_merit_factor_from_bitstring(x, N: int | None = None) -> float:
         negative merit factor of s
     """
     return -merit_factor(1 - 2 * x, N=N)
-
-
-def get_term_indices(N: int) -> list:
-    """Return indices of Pauli Zs in the LABS problem definition
-
-    Parameters
-    ----------
-    N : int
-        Problem size (number of spins)
-
-    Returns
-    -------
-    terms : list of tuples
-        List of ordered tuples, where each tuple defines a summand
-        and contains indices of the Pauli Zs in the product
-        e.g. if terms = [(0,1), (0,1,2,3), (1,2)]
-        the Hamiltonian is Z0Z1 + Z0Z1Z2Z3 + Z1Z2
-    """
-    return list(get_energy_term_indices(N)[0])
-
-
-def get_terms(N: int) -> TermsType:
-    """Return terms definition of the LABS problem
-
-    Parameters
-    ----------
-    N : int
-        Problem size (number of spins)
-
-    Returns
-    -------
-    terms : TermsType
-        List of tuples (number, tuple) where the
-        tuple determines the location of Z operators
-        and the number is a scaling factor for the product.
-
-        e.g. if terms = [(2, (0,1)), (4, (0,1,2,3)), (2, (1,2))]
-        the Hamiltonian is 2*Z0Z1 + 4*Z0Z1Z2Z3 + 2*Z1Z2
-    """
-    return [(len(x), x) for x in get_term_indices(N)]
 
 
 def get_depth_optimized_terms(N: int) -> list:
@@ -524,7 +459,6 @@ def get_gate_optimized_terms_greedy(N: int, number_of_gate_zones: int = 4, seed:
     circuit = []
 
     seed = seed if seed else np.random.randint(np.iinfo(np.int32).max)
-    print(f"seed: {seed}")
     rng = np.random.default_rng(seed)
 
     # greedly align four body terms to cancel CNOTs

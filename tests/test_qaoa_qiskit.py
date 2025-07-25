@@ -11,10 +11,7 @@ from qokit.qaoa_circuit_labs import (
     get_parameterized_qaoa_circuit,
     get_qaoa_circuit,
 )
-from qokit.labs import (
-    get_energy_term_indices,
-    negative_merit_factor_from_bitstring,
-)
+from qokit.labs import negative_merit_factor_from_bitstring
 from qokit.utils import (
     precompute_energies,
     obj_from_statevector,
@@ -36,9 +33,7 @@ def test_qaoa_parameterization():
     )
     row = df[(df["N"] == N) & (df["p"] == p)].squeeze()
 
-    terms_ix, offset = get_energy_term_indices(N)
-
-    qc = get_qaoa_circuit(N, terms_ix, row["gamma"], row["beta"])
+    qc = get_qaoa_circuit(N, row["gamma"], row["beta"])
     backend = AerSimulator(method="statevector")
     sv = np.asarray(backend.run(qc).result().get_statevector())
 
@@ -68,18 +63,17 @@ def test_parameterized_circuit():
     N = 10
     p = 50
     ramp = get_ramp(0.1663, p)
-    terms, offset = get_energy_term_indices(N)
 
     backend = AerSimulator(method="statevector")
 
-    qc_param = get_parameterized_qaoa_circuit(N, terms, p)
+    qc_param = get_parameterized_qaoa_circuit(N, p)
     qc1 = qc_param.assign_parameters(np.hstack([ramp["beta"], ramp["gamma"]]))
     f1 = obj_from_statevector(
         np.asarray(backend.run(qc1).result().get_statevector()),
         negative_merit_factor_from_bitstring,
     )
 
-    qc2 = get_qaoa_circuit(N, terms, ramp["gamma"], ramp["beta"])
+    qc2 = get_qaoa_circuit(N, ramp["gamma"], ramp["beta"])
     f2 = obj_from_statevector(
         np.asarray(backend.run(qc2).result().get_statevector()),
         negative_merit_factor_from_bitstring,
