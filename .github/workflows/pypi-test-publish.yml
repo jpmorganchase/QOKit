@@ -67,12 +67,12 @@ jobs:
           name: release-dists-ubuntu-latest
           path: dist/
 
-      - name: Publish release distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: dist/
-          user: __token__
-          password: ${{ secrets.PYPI_TEST_API_JPMC_OSS }}
+#      - name: Publish release distributions to PyPI
+#        uses: pypa/gh-action-pypi-publish@release/v1
+#        with:
+#          packages-dir: dist/
+#          user: __token__
+#          password: ${{ secrets.PYPI_TEST_API_JPMC_OSS }}
 #          repository-url: https://test.pypi.org/legacy/
 #          skip-existing: true
 
