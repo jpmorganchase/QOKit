@@ -50,7 +50,7 @@ def append_cost_operator_circuit(qc: QuantumCircuit, terms: Sequence, gamma: flo
     """In the following, `gamma` is divided by factor of 2 in order
     to preserve the convention of (2 * gamma) in applying `rz` gates
     in `append_z_prod_term(...)` and that of (2 * beta) in applying `rx`
-    gates in `append_x_term(...)`, which orginates from  different conventions
+    gates in `append_x_term(...)`, which originates from  different conventions
     used between `QOKit` and `Qiskit`."""
     for term in terms:
         if len(term) == 2 and isinstance(term[1], Sequence):
@@ -79,7 +79,7 @@ def get_qaoa_circuit_from_terms(
     terms : list-like
         A sequence of `term` or `(float, term)`, where `term` is a tuple of ints.
         Each term corresponds to a summand in the cost Hamiltonian
-        and th float value is the coefficient of this term.
+        and the float value is the coefficient of this term.
         e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
         the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
         Unweighted Hamiltonians are supported as well:
@@ -104,7 +104,7 @@ def get_qaoa_circuit_from_terms(
         Quantum circuit implementing QAOA
     """
     assert len(betas) == len(gammas)
-    p = len(betas)  # infering number of QAOA steps from the parameters passed
+    p = len(betas)  # inferring number of QAOA steps from the parameters passed
     if qr is not None:
         assert qr.size >= N
     else:
@@ -145,7 +145,7 @@ def get_parameterized_qaoa_circuit_from_terms(
     terms : list-like
         A sequence of `term` or `(float, term)`, where `term` is a tuple of ints.
         Each term corresponds to a summand in the cost Hamiltonian
-        and th float value is the coefficient of this term.
+        and the float value is the coefficient of this term.
         e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
         the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
         Unweighted Hamiltonians are supported as well:
