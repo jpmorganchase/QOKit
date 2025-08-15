@@ -42,7 +42,7 @@ def get_sk_terms(J: np.ndarray) -> TermsType:
 
 
 def get_random_J(N: int, seed=42):
-    """Return a random coupling matrix J for a gicen N and seed.
+    """Return a random coupling matrix J for a given N and seed.
     Args:
         N (int): size of the coupling matrix.
         seed (int): random seed

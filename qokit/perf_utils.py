@@ -23,16 +23,16 @@ def timeit(name: Optional[str] = None):
     """
     simple timer context manager
     usage 1:
-        with timeit("my awsome code"):
+        with timeit("my awesome code"):
             <some very cool stuff ...>
 
     usage 2:
-        @timeit("my awsome code"):
+        @timeit("my awesome code"):
         def my_func():
             <some very cool stuff ...>
 
     output:
-        >>> [TIME] my awsome code took <xxxx> seconds to run
+        >>> [TIME] my awesome code took <xxxx> seconds to run
     """
     start = time.monotonic()
     try:

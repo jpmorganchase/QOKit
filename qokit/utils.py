@@ -128,7 +128,7 @@ def precompute_energies(obj_f, nbits: int, *args: object, **kwargs: object):
     num_processes : int
         Number of processes to use. Default: 1 (serial)
         if num_processes > 1, pathos.Pool is used
-    *args, **kwargs : Objec
+    *args, **kwargs : Object
         Parameters to be passed directly to obj_f
 
     Returns

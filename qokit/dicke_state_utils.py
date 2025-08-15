@@ -106,7 +106,7 @@ def blockii(n, l, qin="xxx"):
     qr = QuantumRegister(3, "blockii{}{}".format(n, l))
     circ = QuantumCircuit(qr)
 
-    # if qubit 1 is guaranteed to be 1 (even after preceeding block),
+    # if qubit 1 is guaranteed to be 1 (even after preceding block),
     # pass on to blocki without the little-endian '1'
     if qin[2] == "1":
         blocki_circ = blocki(n, l, qin[0:2])
@@ -193,7 +193,7 @@ def U(N, k=0, K=None, topology=None):
 
 
 """ dicke_simple(N,K)
-*   Based on improved techniqes upon    "Deterministic Preparation of Dicke States", https://arxiv.org/abs/1904.07358
+*   Based on improved techniques upon    "Deterministic Preparation of Dicke States", https://arxiv.org/abs/1904.07358
     with further improvements from      "On Actual Preparation of Dicke State on a Quantum Computer", https://arxiv.org/abs/2007.01681
 
 *   Generates the Dicke State through the better of the following methods:

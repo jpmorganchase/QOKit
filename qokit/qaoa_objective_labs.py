@@ -82,7 +82,7 @@ precomputed_labs_handler = PrecomputedLABSHandler()
 
 def get_precomputed_labs_merit_factors(N: int) -> np.ndarray:
     """
-    Return a precomputed a vector of negative LABS merit factors
+    Return a precomputed vector of negative LABS merit factors
     that accelerates the energy computation in obj_from_statevector
 
     If available, loads the precomputed vector from disk
@@ -105,7 +105,7 @@ def get_precomputed_labs_merit_factors(N: int) -> np.ndarray:
 
 def get_precomputed_optimal_bitstrings(N: int) -> np.ndarray:
     """
-    Return a precomputed  optimal bitstring for LABS problem of problem size N
+    Return a precomputed optimal bitstring for LABS problem of problem size N
 
     If available, loads the precomputed vector from disk
 

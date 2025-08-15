@@ -46,7 +46,7 @@ def get_configuration_cost_kw(config, po_problem=None):
 
 def po_obj_func(po_problem: dict) -> float:
     """
-    Wrapper function for compute a portofolio value
+    Wrapper function for compute a portfolio value
     """
     return partial(get_configuration_cost_kw, po_problem=po_problem)
 
@@ -86,7 +86,7 @@ def portfolio_brute_force(po_problem: dict, return_bitstring=False) -> tuple[flo
 
 def get_data(N, seed=1, real=False) -> tuple[float, float]:
     """
-    load portofolio data from qiskit-finance (Yahoo)
+    load portfolio data from qiskit-finance (Yahoo)
     https://github.com/Qiskit/qiskit-finance/blob/main/docs/tutorials/11_time_series.ipynb
     """
     import datetime
@@ -142,7 +142,7 @@ def get_data(N, seed=1, real=False) -> tuple[float, float]:
 
 
 def get_problem(N, K, q, seed=1, pre=False) -> dict[str, Any]:
-    """generate the portofolio optimziation problem dict"""
+    """generate the portfolio optimization problem dict"""
     po_problem = {}
     po_problem["N"] = N
     po_problem["K"] = K
@@ -254,7 +254,7 @@ def hamming_weight(index: str) -> int:
     return binary.count("1")
 
 
-def yield_all_indices_cosntrained(N: int, K: int):
+def yield_all_indices_constrained(N: int, K: int):
     """
     Helper function to avoid having to store all indices in memory
     """
@@ -265,7 +265,7 @@ def yield_all_indices_cosntrained(N: int, K: int):
 
 def get_sk_ini(p: int):
     """
-    scaled the sk look-up table for the application of portfolio optimziation
+    scaled the sk look-up table for the application of portfolio optimization
     """
     gamma_scale, beta_scale = 0.5, 1
     gamma, beta = get_sk_gamma_beta(p, parameterization="gamma beta")
