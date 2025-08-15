@@ -45,6 +45,27 @@ class QAOAFastSimulatorCBase(QAOAFastSimulatorBase):
         sv = ComplexArray(sv0.real.astype("float"), sv0.imag.astype("float")) if sv0 is not None else self.default_sv0
         self._apply_qaoa(sv, list(gammas), list(betas), **kwargs)
         return sv
+    
+    def _apply_qaoa_qudit(self, sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], **kwargs):
+        raise NotImplementedError
+
+    def simulate_qaoa_qudit(
+        self,
+        gammas: ParamType,
+        betas: ParamType,
+        sv0: np.ndarray | None = None,
+        **kwargs,
+    ) -> np.ndarray:
+        """
+        simulator QAOA circuit using FUR
+        @param gammas parameters for the phase separating layers
+        @param betas parameters for the mixing layers
+        @param sv0 (optional) initial statevector, default is uniform superposition state
+        @return statevector or vector of probabilities
+        """
+        sv = sv0.astype("complex") if sv0 is not None else self.default_sv0
+        self._apply_qaoa_qudit(sv, list(gammas), list(betas), **kwargs)
+        return sv
 
     def get_statevector(self, result: ComplexArray, **kwargs) -> np.ndarray:
         return result.get_complex()
@@ -95,6 +116,20 @@ class QAOAFURXSimulatorC(QAOAFastSimulatorCBase):
             self._hc_diag,
             self.n_qubits,
         )
+
+class QAOAFURXSimulatorCQudit(QAOAFastSimulatorCBase):
+    def _apply_qaoa_qudit(self, sv: ComplexArray, gammas: Sequence[float], betas: Sequence[float], **kwargs):
+        csim.apply_qaoa_furx_qudit(
+            sv.real,
+            sv.imag,
+            gammas,
+            betas,
+            self._hc_diag,
+            self.A_mat,
+            self.n_precision,
+            self.n_qubits,
+
+        )       
 
 
 class QAOAFURXYRingSimulatorC(QAOAFastSimulatorCBase):

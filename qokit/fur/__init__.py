@@ -1,7 +1,7 @@
 import numba.cuda
 from .qaoa_simulator_base import QAOAFastSimulatorBase, ParamType, CostsType, TermsType
-from .c.qaoa_simulator import QAOAFURXSimulatorC, QAOAFURXYRingSimulatorC, QAOAFURXYCompleteSimulatorC
-from .python.qaoa_simulator import QAOAFURXSimulator, QAOAFURXYRingSimulator, QAOAFURXYCompleteSimulator
+from .c.qaoa_simulator import QAOAFURXSimulatorC, QAOAFURXYRingSimulatorC, QAOAFURXYCompleteSimulatorC,QAOAFURXSimulatorCQudit
+from .python.qaoa_simulator import QAOAFURXSimulator, QAOAFURXYRingSimulator, QAOAFURXYCompleteSimulator,QAOAFURXSimulatorQudit
 from .nbcuda.qaoa_simulator import QAOAFURXSimulatorGPU, QAOAFURXYRingSimulatorGPU, QAOAFURXYCompleteSimulatorGPU
 from .mpi_nbcuda.qaoa_simulator import QAOAFURXSimulatorGPUMPI
 from .mpi_nbcuda.qaoa_simulator import mpi_available
@@ -12,7 +12,9 @@ from .c import is_available as c_available
 SIMULATORS = {
     "x": {
         "c": QAOAFURXSimulatorC,
+        "cqudit":QAOAFURXSimulatorCQudit,
         "python": QAOAFURXSimulator,
+        "pythonqudit":QAOAFURXSimulatorQudit,
         "gpu": QAOAFURXSimulatorGPU,
         "gpumpi": QAOAFURXSimulatorGPUMPI,
     },
@@ -94,7 +96,9 @@ def choose_simulator_xycomplete(name="auto", **kwargs):
 
 __all__ = [
     "QAOAFastSimulatorBase",
+    "QAOAFURXSimulatorCQudit",
     "QAOAFURXSimulatorC",
+    "QAOAFURXSimulatorQudit",
     "QAOAFURXYRingSimulatorC",
     "QAOAFURXYCompleteSimulatorC",
     "QAOAFURXSimulator",

@@ -7,7 +7,7 @@ from collections.abc import Sequence
 import numpy as np
 from ..qaoa_simulator_base import QAOAFastSimulatorBase, CostsType, TermsType, ParamType
 from ..diagonal_precomputation import precompute_vectorized_cpu_parallel
-from .qaoa_fur import apply_qaoa_furx, apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
+from .qaoa_fur import apply_qaoa_furx, apply_qaoa_furxy_complete, apply_qaoa_furxy_ring,apply_qaoa_furx_qudit
 
 
 def little_to_big_endian(arr):
@@ -57,9 +57,29 @@ class QAOAFastSimulatorPythonBase(QAOAFastSimulatorBase):
         sv = sv0.astype("complex") if sv0 is not None else self.default_sv0
         self._apply_qaoa(sv, list(gammas), list(betas), **kwargs)
         return sv
+    
+    def _apply_qaoa_qudit(self, sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], **kwargs):
+        raise NotImplementedError
 
-    # -- Outputs
-
+    def simulate_qaoa_qudit(
+        self,
+        gammas: ParamType,
+        betas: ParamType,
+        sv0: np.ndarray | None = None,
+        **kwargs,
+    ) -> np.ndarray:
+        """
+        simulator QAOA circuit using FUR
+        @param gammas parameters for the phase separating layers
+        @param betas parameters for the mixing layers
+        @param sv0 (optional) initial statevector, default is uniform superposition state
+        @return statevector or vector of probabilities
+        """
+        sv = sv0.astype("complex") if sv0 is not None else self.default_sv0
+        self._apply_qaoa_qudit(sv, list(gammas), list(betas), **kwargs)
+        return sv
+    
+    
     def get_statevector(self, result: np.ndarray, **kwargs) -> np.ndarray:
         return result
 
@@ -102,8 +122,14 @@ class QAOAFastSimulatorPythonBase(QAOAFastSimulatorBase):
 
 class QAOAFURXSimulator(QAOAFastSimulatorPythonBase):
     def _apply_qaoa(self, sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], **kwargs):
-        apply_qaoa_furx(sv, gammas, betas, self._hc_diag, self.n_qubits)
+        apply_qaoa_furx(sv, gammas, betas, self._hc_diag, self.n_qubits,self.n_precision,self.is_precision)
 
+
+class QAOAFURXSimulatorQudit(QAOAFastSimulatorPythonBase):
+    def _apply_qaoa_qudit(self, sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], **kwargs):
+        apply_qaoa_furx_qudit(sv, gammas, betas, self._hc_diag, self.n_qubits,self.n_precision,self.A_mat)
+        
+        
 
 class QAOAFURXYRingSimulator(QAOAFastSimulatorPythonBase):
     def _apply_qaoa(self, sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], **kwargs):

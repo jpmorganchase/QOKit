@@ -11,3 +11,16 @@ void apply_qaoa_furx(double* sv_real, double* sv_imag, double* const gammas, dou
 void apply_qaoa_furxy_ring(double* sv_real, double* sv_imag, double* const gammas, double* const betas, double* const hc_diag, unsigned int n_qubits, size_t n_states, size_t n_layers, size_t n_trotters);
 
 void apply_qaoa_furxy_complete(double* sv_real, double* sv_imag, double* const gammas, double* const betas, double* const hc_diag, unsigned int n_qubits, size_t n_states, size_t n_layers, size_t n_trotters);
+
+void apply_qaoa_furx_qudit(
+    double* sv_real, 
+    double* sv_imag, 
+    double* const gammas, 
+    double* const betas, 
+    double* const hc_diag,
+    double* A_mat_real, 
+    double* A_mat_imag, 
+    unsigned int n_precision, 
+    unsigned int n_qubits, 
+    size_t n_states, 
+    size_t n_layers);

@@ -62,75 +62,73 @@ def apply_qaoa_furx(
     )
 
 
-def furxy(
+def furx_qudit(
     sv_real: np.ndarray,
     sv_imag: np.ndarray,
     theta: float,
-    q1: int,
-    q2: int,
+    q: int,
+    n_precision: int,
+    A_mat: np.ndarray,
 ) -> None:
-    from .lib import _furxy
+    from .lib import _furx_qudit
 
+    # Ensure A_mat is complex and split into real and imaginary parts
+    assert np.iscomplexobj(A_mat), "A_mat must be a complex matrix"
+    A_mat_real = np.asarray(A_mat.real, dtype="float")
+    A_mat_imag = np.asarray(A_mat.imag, dtype="float")
+
+    # Validate input arrays
     n_states = check_arrays(sv_real, sv_imag)
-    _furxy(
+
+    # Call the C function
+    _furx_qudit(
         sv_real,
         sv_imag,
         theta,
-        q1,
-        q2,
+        q,
         n_states,
+        n_precision,
+        A_mat_real,
+        A_mat_imag,
     )
 
-
-def apply_qaoa_furxy_ring(
+def apply_qaoa_furx_qudit(
     sv_real: np.ndarray,
     sv_imag: np.ndarray,
     gammas: typing.Sequence[float],
     betas: typing.Sequence[float],
     hc_diag: np.ndarray,
-    n_qubits: int,
-    n_trotters: int,
-) -> None:
-    from .lib import _apply_qaoa_furxy_ring
+    A_mat: np.ndarray,
+    n_precision:int,
+    n_qubits:int
+    
 
+) -> None:
+    from .lib import _apply_qaoa_furx_qudit
+
+    # Ensure A_mat is complex and split into real and imaginary parts
+    assert np.iscomplexobj(A_mat), "A_mat must be a complex matrix"
+    A_mat_real = np.ascontiguousarray(A_mat.real, dtype=np.float64)
+    A_mat_imag = np.ascontiguousarray(A_mat.imag, dtype=np.float64)
+    # Validate input arrays
     n_states = check_arrays(sv_real, sv_imag, hc_diag)
     n_layers = check_arrays(gammas, betas)
     check_num_qubits(n_qubits, n_states)
-    _apply_qaoa_furxy_ring(
+
+    # Call the C function
+    _apply_qaoa_furx_qudit(
         sv_real,
         sv_imag,
         np.asarray(gammas, dtype="float"),
         np.asarray(betas, dtype="float"),
         hc_diag,
+        A_mat_real,
+        A_mat_imag,
+        n_precision,
         n_qubits,
         n_states,
-        n_layers,
-        n_trotters,
-    )
+        n_layers
+        
 
+    )    
 
-def apply_qaoa_furxy_complete(
-    sv_real: np.ndarray,
-    sv_imag: np.ndarray,
-    gammas: typing.Sequence[float],
-    betas: typing.Sequence[float],
-    hc_diag: np.ndarray,
-    n_qubits: int,
-    n_trotters: int,
-) -> None:
-    from .lib import _apply_qaoa_furxy_complete
-
-    n_states = check_arrays(sv_real, sv_imag, hc_diag)
-    n_layers = check_arrays(gammas, betas)
-    check_num_qubits(n_qubits, n_states)
-    _apply_qaoa_furxy_complete(
-        sv_real,
-        sv_imag,
-        np.asarray(gammas, dtype="float"),
-        np.asarray(betas, dtype="float"),
-        hc_diag,
-        n_qubits,
-        n_states,
-        n_layers,
-        n_trotters,
-    )

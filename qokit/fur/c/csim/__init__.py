@@ -1,9 +1,8 @@
 from .wrapper import (
     furx,
     apply_qaoa_furx,
-    furxy,
-    apply_qaoa_furxy_ring,
-    apply_qaoa_furxy_complete,
+    furx_qudit,
+    apply_qaoa_furx_qudit,
 )
 
 from .libpath import is_available
@@ -12,8 +11,7 @@ from .libpath import is_available
 __all__ = [
     "furx",
     "apply_qaoa_furx",
-    "furxy",
-    "apply_qaoa_furxy_ring",
-    "apply_qaoa_furxy_complete",
+    "furx_qudit",
+    "apply_qaoa_furx_qudit",
     "is_available",
 ]

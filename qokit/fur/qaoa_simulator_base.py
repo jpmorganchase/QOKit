@@ -34,6 +34,9 @@ class QAOAFastSimulatorBase(ABC):
     def __init__(
         self,
         n_qubits: int,
+        n_precision:int=2,
+        A_mat:np.ndarray=np.eye(2),
+        is_precision:bool=False,
         costs: CostsType | None = None,
         terms: TermsType | None = None,
     ) -> None:
@@ -57,6 +60,10 @@ class QAOAFastSimulatorBase(ABC):
         """
         self.n_qubits = n_qubits
         self.n_states = 2**n_qubits
+        self.n_precision=n_precision
+        self.is_precision=is_precision
+        self.A_mat=A_mat
+        
         if costs is None:
             if terms is None:
                 raise ValueError("Either costs or terms must be provided")
