@@ -35,6 +35,8 @@ def append_z_prod_term(qc: QuantumCircuit, term: Sequence, gamma: float) -> None
         qc.cx(term[0], term[1])
     elif term_weight == 2:
         qc.rzz(2 * gamma, term[0], term[1])
+    elif term_weight == 1:
+        qc.rz(2 * gamma, term[0])
     else:
         # fallback to general case
         target = term[-1]
@@ -52,8 +54,12 @@ def append_x_term(qc: QuantumCircuit, q1: int, beta: float) -> None:
 def append_cost_operator_circuit(qc: QuantumCircuit, terms: Sequence, gamma: float) -> None:
     for term in terms:
         if len(term) == 2 and isinstance(term[1], tuple):
-            coeff, (i, j) = term
-            append_z_prod_term(qc, (i, j), gamma * coeff / 2)
+            if len(term[1]) == 2:
+                coeff, (i, j) = term
+                append_z_prod_term(qc, (i, j), gamma * coeff / 2)
+            elif len(term[1]) == 1:
+                coeff, (i, ) = term
+                append_z_prod_term(qc, (i, ), gamma * coeff / 2)
         elif any([isinstance(i, tuple) for i in term]):
             raise ValueError(f"Invalid term received: {term}")
         else:
