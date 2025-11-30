@@ -23,6 +23,8 @@ def to_basis(gamma, beta, num_coeffs=None, basis="fourier"):
     gamma : list-like
     beta : list-like
     num_coeffs : int
+        p is recommended for "fourier"
+        p // 2 is recommended for "chebyshev", "hermite", "legendre", and "laguerre"
     basis : string
         QAOA parameters in standard basis
     Returns
