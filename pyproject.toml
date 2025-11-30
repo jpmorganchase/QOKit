@@ -33,7 +33,6 @@ dependencies = [
     'pytket-qiskit==0.74.0',
     'pytket-quantinuum==0.45.0',
     'qiskit==2.2.3',
-    'qiskit_ibm_runtime==0.43.1',
     'scipy>=1.10.1',
     'seaborn>=0.12.2',
     'sympy>=1.12',
