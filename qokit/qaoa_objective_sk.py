@@ -33,7 +33,7 @@ def get_qaoa_sk_objective(
     p : int
         Number of QAOA layers (number of parameters will be 2*p)
     J : numpy.ndarray
-        Couplinf matrix for the SK model.
+        Coupling matrix for the SK model.
     precomputed_energies : np.array
         precomputed cuts to compute the QAOA expectation, for maximization problem
         send the precomputed cuts/energies as negative

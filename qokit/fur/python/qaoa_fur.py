@@ -19,7 +19,7 @@ def apply_qaoa_furx(sv: np.ndarray, gammas: Sequence[float], betas: Sequence[flo
     @param n_qubits total number of qubits represented by the statevector
     """
     for gamma, beta in zip(gammas, betas):
-        sv *= np.exp(-0.5j * gamma * hc_diag)
+        sv *= np.exp(-0.5j * np.array(gamma * hc_diag))
         furx_all(sv, beta, n_qubits)
 
 def apply_qaoa_furxz(sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], init_rots: Sequence[float], hc_diag: np.ndarray, n_qubits: int) -> None:

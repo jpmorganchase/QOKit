@@ -4,7 +4,7 @@
 ###############################################################################
 import qiskit
 import numpy as np
-from .portfolio_optimization import yield_all_indices_cosntrained, get_configuration_cost
+from .portfolio_optimization import yield_all_indices_constrained, get_configuration_cost
 from qiskit import QuantumCircuit, transpile, QuantumRegister
 from qiskit_aer import Aer
 from qiskit.circuit import ParameterVector
@@ -17,7 +17,7 @@ def generate_dicke_state_fast(N, K):
     """
     Generate the dicke state with yield function
     """
-    index = yield_all_indices_cosntrained(N, K)
+    index = yield_all_indices_constrained(N, K)
     s = np.zeros(2**N)
     for i in index:
         s[i] = 1
@@ -48,7 +48,7 @@ def get_dicke_init(N, K):
     """
     from qokit.dicke_state_utils import dicke_simple
 
-    # can be other dicke state implementaitons
+    # can be other dicke state implementations
     return dicke_simple(N, K)
 
 
@@ -74,7 +74,7 @@ def get_mixer_Txy(qc, beta, minus=False, T=None):
             # odd Exp[-j*angle*(XX+YY)]
             # qc.append(qiskit.circuit.library.XXPlusYYGate(4 * beta), [i, i + 1])
             qc.append(qiskit.circuit.library.XXPlusYYGate(4 * beta), [N - 2 - i, N - 1 - i])
-        # last uniary
+        # last unitary
         qc.append(qiskit.circuit.library.XXPlusYYGate(4 * beta), [N - 1, 0])
     return qc
 

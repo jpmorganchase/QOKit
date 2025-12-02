@@ -10,40 +10,35 @@ from qiskit.circuit import ParameterVector
 from typing import Sequence
 
 
-def append_z_prod_term(qc: QuantumCircuit, term: Sequence, gamma: float) -> None:
+def append_z_prod_term(qc: QuantumCircuit, indices: Sequence, gamma: float) -> None:
     """Appends a  multi-body Pauli-Z interaction acting on qubits whose indices
-    correspond to those in 'term'.
+    correspond to those in 'indices'.
 
     Parameters:
         qc: QuantumCircuit
-        term: iterable
+        indices: iterable
             ordered iterable containing qubit indices to apply Pauli-Z interaction to
         gamma: float
             evolution time for interaction
 
     """
-    term_weight = len(term)
+    term_weight = len(indices)
     if term_weight == 4:
-        # in labs, four-body terms appear two times more than two-body
-        # there is also a global scaling factor of 2 for all terms (four and two), which is ignored here
-        assert all(term[i] < term[i + 1] for i in range(len(term) - 1))
-        _gamma = 2 * gamma
-        qc.cx(term[0], term[1])
-        qc.cx(term[3], term[2])
-        qc.rzz(2 * _gamma, term[1], term[2])
-        qc.cx(term[3], term[2])
-        qc.cx(term[0], term[1])
+        assert all(indices[i] < indices[i + 1] for i in range(term_weight - 1))
+        qc.cx(indices[0], indices[1])
+        qc.cx(indices[3], indices[2])
+        qc.rzz(2 * gamma, indices[1], indices[2])
+        qc.cx(indices[3], indices[2])
+        qc.cx(indices[0], indices[1])
     elif term_weight == 2:
-        qc.rzz(2 * gamma, term[0], term[1])
-    elif term_weight == 1:
-        qc.rz(2 * gamma, term[0])
+        qc.rzz(2 * gamma, indices[0], indices[1])
     else:
         # fallback to general case
-        target = term[-1]
-        for control in term[:-1]:
+        target = indices[-1]
+        for control in indices[:-1]:
             qc.cx(control, target)
         qc.rz(2 * gamma, target)
-        for control in term[:-1]:
+        for control in indices[:-1]:
             qc.cx(control, target)
 
 
@@ -52,18 +47,19 @@ def append_x_term(qc: QuantumCircuit, q1: int, beta: float) -> None:
 
 
 def append_cost_operator_circuit(qc: QuantumCircuit, terms: Sequence, gamma: float) -> None:
+    """In the following, `gamma` is divided by factor of 2 in order
+    to preserve the convention of (2 * gamma) in applying `rz` gates
+    in `append_z_prod_term(...)` and that of (2 * beta) in applying `rx`
+    gates in `append_x_term(...)`, which originates from  different conventions
+    used between `QOKit` and `Qiskit`."""
     for term in terms:
-        if len(term) == 2 and isinstance(term[1], tuple):
-            if len(term[1]) == 2:
-                coeff, (i, j) = term
-                append_z_prod_term(qc, (i, j), gamma * coeff / 2)
-            elif len(term[1]) == 1:
-                coeff, (i, ) = term
-                append_z_prod_term(qc, (i, ), gamma * coeff / 2)
+        if len(term) == 2 and isinstance(term[1], Sequence):
+            coeff, indices = term
+            append_z_prod_term(qc, indices, gamma * coeff / 2)
         elif any([isinstance(i, tuple) for i in term]):
             raise ValueError(f"Invalid term received: {term}")
         else:
-            append_z_prod_term(qc, term, gamma)
+            append_z_prod_term(qc, term, gamma / 2)
 
 
 def append_mixer_operator_circuit(qc: QuantumCircuit, beta: float) -> None:
@@ -83,7 +79,7 @@ def get_qaoa_circuit_from_terms(
     terms : list-like
         A sequence of `term` or `(float, term)`, where `term` is a tuple of ints.
         Each term corresponds to a summand in the cost Hamiltonian
-        and th float value is the coefficient of this term.
+        and the float value is the coefficient of this term.
         e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
         the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
         Unweighted Hamiltonians are supported as well:
@@ -108,7 +104,7 @@ def get_qaoa_circuit_from_terms(
         Quantum circuit implementing QAOA
     """
     assert len(betas) == len(gammas)
-    p = len(betas)  # infering number of QAOA steps from the parameters passed
+    p = len(betas)  # inferring number of QAOA steps from the parameters passed
     if qr is not None:
         assert qr.size >= N
     else:
@@ -210,7 +206,7 @@ def get_parameterized_qaoa_circuit_from_terms(
     terms : list-like
         A sequence of `term` or `(float, term)`, where `term` is a tuple of ints.
         Each term corresponds to a summand in the cost Hamiltonian
-        and th float value is the coefficient of this term.
+        and the float value is the coefficient of this term.
         e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
         the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
         Unweighted Hamiltonians are supported as well:

@@ -213,7 +213,7 @@ def get_qaoa_labs_overlap(N: int, p: int, **kwargs):
     Returns
     -------
     f : callable
-        Retrun the 1 - overlap of the state with the optimal bitstrings (we compute the sum of the probability of the output state to be in any one of the optimal bitstring states).
+        Return the 1 - overlap of the state with the optimal bitstrings (we compute the sum of the probability of the output state to be in any one of the optimal bitstring states).
     """
     return get_qaoa_labs_objective(N, p, objective="overlap", **kwargs)
 
@@ -234,7 +234,7 @@ def get_qaoa_labs_overlap_fourier(N: int, p: int, parameterization: str = "freq"
     Returns
     -------
     f : callable
-        Retrun the 1 - overlap of the state with the optimal bitstrings (we compute the sum of the probability of the output state to be in any one of the optimal bitstring states).
+        Return the 1 - overlap of the state with the optimal bitstrings (we compute the sum of the probability of the output state to be in any one of the optimal bitstring states).
     """
 
     return get_qaoa_labs_objective(N, p, objective="overlap", parameterization=parameterization, **kwargs)
