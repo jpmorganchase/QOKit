@@ -6,6 +6,7 @@ import numpy as np
 from qokit.qaoa_circuit_maxcut import get_ws_qaoa_circuit
 from qokit.fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
 from qiskit_aer import AerSimulator
+import pytest
 
 
 @pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
