@@ -3,6 +3,9 @@ import networkx as nx
 import qokit
 from qokit.parameter_utils import get_fixed_gamma_beta
 from qokit.warm_start import WSSolver, maxcut_qubo_from_G, WSSolverQUBO, get_terms_from_QUBO
+from qokit.maxcut import get_maxcut_terms
+import pytest
+import sys
 
 
 def test_p0_objective():
@@ -68,6 +71,7 @@ def test_batch_obj_grad():
 
 
 ############################
+@pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
 def test_maxcut_qaoa():
     N = 10
     G = nx.random_regular_graph(3, N, seed=1)
@@ -82,6 +86,12 @@ def test_maxcut_qaoa():
     sim = simclass(N, terms=terms)
     cost = sim.get_cost_diagonal()
     best_cut = np.max(cost)
+
+    terms_maxcut = get_maxcut_terms(G)
+    sim_maxcut = simclass(N, terms=terms_maxcut)
+    cost_maxcut = sim_maxcut.get_cost_diagonal()
+    best_cut_maxcut = np.max(cost_maxcut)
+
     _result = sim.simulate_ws_qaoa(list(np.asarray(gamma)), list(np.asarray(beta)), np.ones(N) * np.pi / 2)
     qokit_energy = sim.get_expectation(_result)
 
@@ -91,3 +101,4 @@ def test_maxcut_qaoa():
     ws_energy = ws_solver.run_standard_qaoa(p)
     assert np.isclose(qokit_energy, qubo_energy)
     assert np.isclose(ws_energy, qubo_energy)
+    assert best_cut_maxcut < ws_energy
