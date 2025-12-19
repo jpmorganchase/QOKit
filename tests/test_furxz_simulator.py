@@ -8,6 +8,7 @@ from qokit.fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
 from qiskit_aer import AerSimulator
 
 
+@pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
 def test_furxz_backends():
 
     N = 10
@@ -64,6 +65,7 @@ def test_ws_degeneracy():
     assert np.isclose(qiskit_energy, qaoa_energy)
 
 
+@pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
 def test_qiskit_qokit():
     ##### qiskit circuit
 
