@@ -125,8 +125,16 @@ def get_qaoa_circuit_from_terms(
         qc.save_statevector()
     return qc
 
+
 def get_ws_qaoa_circuit_from_terms(
-    N: int, terms: Sequence, gammas: Sequence, betas: Sequence, thetas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None
+    N: int,
+    terms: Sequence,
+    gammas: Sequence,
+    betas: Sequence,
+    thetas: Sequence,
+    save_statevector: bool = True,
+    qr: QuantumRegister = None,
+    cr: ClassicalRegister = None,
 ):
     """Generates a Qiskit circuit from Hamiltonian terms
 
@@ -186,6 +194,7 @@ def get_ws_qaoa_circuit_from_terms(
     if save_statevector:
         qc.save_statevector()
     return qc
+
 
 def get_parameterized_qaoa_circuit_from_terms(
     N: int,
