@@ -82,11 +82,13 @@ def choose_simulator(name="auto", **kwargs):
 
     return get_available_simulators("x")[0]
 
+
 def choose_simulator_xz(name="auto", **kwargs):
     if name != "auto":
         return SIMULATORS["xz"][name]
 
     return get_available_simulators("xz")[0]
+
 
 def choose_simulator_xyring(name="auto", **kwargs):
     if name != "auto":
