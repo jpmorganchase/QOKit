@@ -61,6 +61,7 @@ def apply_qaoa_furx(
         n_layers,
     )
 
+
 def apply_qaoa_furxz(
     sv_real: np.ndarray,
     sv_imag: np.ndarray,
@@ -80,12 +81,13 @@ def apply_qaoa_furxz(
         sv_imag,
         np.asarray(gammas, dtype="float"),
         np.asarray(betas, dtype="float"),
-        np.asarray(init_rots, dtype="float"), 
+        np.asarray(init_rots, dtype="float"),
         hc_diag,
         n_qubits,
         n_states,
         n_layers,
     )
+
 
 def furxy(
     sv_real: np.ndarray,
