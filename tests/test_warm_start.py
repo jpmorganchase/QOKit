@@ -1,9 +1,14 @@
+###############################################################################
+# // SPDX-License-Identifier: Apache-2.0
+# // Copyright : JP Morgan Chase & Co
+###############################################################################
 import numpy as np
 import networkx as nx
 import qokit
 from qokit.parameter_utils import get_fixed_gamma_beta
 from qokit.warm_start import WSSolver, maxcut_qubo_from_G, WSSolverQUBO, get_terms_from_QUBO
 from qokit.maxcut import get_maxcut_terms
+from qokit.qaoa_objective_maxcut import get_qaoa_maxcut_objective
 import pytest
 import sys
 
@@ -90,7 +95,8 @@ def test_maxcut_qaoa():
     terms_maxcut = get_maxcut_terms(G)
     sim_maxcut = simclass(N, terms=terms_maxcut)
     cost_maxcut = sim_maxcut.get_cost_diagonal()
-    best_cut_maxcut = np.max(cost_maxcut)
+    mean_cut_maxcut = np.mean(cost_maxcut)
+    maxcut_obj = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator='c', objective="expectation")(gamma, beta)
 
     _result = sim.simulate_ws_qaoa(list(np.asarray(gamma)), list(np.asarray(beta)), np.ones(N) * np.pi / 2)
     qokit_energy = sim.get_expectation(_result)
@@ -101,4 +107,5 @@ def test_maxcut_qaoa():
     ws_energy = ws_solver.run_standard_qaoa(p)
     assert np.isclose(qokit_energy, qubo_energy)
     assert np.isclose(ws_energy, qubo_energy)
-    assert best_cut_maxcut < ws_energy
+    assert mean_cut_maxcut < ws_energy
+    assert maxcut_obj < ws_energy
