@@ -96,7 +96,7 @@ def test_maxcut_qaoa():
     sim_maxcut = simclass(N, terms=terms_maxcut)
     cost_maxcut = sim_maxcut.get_cost_diagonal()
     mean_cut_maxcut = np.mean(cost_maxcut)
-    maxcut_obj = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator='c', objective="expectation")(gamma, beta)
+    maxcut_obj = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator="c", objective="expectation")(gamma, beta)
 
     _result = sim.simulate_ws_qaoa(list(np.asarray(gamma)), list(np.asarray(beta)), np.ones(N) * np.pi / 2)
     qokit_energy = sim.get_expectation(_result)
