@@ -27,6 +27,20 @@ _apply_qaoa_furx.argtypes = [
     ctypes.c_size_t,
 ]
 
+_apply_qaoa_furxz = lib.apply_qaoa_furxz
+_apply_qaoa_furxz.restype = None
+_apply_qaoa_furxz.argtypes = [
+    ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
+    ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
+    ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
+    ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
+    ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
+    ndpointer(ctypes.c_double, flags="C_CONTIGUOUS"),
+    ctypes.c_uint,
+    ctypes.c_size_t,
+    ctypes.c_size_t,
+]
+
 
 _furxy = lib.furxy
 _furxy.restype = None

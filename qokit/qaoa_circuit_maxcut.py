@@ -8,7 +8,7 @@ import networkx as nx
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from typing import Sequence
 from .maxcut import get_maxcut_terms
-from .qaoa_circuit import get_qaoa_circuit_from_terms, get_parameterized_qaoa_circuit_from_terms
+from .qaoa_circuit import get_qaoa_circuit_from_terms, get_ws_qaoa_circuit_from_terms, get_parameterized_qaoa_circuit_from_terms
 
 
 def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
@@ -39,6 +39,38 @@ def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statev
     terms = get_maxcut_terms(G)
     N = G.number_of_nodes()
     return get_qaoa_circuit_from_terms(N=N, terms=terms[:-1], gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
+
+
+def get_ws_qaoa_circuit(
+    G: nx.Graph, gammas: Sequence, betas: Sequence, thetas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None
+):
+    """Generates a circuit for weighted MaxCut on graph G.
+    Parameters
+    ----------
+    G : networkx.Graph
+        Graph to solve MaxCut on
+    beta : list-like
+        QAOA parameter beta
+    gamma : list-like
+        QAOA parameter gamma
+    save_statevector : bool, default True
+        Add save state instruction to the end of the circuit
+    qr : qiskit.QuantumRegister, default None
+        Registers to use for the circuit.
+        Useful when one has to compose circuits in a complicated way
+        By default, G.number_of_nodes() registers are used
+    cr : qiskit.ClassicalRegister, default None
+        Classical registers, useful if measuring
+        By default, no classical registers are added
+    Returns
+    -------
+    qc : qiskit.QuantumCircuit
+        Quantum circuit implementing QAOA
+    """
+
+    terms = get_maxcut_terms(G)
+    N = G.number_of_nodes()
+    return get_ws_qaoa_circuit_from_terms(N=N, terms=terms[:-1], gammas=gammas, betas=betas, thetas=thetas, save_statevector=save_statevector, qr=qr, cr=cr)
 
 
 def get_parameterized_qaoa_circuit(
