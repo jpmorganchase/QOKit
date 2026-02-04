@@ -20,9 +20,14 @@ jobs:
         uses: pypa/cibuildwheel@v3.1.3
         env:
           CIBW_BUILD_FRONTEND: "build"
+          CIBW_PLATFORM: "linux"
+          CIBW_ARCHS: "x86_64"
+          CIBW_SKIP: "pp*"
+        with:
+          output-dir: wheelhouse
       - uses: actions/upload-artifact@v4
         with:
-          path: ./wheelhouse/*.whl
+          path: wheelhouse/*.whl
 
   build_sdist:        
     name: Build Source Distribution
