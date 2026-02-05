@@ -34,6 +34,7 @@ jobs:
           output-dir: wheelhouse
       - uses: actions/upload-artifact@v4
         with:
+          name: wheels-${{ matrix.python }}-${{ matrix.os }}
           path: wheelhouse/*.whl
 
   build_sdist:        
@@ -45,7 +46,7 @@ jobs:
         run: pipx run build --sdist
       - uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ matrix.python }} - ${{matrix.os}}
+          name: sdist
           path: dist/*.tar.gz  
 
   upload_pypi:
@@ -58,8 +59,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4.1.7
         with:
-          name: artifact
           path: dist
+          merge-multiple: true
       - uses: pypa/gh-action-pypi-publish@release/v1      
         with:
           user: __token__
