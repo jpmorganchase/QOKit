@@ -40,7 +40,7 @@ class SimulatorBuild(build_ext):
                 if QOKIT_NO_C_ENV:
                     raise Exception("No C/C++ enviroment setup")
                 subprocess.call(["make", "-C", path])
-            super().run
+            super().run()
         except Exception as e:
             print("No C/C++ enviroment setup to compile the C simulator. Installing Python Simulator")
 
