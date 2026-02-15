@@ -62,6 +62,33 @@ def apply_qaoa_furx(
     )
 
 
+def apply_qaoa_furxz(
+    sv_real: np.ndarray,
+    sv_imag: np.ndarray,
+    gammas: typing.Sequence[float],
+    betas: typing.Sequence[float],
+    init_rots: typing.Sequence[float],
+    hc_diag: np.ndarray,
+    n_qubits: int,
+) -> None:
+    from .lib import _apply_qaoa_furxz
+
+    n_states = check_arrays(sv_real, sv_imag, hc_diag)
+    n_layers = check_arrays(gammas, betas)
+    check_num_qubits(n_qubits, n_states)
+    _apply_qaoa_furxz(
+        sv_real,
+        sv_imag,
+        np.asarray(gammas, dtype="float"),
+        np.asarray(betas, dtype="float"),
+        np.asarray(init_rots, dtype="float"),
+        hc_diag,
+        n_qubits,
+        n_states,
+        n_layers,
+    )
+
+
 def furxy(
     sv_real: np.ndarray,
     sv_imag: np.ndarray,

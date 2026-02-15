@@ -7,7 +7,7 @@ from collections.abc import Sequence
 import numpy as np
 from ..qaoa_simulator_base import QAOAFastSimulatorBase, CostsType, TermsType, ParamType
 from ..diagonal_precomputation import precompute_vectorized_cpu_parallel
-from .qaoa_fur import apply_qaoa_furx, apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
+from .qaoa_fur import apply_qaoa_furx, apply_qaoa_furxz, apply_qaoa_furxy_complete, apply_qaoa_furxy_ring
 
 
 def little_to_big_endian(arr):
@@ -37,8 +37,44 @@ class QAOAFastSimulatorPythonBase(QAOAFastSimulatorBase):
     def default_sv0(self):
         return np.full(self.n_states, 1.0 / np.sqrt(self.n_states), dtype="complex")
 
+    def warmstart_sv0(self, init_rots):
+        state = 1.0
+        for init_rot in init_rots:
+            qubit_state = np.array(
+                [
+                    np.cos(init_rot / 2),
+                    # np.exp(-1j*np.pi/2)*np.sin(init_rot/2)
+                    np.sin(init_rot / 2),
+                ]
+            )
+            # state = np.kron(state, qubit_state) #original as GW
+            state = np.kron(qubit_state, state)
+
+        return state
+
     def _apply_qaoa(self, sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], **kwargs):
         raise NotImplementedError
+
+    def simulate_ws_qaoa(
+        self,
+        gammas: ParamType,
+        betas: ParamType,
+        init_rots: ParamType,
+        sv0: np.ndarray | None = None,
+        **kwargs,
+    ) -> np.ndarray:
+        """
+        simulator QAOA circuit using FUR
+        @param gammas parameters for the phase separating layers
+        @param betas parameters for the mixing layers
+        @param sv0 (optional) initial statevector, default is uniform superposition state
+        @return statevector or vector of probabilities
+        """
+        sv = sv0.astype("complex") if sv0 is not None else self.warmstart_sv0(init_rots).astype("complex")
+        assert np.isclose(np.sum(np.abs(sv**2)), 1)
+        self._apply_qaoa(sv, list(gammas), list(betas), init_rots, **kwargs)
+        assert np.isclose(np.sum(np.abs(sv**2)), 1)
+        return sv
 
     def simulate_qaoa(
         self,
@@ -73,6 +109,12 @@ class QAOAFastSimulatorPythonBase(QAOAFastSimulatorBase):
             return -1 * np.dot(costs, np.abs(result) ** 2)
         return np.dot(costs, np.abs(result) ** 2)
 
+    def get_std(self, result: np.ndarray, costs: np.ndarray | None = None, **kwargs) -> float:
+        if costs is None:
+            costs = self._hc_diag
+        probs = np.abs(result) ** 2
+        return np.sqrt(max(np.dot(costs**2, probs) - np.dot(costs, probs) ** 2, 0))
+
     def get_overlap(
         self, result: np.ndarray, costs: CostsType | None = None, indices: np.ndarray | Sequence[int] | None = None, optimization_type="min", **kwargs
     ) -> float:
@@ -103,6 +145,11 @@ class QAOAFastSimulatorPythonBase(QAOAFastSimulatorBase):
 class QAOAFURXSimulator(QAOAFastSimulatorPythonBase):
     def _apply_qaoa(self, sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], **kwargs):
         apply_qaoa_furx(sv, gammas, betas, self._hc_diag, self.n_qubits)
+
+
+class QAOAFURXZSimulator(QAOAFastSimulatorPythonBase):
+    def _apply_qaoa(self, sv: np.ndarray, gammas: Sequence[float], betas: Sequence[float], init_rots: Sequence[float], **kwargs):
+        apply_qaoa_furxz(sv, gammas, betas, init_rots, self._hc_diag, self.n_qubits)
 
 
 class QAOAFURXYRingSimulator(QAOAFastSimulatorPythonBase):

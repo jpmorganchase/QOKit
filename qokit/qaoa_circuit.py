@@ -126,6 +126,76 @@ def get_qaoa_circuit_from_terms(
     return qc
 
 
+def get_ws_qaoa_circuit_from_terms(
+    N: int,
+    terms: Sequence,
+    gammas: Sequence,
+    betas: Sequence,
+    thetas: Sequence,
+    save_statevector: bool = True,
+    qr: QuantumRegister = None,
+    cr: ClassicalRegister = None,
+):
+    """Generates a Qiskit circuit from Hamiltonian terms
+
+    Parameters
+    ----------
+    N : int
+        Number of qubits
+    terms : list-like
+        A sequence of `term` or `(float, term)`, where `term` is a tuple of ints.
+        Each term corresponds to a summand in the cost Hamiltonian
+        and th float value is the coefficient of this term.
+        e.g. if terms = [(0.5, (0,1)), (0.3, (0,1,2,3))]
+        the Hamiltonian is 0.5*Z0Z1 + 0.3*Z0Z1Z2Z3
+        Unweighted Hamiltonians are supported as well:
+        e.g. if terms = [(0,1), (0,1,2,3)]
+        the Hamiltonian is Z0Z1 + Z0Z1Z2Z3
+    beta : list-like
+        QAOA parameter beta
+    gamma : list-like
+        QAOA parameter gamma
+    save_statevector : bool, default True
+        Add save state instruction to the end of the circuit
+    qr : qiskit.QuantumRegister, default None
+        Registers to use for the circuit.
+        Useful when one has to compose circuits in a complicated way
+        By default, G.number_of_nodes() registers are used
+    cr : qiskit.ClassicalRegister, default None
+        Classical registers, useful if measuring
+        By default, no classical registers are added
+    Returns
+    -------
+    qc : qiskit.QuantumCircuit
+        Quantum circuit implementing QAOA
+    """
+    assert len(betas) == len(gammas)
+    p = len(betas)  # infering number of QAOA steps from the parameters passed
+    if qr is not None:
+        assert qr.size >= N
+    else:
+        qr = QuantumRegister(N)
+
+    if cr is not None:
+        qc = QuantumCircuit(qr, cr)
+    else:
+        qc = QuantumCircuit(qr)
+
+    # first, apply a layer of Hadamards
+    for n in range(N):
+        qc.ry(thetas[n], qc.qubits[n])
+    # second, apply p alternating operators
+    for i in range(p):
+        append_cost_operator_circuit(qc, terms, gammas[i])
+        for n in range(N):
+            qc.ry(-thetas[n], qc.qubits[n])
+            qc.rz(2 * betas[i], qc.qubits[n])
+            qc.ry(thetas[n], qc.qubits[n])
+    if save_statevector:
+        qc.save_statevector()
+    return qc
+
+
 def get_parameterized_qaoa_circuit_from_terms(
     N: int,
     terms: Sequence,

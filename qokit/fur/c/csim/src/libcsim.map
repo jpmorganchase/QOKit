@@ -1,8 +1,8 @@
 LIBCSIM_1.0 {
   global:
     apply_diagonal;
-    furx; furx_all; furxy; furxy_ring; furxy_complete;
-    apply_qaoa_furx; apply_qaoa_furxy_ring; apply_qaoa_furxy_complete;  
+    furx; furx_all; furxz; furxz_all; furxy; furxy_ring; furxy_complete;
+    apply_qaoa_furx; apply_qaoa_furxz; apply_qaoa_furxy_ring; apply_qaoa_furxy_complete;  
 
   local:
     *;

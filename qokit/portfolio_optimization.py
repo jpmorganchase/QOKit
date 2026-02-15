@@ -9,7 +9,7 @@ from functools import partial
 import itertools
 from typing import Any
 from qokit.parameter_utils import get_sk_gamma_beta
-
+import random
 from typing import Tuple, Optional, List, cast
 
 
@@ -93,6 +93,8 @@ def get_data(N, seed=1, real=False) -> tuple[float, float]:
 
     from qokit.yahoo import YahooDataProvider
 
+    random.seed(seed)
+
     stock_symbols = [
         "AAPL",
         "GOOGL",
@@ -129,7 +131,8 @@ def get_data(N, seed=1, real=False) -> tuple[float, float]:
     ]
 
     data = YahooDataProvider(
-        tickers=stock_symbols[:N],
+        # tickers=stock_symbols[:N],
+        tickers=random.sample(stock_symbols, N),
         start=datetime.datetime(2020, 1, 1),
         end=datetime.datetime(2020, 1, 30),
     )
