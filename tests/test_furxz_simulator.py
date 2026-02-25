@@ -9,6 +9,7 @@ from qiskit_aer import AerSimulator
 import pytest
 import sys
 
+
 @pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
 def test_furxz_backends():
 
