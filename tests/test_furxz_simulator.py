@@ -12,6 +12,7 @@ import sys
 
 PYTHON_ONLY = False if os.environ.get("QOKIT_PYTHON_ONLY") is None else os.environ.get("QOKIT_PYTHON_ONLY")
 
+
 @pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator is not installed if PYTHON_ONLY is set")
 def test_furxz_backends():
 
