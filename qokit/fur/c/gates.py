@@ -24,6 +24,7 @@ def furx(sv: ComplexArray | np.ndarray, theta: float, q: int) -> ComplexArray:
     csim.furx(sv.real, sv.imag, 0.5 * theta, q)
     return sv
 
+
 def furxz(sv: ComplexArray | np.ndarray, theta: float, init_rots: np.ndarray, q: int) -> ComplexArray:
     """
     apply to a statevector a single-qubit Pauli-XZ rotation defined by
@@ -39,6 +40,7 @@ def furxz(sv: ComplexArray | np.ndarray, theta: float, init_rots: np.ndarray, q:
     sv = get_complex_array(sv)
     csim.furxz(sv.real, sv.imag, 0.5 * theta, init_rots, q)
     return sv
+
 
 def furxy(sv: ComplexArray | np.ndarray, theta: float, q1: int, q2: int) -> ComplexArray:
     """

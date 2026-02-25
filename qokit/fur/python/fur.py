@@ -38,6 +38,7 @@ def furx_all(x: np.ndarray, theta: float, n_qubits: int) -> np.ndarray:
         furx(x, theta, i)
     return x
 
+
 def furxz(x: np.ndarray, theta: float, init_rot: float, q: int) -> np.ndarray:
     """
     Applies e^{-i theta (sin(init_rot) X + cos(init_rot)Z) } on qubit indexed by q
@@ -48,25 +49,26 @@ def furxz(x: np.ndarray, theta: float, init_rot: float, q: int) -> np.ndarray:
     mask1 = (1 << q) - 1
     mask2 = mask1 ^ ((n_states - 1) >> 1)
 
-    cos_beta = math.cos(theta) 
-    sin_beta = math.sin(theta) 
-    
+    cos_beta = math.cos(theta)
+    sin_beta = math.sin(theta)
+
     sin_rot = math.sin(init_rot)
     cos_rot = math.cos(init_rot)
-    
-    
+
     for i in range(n_groups):
         ia = (i & mask1) | ((i & mask2) << 1)
         ib = ia | (1 << q)
         # when phi = 0
-        x[ia], x[ib] = (cos_beta - 1j * cos_rot*sin_beta ) * x[ia] - 1j*sin_rot * sin_beta * x[ib], -1j*sin_rot * sin_beta * x[ia] +  (cos_beta + 1j * cos_rot*sin_beta )* x[ib]
-        
+        x[ia], x[ib] = (cos_beta - 1j * cos_rot * sin_beta) * x[ia] - 1j * sin_rot * sin_beta * x[ib], -1j * sin_rot * sin_beta * x[ia] + (
+            cos_beta + 1j * cos_rot * sin_beta
+        ) * x[ib]
+
         # when phi = -pi/2
         # x[ia], x[ib] = (cos_beta - 1j * cos_rot*sin_beta ) * x[ia] + sin_rot * sin_beta * x[ib], -sin_rot * sin_beta * x[ia] +  (cos_beta + 1j * cos_rot*sin_beta )* x[ib]
-        
+
     return x
-    
-        
+
+
 def furxz_all(x: np.ndarray, theta: float, init_rots: list, n_qubits: int) -> np.ndarray:
     """
     Applies e^{-i theta X} on all qubits
@@ -74,6 +76,8 @@ def furxz_all(x: np.ndarray, theta: float, init_rots: list, n_qubits: int) -> np
     for i in range(n_qubits):
         furxz(x, theta, init_rots[i], i)
     return x
+
+
 ########################################
 # two-qubit XX+YY rotation
 ########################################

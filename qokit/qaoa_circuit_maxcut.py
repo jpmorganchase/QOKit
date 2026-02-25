@@ -40,7 +40,10 @@ def get_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, save_statev
     N = G.number_of_nodes()
     return get_qaoa_circuit_from_terms(N=N, terms=terms[:-1], gammas=gammas, betas=betas, save_statevector=save_statevector, qr=qr, cr=cr)
 
-def get_ws_qaoa_circuit(G: nx.Graph, gammas: Sequence, betas: Sequence, thetas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None):
+
+def get_ws_qaoa_circuit(
+    G: nx.Graph, gammas: Sequence, betas: Sequence, thetas: Sequence, save_statevector: bool = True, qr: QuantumRegister = None, cr: ClassicalRegister = None
+):
     """Generates a circuit for weighted MaxCut on graph G.
     Parameters
     ----------
