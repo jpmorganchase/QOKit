@@ -7,13 +7,9 @@ from qokit.qaoa_circuit_maxcut import get_ws_qaoa_circuit
 from qokit.fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
 from qiskit_aer import AerSimulator
 import pytest
-import os
 import sys
 
-PYTHON_ONLY = False if os.environ.get("QOKIT_PYTHON_ONLY") is None else os.environ.get("QOKIT_PYTHON_ONLY")
-
-
-@pytest.mark.skipif(PYTHON_ONLY, reason="Fast c/c++ simulator is not installed if PYTHON_ONLY is set")
+@pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
 def test_furxz_backends():
 
     N = 10
