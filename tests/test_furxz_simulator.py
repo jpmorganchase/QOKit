@@ -6,7 +6,12 @@ import numpy as np
 from qokit.qaoa_circuit_maxcut import get_ws_qaoa_circuit
 from qokit.fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
 from qiskit_aer import AerSimulator
+import os
+import pytest
 
+PYTHON_ONLY = False if os.environ.get("QOKIT_PYTHON_ONLY") is None else os.environ.get("QOKIT_PYTHON_ONLY")
+
+@pytest.mark.skipif(PYTHON_ONLY)
 def test_furxz_backends():
 
     N = 10
@@ -73,7 +78,7 @@ def test_qiskit_qokit():
     gamma, beta = get_fixed_gamma_beta(d=d,p=p)
     ini_rots = np.random.rand(N)
     
-    simclass = qokit.fur.choose_simulator_xz(name='c')
+    simclass = qokit.fur.choose_simulator_xz(name='python')
     sim = simclass(N, terms=terms)
     _result = sim.simulate_ws_qaoa(list(np.asarray(gamma)), list(np.asarray(beta)), ini_rots)
     qaoa_prob = sim.get_probabilities(_result)
