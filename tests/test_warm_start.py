@@ -25,7 +25,7 @@ def test_p0_objective():
     )
     theta = np.random.rand(n_v)
     f_value = solver.get_p0_cut(theta)
-    expH, _, _, _ = solver.get_p0_std_quantities(theta)
+    expH = solver.rws_objective(theta)
     assert np.isclose(expH, f_value)
 
 
@@ -41,7 +41,8 @@ def test_ws_degeneracy():
     )
     theta = np.pi / 2 * np.ones(n_v)
     p = 3
-    ws_qaoa_energy = solver.run_ws_qaoa(p=p, theta=theta, check_saved_result=False)
+    gamma, beta = get_fixed_gamma_beta(graph_degree, p)
+    ws_qaoa_energy = solver.run_ws_qaoa(p=p, gamma=gamma, beta=beta, theta=theta)
     qaoa_energy = solver.run_standard_qaoa(p=p)
     assert np.isclose(ws_qaoa_energy, qaoa_energy)
 
@@ -54,58 +55,78 @@ def test_batch_obj_grad():
     theta1 = np.random.rand(N)
     theta2 = np.random.rand(N)
 
-    assert np.allclose(np.asarray([ws_solver.bm_objective(theta1), ws_solver.bm_objective(theta2)]), ws_solver.bm_objective_batch(np.vstack([theta1, theta2])))
-    assert np.allclose(np.asarray([ws_solver.bm_gradient(theta1), ws_solver.bm_gradient(theta2)]), ws_solver.bm_gradient_batch(np.vstack([theta1, theta2])))
+    assert np.allclose(np.asarray([ws_solver.bm_objective(theta1), ws_solver.bm_objective(theta2)]), ws_solver.bm_objective(np.vstack([theta1, theta2])))
+    assert np.allclose(np.asarray([ws_solver.bm_gradient(theta1), ws_solver.bm_gradient(theta2)]), ws_solver.bm_gradient(np.vstack([theta1, theta2])))
     assert np.allclose(
-        np.asarray([ws_solver.p0_theta_objective(theta1), ws_solver.p0_theta_objective(theta2)]),
-        ws_solver.p0_theta_objective_batch(np.vstack([theta1, theta2])),
+        np.asarray([ws_solver.rws_objective(theta1), ws_solver.rws_objective(theta2)]),
+        ws_solver.rws_objective(np.vstack([theta1, theta2])),
     )
     assert np.allclose(
-        np.asarray([ws_solver.p0_theta_grad(theta1), ws_solver.p0_theta_grad(theta2)]), ws_solver.p0_theta_grad_batch(np.vstack([theta1, theta2]))
-    )
-
-    local_bit = np.random.randint(0, 2, size=N)
-    assert np.allclose(
-        np.asarray([ws_solver.abid_gradient(theta1, local_bit), ws_solver.abid_gradient(theta2, local_bit)]),
-        ws_solver.abid_gradient_batch(np.vstack([theta1, theta2]), local_bit),
-    )
-    assert np.allclose(
-        np.asarray([ws_solver.abid_objective(theta1, local_bit), ws_solver.abid_objective(theta2, local_bit)]),
-        ws_solver.abid_objective_batch(np.vstack([theta1, theta2]), local_bit),
+        np.asarray([ws_solver.rws_grad(theta1), ws_solver.rws_grad(theta2)]), ws_solver.rws_grad(np.vstack([theta1, theta2]))
     )
 
 
 ############################
-@pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
-def test_maxcut_qaoa():
+# @pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
+def test_ws_qaoa_better_than_qaoa():
     N = 10
     G = nx.random_regular_graph(3, N, seed=1)
+    terms_maxcut = get_maxcut_terms(G)
+    ws_solver = WSSolver(G)
 
-    Q = maxcut_qubo_from_G(G)
-    qubo_ws_solver = WSSolverQUBO(Q)
-    terms = get_terms_from_QUBO(Q)
+    theta, p0_energy = ws_solver.optimize_theta(
+                    objective = 'rws', 
+                    optimizer = 'ADAM', 
+                    global_alpha = False, 
+                    trials = 100, 
+                    lamd = 0.6, 
+                    )
 
     p = 2
-    gamma, beta = get_fixed_gamma_beta(3, p)
-    simclass = qokit.fur.choose_simulator_xz(name="c")
-    sim = simclass(N, terms=terms)
-    cost = sim.get_cost_diagonal()
-    best_cut = np.max(cost)
-
-    terms_maxcut = get_maxcut_terms(G)
+    ws_gamma, ws_beta = ws_solver.get_ws_qaoa_para(p)
+    simclass = qokit.fur.choose_simulator_xz(name="python")
+    sim = simclass(N, terms=terms_maxcut)
+    _result = sim.simulate_ws_qaoa(list(np.asarray(ws_gamma)), list(np.asarray(ws_beta)), theta)
+    ws_energy = sim.get_expectation(_result)
+    
     sim_maxcut = simclass(N, terms=terms_maxcut)
     cost_maxcut = sim_maxcut.get_cost_diagonal()
     mean_cut_maxcut = np.mean(cost_maxcut)
-    maxcut_obj = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator="c", objective="expectation")(gamma, beta)
 
-    _result = sim.simulate_ws_qaoa(list(np.asarray(gamma)), list(np.asarray(beta)), np.ones(N) * np.pi / 2)
-    qokit_energy = sim.get_expectation(_result)
-
-    qubo_energy = qubo_ws_solver.run_standard_qaoa(gamma, beta)
-
-    ws_solver = WSSolver(G)
-    ws_energy = ws_solver.run_standard_qaoa(p)
-    assert np.isclose(qokit_energy, qubo_energy)
-    assert np.isclose(ws_energy, qubo_energy)
+    gamma, beta = get_fixed_gamma_beta(3,p)
+    qaoa_energy = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator="python", objective="expectation")(gamma, beta)
+    
+    assert ws_energy > p0_energy
     assert mean_cut_maxcut < ws_energy
-    assert maxcut_obj < ws_energy
+    assert qaoa_energy < ws_energy
+
+
+def test_ws_qaoa_p2_better_than_p1():
+    """Test that WS-QAOA at p=2 yields higher energy than p=1 (notebook example)."""
+    n_v = 16
+    graph_degree = 3
+    graph_seed = 0
+    G = nx.random_regular_graph(graph_degree, n_v, seed=graph_seed)
+
+    solver = WSSolver(
+        graph=G,
+        graph_degree=graph_degree,
+        graph_seed=graph_seed,
+    )
+
+    lamd = 0.6
+    theta, p0_energy = solver.optimize_theta(
+        objective='rws',
+        optimizer='ADAM',
+        trials=100,
+        lamd=lamd,
+    )
+
+    gamma1, beta1 = solver.get_ws_qaoa_para(p=1)
+    energy_p1 = solver.run_ws_qaoa(gamma=gamma1, beta=beta1, theta=theta)
+
+    gamma2, beta2 = solver.get_ws_qaoa_para(p=2)
+    energy_p2 = solver.run_ws_qaoa(gamma=gamma2, beta=beta2, theta=theta)
+
+    assert energy_p2 > energy_p1, f"p=2 energy ({energy_p2}) should exceed p=1 energy ({energy_p1})"
+    assert energy_p1 > p0_energy, f"p=1 energy ({energy_p1}) should exceed p0 energy ({p0_energy})"
