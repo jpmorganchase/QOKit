@@ -523,13 +523,16 @@ class WSSolver:
         if p <= 11:
             gamma, beta = get_fixed_gamma_beta(self.graph_degree, p)
         else:
-            import pickle
-            
+            import json
+            from pathlib import Path
+
             assert np.isclose(self.graph_degree, 3)
-            with open("../assets/maxcut_datasets/data_max_cut_qaoa_d2.pkl", "rb") as file:
-                data = pickle.load(file)
-            gamma = np.asarray(data[data["p"] == p]["gammas"].values[0]) * 4
-            beta = np.asarray(data[data["p"] == p]["betas"].values[0])
+            json_path = Path(__file__).parent / "assets" / "maxcut_datasets" / "data_max_cut_qaoa_p17.json"
+            with open(json_path, "r") as file:
+                data = json.load(file)
+            entry = data[str(p)]
+            gamma = np.asarray(entry["gamma"]) * 4
+            beta = np.asarray(entry["beta"])
         return gamma, beta
 
     def run_ws_qaoa(

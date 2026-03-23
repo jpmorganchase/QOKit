@@ -5,6 +5,7 @@
 import numpy as np
 import networkx as nx
 import qokit
+from qokit.fur import get_available_simulator_names
 from qokit.parameter_utils import get_fixed_gamma_beta
 from qokit.warm_start import WSSolver, maxcut_qubo_from_G, WSSolverQUBO, get_terms_from_QUBO
 from qokit.maxcut import get_maxcut_terms
@@ -12,6 +13,7 @@ from qokit.qaoa_objective_maxcut import get_qaoa_maxcut_objective
 import pytest
 import sys
 
+simulators_to_run = get_available_simulator_names("xz") 
 
 def test_p0_objective():
     n_v = 10
@@ -65,10 +67,8 @@ def test_batch_obj_grad():
         np.asarray([ws_solver.rws_grad(theta1), ws_solver.rws_grad(theta2)]), ws_solver.rws_grad(np.vstack([theta1, theta2]))
     )
 
-
-############################
-# @pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
-def test_ws_qaoa_better_than_qaoa():
+@pytest.mark.parametrize("simulator", simulators_to_run)
+def test_ws_qaoa_better_than_qaoa(simulator):
     N = 10
     G = nx.random_regular_graph(3, N, seed=1)
     terms_maxcut = get_maxcut_terms(G)
@@ -84,7 +84,7 @@ def test_ws_qaoa_better_than_qaoa():
 
     p = 2
     ws_gamma, ws_beta = ws_solver.get_ws_qaoa_para(p)
-    simclass = qokit.fur.choose_simulator_xz(name="python")
+    simclass = qokit.fur.choose_simulator_xz(name=simulator)
     sim = simclass(N, terms=terms_maxcut)
     _result = sim.simulate_ws_qaoa(list(np.asarray(ws_gamma)), list(np.asarray(ws_beta)), theta)
     ws_energy = sim.get_expectation(_result)
@@ -94,7 +94,7 @@ def test_ws_qaoa_better_than_qaoa():
     mean_cut_maxcut = np.mean(cost_maxcut)
 
     gamma, beta = get_fixed_gamma_beta(3,p)
-    qaoa_energy = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator="python", objective="expectation")(gamma, beta)
+    qaoa_energy = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator, objective="expectation")(gamma, beta)
     
     assert ws_energy > p0_energy
     assert mean_cut_maxcut < ws_energy

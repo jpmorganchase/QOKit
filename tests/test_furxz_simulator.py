@@ -1,6 +1,7 @@
 import networkx as nx
 from qokit.maxcut import get_maxcut_terms
 from qokit.parameter_utils import get_fixed_gamma_beta
+from qokit.fur import get_available_simulator_names
 import qokit
 import numpy as np
 from qokit.qaoa_circuit_maxcut import get_ws_qaoa_circuit
@@ -9,6 +10,7 @@ from qiskit_aer import AerSimulator
 import pytest
 import sys
 
+simulators_to_run = get_available_simulator_names("xz") 
 
 @pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
 def test_furxz_backends():
@@ -34,8 +36,8 @@ def test_furxz_backends():
 
     assert np.isclose(c_energy, python_energy)
 
-
-def test_ws_degeneracy():
+@pytest.mark.parametrize("simulator", simulators_to_run)
+def test_ws_degeneracy(simulator):
 
     N = 10
     d = 3
@@ -47,12 +49,12 @@ def test_ws_degeneracy():
     gamma, beta = get_fixed_gamma_beta(d, p)
     ini_rots = np.pi / 2 * np.ones(N)
 
-    simclass = qokit.fur.choose_simulator_xz(name="python")
+    simclass = qokit.fur.choose_simulator_xz(name=simulator)
     sim = simclass(N, terms=terms)
     _result = sim.simulate_ws_qaoa(gamma, beta, ini_rots)
     ws_energy = sim.get_expectation(_result)
 
-    simclass = qokit.fur.choose_simulator(name="python")
+    simclass = qokit.fur.choose_simulator(name='python')
     sim = simclass(N, terms=terms)
     _result = sim.simulate_qaoa(gamma, beta)
     qaoa_energy = sim.get_expectation(_result)
@@ -66,9 +68,8 @@ def test_ws_degeneracy():
     assert np.isclose(ws_energy, qaoa_energy)
     assert np.isclose(qiskit_energy, qaoa_energy)
 
-
-def test_qiskit_qokit():
-    ##### qiskit circuit
+@pytest.mark.parametrize("simulator", simulators_to_run)
+def test_qiskit_qokit(simulator):
 
     N = 10
     d = 3
@@ -79,7 +80,7 @@ def test_qiskit_qokit():
     gamma, beta = get_fixed_gamma_beta(d=d, p=p)
     ini_rots = np.random.rand(N)
 
-    simclass = qokit.fur.choose_simulator_xz(name="python")
+    simclass = qokit.fur.choose_simulator_xz(name=simulator)
     sim = simclass(N, terms=terms)
     _result = sim.simulate_ws_qaoa(list(np.asarray(gamma)), list(np.asarray(beta)), ini_rots)
     qaoa_prob = sim.get_probabilities(_result)

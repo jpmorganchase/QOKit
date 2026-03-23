@@ -58,13 +58,10 @@ def furxz(x: np.ndarray, theta: float, init_rot: float, q: int) -> np.ndarray:
     for i in range(n_groups):
         ia = (i & mask1) | ((i & mask2) << 1)
         ib = ia | (1 << q)
-        # when phi = 0
+        
         x[ia], x[ib] = (cos_beta - 1j * cos_rot * sin_beta) * x[ia] - 1j * sin_rot * sin_beta * x[ib], -1j * sin_rot * sin_beta * x[ia] + (
             cos_beta + 1j * cos_rot * sin_beta
         ) * x[ib]
-
-        # when phi = -pi/2
-        # x[ia], x[ib] = (cos_beta - 1j * cos_rot*sin_beta ) * x[ia] + sin_rot * sin_beta * x[ib], -sin_rot * sin_beta * x[ia] +  (cos_beta + 1j * cos_rot*sin_beta )* x[ib]
 
     return x
 

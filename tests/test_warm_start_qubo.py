@@ -2,12 +2,15 @@ import numpy as np
 import networkx as nx
 import random
 from qokit.warm_start import WSSolver, WSSolverQUBO, maxcut_qubo_from_G, get_terms_from_QUBO
-
+from qokit.fur import get_available_simulator_names
 import qokit
 from qokit.maxcut import maxcut_obj, get_adjacency_matrix 
 from qokit.fur.diagonal_precomputation import precompute_vectorized_cpu_parallel
 from qokit.qaoa_circuit import get_ws_qaoa_circuit_from_terms
 from qiskit_aer import Aer
+import pytest
+
+simulators_to_run = get_available_simulator_names("xz") 
 
 def test_qubo_matrix():
     N = 10
@@ -67,8 +70,8 @@ def test_obj_in_p_space():
     assert np.isclose(obj1, obj2)
     assert np.isclose(obj1, obj3)
     
-    
-def test_po_qubo():
+@pytest.mark.parametrize("simulator", simulators_to_run)
+def test_po_qubo(simulator):
     from qokit.portfolio_optimization import get_problem, po_obj_func
     from qokit.qaoa_objective import get_qaoa_objective
     from qokit.utils import precompute_energies, reverse_array_index_bit_order
@@ -84,7 +87,7 @@ def test_po_qubo():
     gamma, beta = np.random.rand(p), np.random.rand(p)
     
         
-    qaoa_obj = get_qaoa_objective(N=N, precomputed_diagonal_hamiltonian=po_problem["scale"] * precomputed_energies,mixer='x',simulator='python')
+    qaoa_obj = get_qaoa_objective(N=N, precomputed_diagonal_hamiltonian=po_problem["scale"] * precomputed_energies,mixer='x',simulator=simulator)
     x0 = np.concatenate((gamma,beta))
     po_energy = qaoa_obj(x0).real/po_problem["scale"]
 
@@ -116,8 +119,6 @@ def test_qubo_mean_and_variance():
     
 def test_qubo_qiskit_circuit():
     N = 10
-    # G = nx.random_regular_graph(3, N, seed=1)
-    # Q = maxcut_qubo_from_G(G)
     Q = np.random.rand(N,N)
     terms = get_terms_from_QUBO(Q)
     precomputed_objectives = precompute_vectorized_cpu_parallel(terms, 0.0, N)

@@ -43,11 +43,9 @@ class QAOAFastSimulatorPythonBase(QAOAFastSimulatorBase):
             qubit_state = np.array(
                 [
                     np.cos(init_rot / 2),
-                    # np.exp(-1j*np.pi/2)*np.sin(init_rot/2)
                     np.sin(init_rot / 2),
                 ]
             )
-            # state = np.kron(state, qubit_state) #original as GW
             state = np.kron(qubit_state, state)
 
         return state
