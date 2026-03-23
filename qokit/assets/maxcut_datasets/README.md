@@ -1,8 +1,8 @@
 # MaxCut Datasets
 
-Optimized QAOA parameters (gamma, beta) for MaxCut on 3-regular graphs 
+Optimized QAOA parameters (gamma, beta) for regular MaxCut graphs 
 
-## data_max_cut_qaoa_p17
+## data_max_cut_qaoa_p17 (for degree=3 only)
 
 Source: https://arxiv.org/pdf/2503.12789
 
