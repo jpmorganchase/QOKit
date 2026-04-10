@@ -13,7 +13,8 @@ from qokit.qaoa_objective_maxcut import get_qaoa_maxcut_objective
 import pytest
 import sys
 
-simulators_to_run = get_available_simulator_names("xz") 
+simulators_to_run = get_available_simulator_names("xz")
+
 
 def test_p0_objective():
     n_v = 10
@@ -63,9 +64,8 @@ def test_batch_obj_grad():
         np.asarray([ws_solver.rws_objective(theta1), ws_solver.rws_objective(theta2)]),
         ws_solver.rws_objective(np.vstack([theta1, theta2])),
     )
-    assert np.allclose(
-        np.asarray([ws_solver.rws_grad(theta1), ws_solver.rws_grad(theta2)]), ws_solver.rws_grad(np.vstack([theta1, theta2]))
-    )
+    assert np.allclose(np.asarray([ws_solver.rws_grad(theta1), ws_solver.rws_grad(theta2)]), ws_solver.rws_grad(np.vstack([theta1, theta2])))
+
 
 @pytest.mark.parametrize("simulator", simulators_to_run)
 def test_ws_qaoa_better_than_qaoa(simulator):
@@ -75,12 +75,12 @@ def test_ws_qaoa_better_than_qaoa(simulator):
     ws_solver = WSSolver(G)
 
     theta, p0_energy = ws_solver.optimize_theta(
-                    objective = 'rws', 
-                    optimizer = 'ADAM', 
-                    global_alpha = False, 
-                    trials = 100, 
-                    lamd = 0.6, 
-                    )
+        objective="rws",
+        optimizer="ADAM",
+        global_alpha=False,
+        trials=100,
+        lamd=0.6,
+    )
 
     p = 2
     ws_gamma, ws_beta = ws_solver.get_ws_qaoa_para(p)
@@ -88,14 +88,14 @@ def test_ws_qaoa_better_than_qaoa(simulator):
     sim = simclass(N, terms=terms_maxcut)
     _result = sim.simulate_ws_qaoa(list(np.asarray(ws_gamma)), list(np.asarray(ws_beta)), theta)
     ws_energy = sim.get_expectation(_result)
-    
+
     sim_maxcut = simclass(N, terms=terms_maxcut)
     cost_maxcut = sim_maxcut.get_cost_diagonal()
     mean_cut_maxcut = np.mean(cost_maxcut)
 
-    gamma, beta = get_fixed_gamma_beta(3,p)
+    gamma, beta = get_fixed_gamma_beta(3, p)
     qaoa_energy = get_qaoa_maxcut_objective(N, p, G=G, parameterization="gamma beta", simulator=simulator, objective="expectation")(gamma, beta)
-    
+
     assert ws_energy > p0_energy
     assert mean_cut_maxcut < ws_energy
     assert qaoa_energy < ws_energy
@@ -116,8 +116,8 @@ def test_ws_qaoa_p2_better_than_p1():
 
     lamd = 0.6
     theta, p0_energy = solver.optimize_theta(
-        objective='rws',
-        optimizer='ADAM',
+        objective="rws",
+        optimizer="ADAM",
         trials=100,
         lamd=lamd,
     )

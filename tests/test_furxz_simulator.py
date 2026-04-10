@@ -10,7 +10,8 @@ from qiskit_aer import AerSimulator
 import pytest
 import sys
 
-simulators_to_run = get_available_simulator_names("xz") 
+simulators_to_run = get_available_simulator_names("xz")
+
 
 @pytest.mark.skipif(sys.platform.startswith("darwin"), reason="Fast c/c++ simulator should be installed")
 def test_furxz_backends():
@@ -36,6 +37,7 @@ def test_furxz_backends():
 
     assert np.isclose(c_energy, python_energy)
 
+
 @pytest.mark.parametrize("simulator", simulators_to_run)
 def test_ws_degeneracy(simulator):
 
@@ -54,7 +56,7 @@ def test_ws_degeneracy(simulator):
     _result = sim.simulate_ws_qaoa(gamma, beta, ini_rots)
     ws_energy = sim.get_expectation(_result)
 
-    simclass = qokit.fur.choose_simulator(name='python')
+    simclass = qokit.fur.choose_simulator(name="python")
     sim = simclass(N, terms=terms)
     _result = sim.simulate_qaoa(gamma, beta)
     qaoa_energy = sim.get_expectation(_result)
@@ -67,6 +69,7 @@ def test_ws_degeneracy(simulator):
 
     assert np.isclose(ws_energy, qaoa_energy)
     assert np.isclose(qiskit_energy, qaoa_energy)
+
 
 @pytest.mark.parametrize("simulator", simulators_to_run)
 def test_qiskit_qokit(simulator):

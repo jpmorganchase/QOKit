@@ -32,9 +32,7 @@ class WSSolver:
 
         return f_value
 
-    def get_p0_std_quantities(
-        self, theta: np.ndarray
-    ):
+    def get_p0_std_quantities(self, theta: np.ndarray):
         """
         Weighted Max-Cut warm-start statistics on a NetworkX graph.
 
@@ -53,7 +51,7 @@ class WSSolver:
         G = self.G
         n = self.n_v
         # Build edge arrays
-        
+
         i_list, j_list, w_list = [], [], []
         for u, v, d in G.edges(data=True):
             i_list.append(u)
@@ -266,10 +264,7 @@ class WSSolver:
 
     ########################### Optimizer ###########################
     #################################################################
-    def theta_sdg(
-        self, objective='rws', iterations=300, learning_rate=0.01, seed=0, lamd=None,
-        ini_theta=None, threshold=1e-8, batch_size=None
-    ):
+    def theta_sdg(self, objective="rws", iterations=300, learning_rate=0.01, seed=0, lamd=None, ini_theta=None, threshold=1e-8, batch_size=None):
         n = self.n_v
         if lamd is None:
             lamd = self.lamd
@@ -277,10 +272,10 @@ class WSSolver:
 
         is_batch = batch_size is not None
 
-        if objective == 'BM':
+        if objective == "BM":
             grad_func = self.bm_gradient
             obj_func = self.bm_objective
-        elif objective == 'rws':
+        elif objective == "rws":
             grad_func = self.rws_grad
             obj_func = self.rws_objective
         else:
@@ -326,8 +321,7 @@ class WSSolver:
         return ws_obj, theta, converged
 
     def theta_adam(
-        self, objective='rws', iterations=300, learning_rate=0.01, seed=0, lamd=None, ini_theta=None,
-        beta1=0.9, beta2=0.999, threshold=1e-8, batch_size=None
+        self, objective="rws", iterations=300, learning_rate=0.01, seed=0, lamd=None, ini_theta=None, beta1=0.9, beta2=0.999, threshold=1e-8, batch_size=None
     ):
         n = self.n_v
         if lamd is None:
@@ -336,10 +330,10 @@ class WSSolver:
 
         is_batch = batch_size is not None
 
-        if objective == 'BM':
+        if objective == "BM":
             grad_func = self.bm_gradient
             obj_func = self.bm_objective
-        elif objective == 'rws':
+        elif objective == "rws":
             grad_func = self.rws_grad
             obj_func = self.rws_objective
         else:
@@ -369,10 +363,10 @@ class WSSolver:
             grad_theta = grad_func(theta)
 
             m = beta1 * m + (1 - beta1) * grad_theta
-            v = beta2 * v + (1 - beta2) * (grad_theta ** 2)
+            v = beta2 * v + (1 - beta2) * (grad_theta**2)
 
-            m_hat = m / (1 - beta1 ** it)
-            v_hat = v / (1 - beta2 ** it)
+            m_hat = m / (1 - beta1**it)
+            v_hat = v / (1 - beta2**it)
 
             if is_batch:
                 grad_norm_sq = np.linalg.norm(grad_theta, axis=1) ** 2 / n
@@ -395,8 +389,8 @@ class WSSolver:
 
     def optimize_theta(
         self,
-        objective: str = 'rws',
-        optimizer: str = 'ADAM',
+        objective: str = "rws",
+        optimizer: str = "ADAM",
         global_alpha: bool = False,
         lamd: float = 0,
         trials: int = 50,
@@ -405,42 +399,50 @@ class WSSolver:
         threshold: float = 1e-8,
         ini_theta=None,
     ):
-        assert objective in ['rws', 'BM']
-        assert optimizer in ['ADAM', 'SGD']
+        assert objective in ["rws", "BM"]
+        assert optimizer in ["ADAM", "SGD"]
 
         G = self.G
         self.lamd = lamd
-        if objective == 'BM':
+        if objective == "BM":
             assert np.isclose(self.lamd, 0)
 
-        if optimizer == 'ADAM':
+        if optimizer == "ADAM":
             ws_obj, init_rot_list, converged = self.theta_adam(
-                objective=objective, iterations=int(iterations), learning_rate=learning_rate,
-                seed=42, batch_size=trials, lamd=lamd, ini_theta=ini_theta, beta1=0.9, beta2=0.999, threshold=threshold
+                objective=objective,
+                iterations=int(iterations),
+                learning_rate=learning_rate,
+                seed=42,
+                batch_size=trials,
+                lamd=lamd,
+                ini_theta=ini_theta,
+                beta1=0.9,
+                beta2=0.999,
+                threshold=threshold,
             )
-        elif optimizer == 'SGD':
+        elif optimizer == "SGD":
             ws_obj, init_rot_list, converged = self.theta_sdg(
-                objective=objective, iterations=int(iterations), learning_rate=learning_rate,
-                seed=42, batch_size=trials, lamd=lamd
+                objective=objective, iterations=int(iterations), learning_rate=learning_rate, seed=42, batch_size=trials, lamd=lamd
             )
         max_idx = np.argmax(ws_obj)
         best_obj = ws_obj[max_idx]
         best_rot = init_rot_list[max_idx]
-        
 
         if global_alpha:
+
             def f_obj(alpha):
                 f_value = 0
-                for (i, j) in G.edges():
+                for i, j in G.edges():
                     f_value += np.cos(alpha + best_rot[i]) * np.cos(alpha + best_rot[j])
                 return f_value
+
             opt_res = scipy.optimize.minimize_scalar(f_obj)
             opt_alpha = opt_res.x
             best_rot = best_rot + opt_alpha
 
         # Compute p0 energy
         f_value = 0
-        for (i, j) in G.edges():
+        for i, j in G.edges():
             f_value += np.cos(best_rot[i]) * np.cos(best_rot[j])
         p0_energy = self.n_v * self.graph_degree / 4 - 0.5 * f_value
 
@@ -452,7 +454,7 @@ class WSSolver:
         if graph_degree is None:
             graph_degree = self.graph_degree
         if lamd is None:
-            if not hasattr(self, 'lamd'):
+            if not hasattr(self, "lamd"):
                 raise ValueError("lamd must be specified either as an argument or by calling optimize_theta first")
             lamd = self.lamd
         if graph_degree == 3:
@@ -467,7 +469,7 @@ class WSSolver:
                     gamma = [0.55505739, 1.49498448, 2.30554454]
                     beta = [0.61608703, 0.32868682, 0.17954946]
                 elif p == 4:
-                    gamma = [0.41408643, 0.9740519,  1.92943177, 2.21302296]
+                    gamma = [0.41408643, 0.9740519, 1.92943177, 2.21302296]
                     beta = [0.80261765, 0.49482749, 0.24675206, 0.15168564]
                 elif p == 5:
                     gamma = [0.31752051, 0.79044374, 1.36835544, 2.06237682, 2.15305022]
@@ -491,7 +493,7 @@ class WSSolver:
                     gamma = [0.55505739, 1.49498448, 2.30554454]
                     beta = [0.61608703, 0.32868682, 0.17954946]
                 elif p == 4:
-                    gamma = [0.41408643, 0.9740519,  1.92943177, 2.21302296]
+                    gamma = [0.41408643, 0.9740519, 1.92943177, 2.21302296]
                     beta = [0.80261765, 0.49482749, 0.24675206, 0.15168564]
                 else:
                     raise ValueError(f"parameters for d={graph_degree}, lamd={lamd}, p={p} are not available")
@@ -514,9 +516,9 @@ class WSSolver:
                 raise ValueError(f"parameters for d={graph_degree}, lamd={lamd} are not available")
         else:
             raise ValueError(f"parameters for d={graph_degree}, lamd={lamd} are not available")
-        
+
         return gamma, beta
-    
+
     ########################### QAOA Simulation ###########################
     #######################################################################
     def get_qaoa_para(self, p: int = 11):
@@ -605,43 +607,44 @@ class WSSolverQUBO:
         self.beta = beta
         self.qaoa_energy = c_energy
         return c_energy
-    
+
     def product_state_stats_and_grads_from_Q(self, theta, include_const=True):
         """
         For |psi(theta)> = ⊗_i (cos(theta_i/2)|0> + sin(theta_i/2)|1>),
         return mean, var, grad_mean (d/dtheta), grad_var (d/dtheta).
         """
-        
+
         theta = np.asarray(theta, dtype=float)
         const, h, J = qubo_to_z_hamiltonian(self.Q)
 
-        z  = np.cos(theta)          # <Z_i>
-        s  = np.sin(theta)
-        s2 = 1.0 - z**2             # = sin^2(theta)
+        z = np.cos(theta)  # <Z_i>
+        s = np.sin(theta)
+        s2 = 1.0 - z**2  # = sin^2(theta)
 
-        a = h + J @ z               # a = h + J z
+        a = h + J @ z  # a = h + J z
 
         # Mean and its gradient
         mean = h @ z + 0.5 * z @ (J @ z)
         if include_const:
             mean += const
-        grad_mean = -a * s          # element-wise
+        grad_mean = -a * s  # element-wise
 
         # Variance and its gradient
         # Var = sum_i a_i^2 s_i^2 + sum_{i<j} J_ij^2 s_i^2 s_j^2
         var_linear = np.sum((a**2) * s2)
-        var_pair   = 0.5 * np.sum((J**2) * (s2[:, None] * s2[None, :]))  # i<j
-        variance   = var_linear + var_pair
+        var_pair = 0.5 * np.sum((J**2) * (s2[:, None] * s2[None, :]))  # i<j
+        variance = var_linear + var_pair
 
         # Gradient of variance:
         # b = a * s^2
         b = a * s2
-        term1 = -(J @ b)                       # shape (n,)
-        term2 = (a**2) * z                     # shape (n,)
-        term3 = z * ((J**2) @ s2)              # shape (n,)
+        term1 = -(J @ b)  # shape (n,)
+        term2 = (a**2) * z  # shape (n,)
+        term3 = z * ((J**2) @ s2)  # shape (n,)
         grad_var = 2.0 * s * (term1 + term2 + term3)
 
         return float(mean), float(variance), grad_mean, grad_var
+
 
 def maxcut_qubo_from_G(G):
     """
@@ -702,5 +705,3 @@ def get_terms_from_QUBO(Q):
             terms += [(h[i], (i,))]
     terms.append((+constant, tuple()))
     return terms
-
-
