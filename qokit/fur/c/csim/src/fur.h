@@ -8,7 +8,11 @@
 
 void furx(double* a_real, double* a_imag, double theta, unsigned int q, size_t n_states);
 
+void furxz(double* a_real, double* a_imag, double theta, double init_rot, unsigned int q, size_t n_states);
+
 void furx_all(double* a_real, double* a_imag, double theta, unsigned int n_qubits, size_t n_states);
+
+void furxz_all(double* a_real, double* a_imag, double theta, double* init_rots, unsigned int n_qubits, size_t n_states);
 
 void furxy(double* a_real, double* a_imag, double theta, unsigned int q1, unsigned int q2, size_t n_states);
 
