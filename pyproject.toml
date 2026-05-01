@@ -92,7 +92,7 @@ omit = [
     ]
 [tool.setuptools.packages.find]
 where = ["."]
-exclude = ["tests*"]    
+exclude = ["tests*", "qokit.max_k_xor_sat.cpp.build*"]
 
 
 [tool.setuptools.package-data]
