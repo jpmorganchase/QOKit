@@ -47,6 +47,13 @@ solvers = [
   'docplex>=2.18.200',
   'gurobipy>=9.1.2'
 ]
+xorsat-gpu = [
+    'jax[cuda12]'
+]
+xorsat-optimize = [
+    'pybobyqa',
+    'scipy>=1.10.1'
+]
 
 [build-system]
 requires = ["setuptools>=45",
@@ -89,7 +96,7 @@ exclude = ["tests*"]
 
 
 [tool.setuptools.package-data]
-"*" = ["*.json", "*.npy"]
+"*" = ["*.json", "*.npy", "*.cpp", "*.h", "CMakeLists.txt"]
 
 
 [tool.setuptools.dynamic]
