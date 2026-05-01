@@ -205,14 +205,128 @@ def _run_lbfgs(gammas, betas, p, k, D, maxiter, verbose, state, precision="float
     )
 
 
+# ── Steepest descent with FD gradient ────────────────────────────
+
+
+def _run_steepest(gammas, betas, p, k, D, maxiter, verbose, state, precision="float64", on_improvement=None, n_cheb=None):
+    """Single steepest-descent step: FD gradient + line search.
+
+    Computes the gradient via sequential central finite differences
+    in the full 2p angle space (one eval at a time — no extra memory
+    beyond a single forward pass). Then does a golden-section line
+    search along -grad.
+
+    Memory: O(4^p) per eval (forward only, no adjoint cache).
+    Cost: 2*(2p)+1 evals for gradient + ~10 evals for line search.
+    """
+    contract_fn = _get_contract_fn()
+    x0 = _np.concatenate([gammas, betas])
+    n = len(x0)
+
+    # Central value (reuse probe if available)
+    if state["best"] <= 1.0:
+        f0 = state["best"]
+    else:
+        f0 = float(contract_fn(gammas, betas, p, D, k, precision=precision))
+        state["n_evals"] += 1
+
+    # FD gradient: sequential central differences, one perturbation at a time
+    a = (D - 1) * (k - 1)
+    noise = max(a ** (p / 2.0) * 2.3e-16, 1e-14) if a > 1 else 1e-14
+    h = max(min(noise ** (1.0 / 3.0), 1e-2), 1e-8)
+
+    grad = _np.zeros(n)
+    if verbose:
+        print(f"  --- FD gradient ({n} params, h={h:.1e}) ---", file=sys.stderr)
+
+    for i in range(n):
+        x_plus = x0.copy()
+        x_plus[i] += h
+        f_plus = float(contract_fn(x_plus[:p], x_plus[p:], p, D, k, precision=precision))
+        state["n_evals"] += 1
+
+        x_minus = x0.copy()
+        x_minus[i] -= h
+        f_minus = float(contract_fn(x_minus[:p], x_minus[p:], p, D, k, precision=precision))
+        state["n_evals"] += 1
+
+        grad[i] = (f_plus - f_minus) / (2 * h)
+
+    gnorm = float(_np.linalg.norm(grad))
+    direction = -grad / max(gnorm, 1e-12)
+
+    if verbose:
+        elapsed = time.perf_counter() - state["t0"]
+        print(f"  --- gradient computed: |g|={gnorm:.6e}  ({elapsed:.1f}s) ---", file=sys.stderr)
+
+    if gnorm < 1e-12:
+        return  # already at optimum
+
+    # Golden-section line search along x0 + alpha * direction
+    def eval_alpha(alpha):
+        x = x0 + alpha * direction
+        val = float(contract_fn(x[:p], x[p:], p, D, k, precision=precision))
+        state["n_evals"] += 1
+        if abs(val) <= 1.0 and val < state["best"]:
+            state["best"] = val
+            state["best_valid_x"] = x.copy()
+            if on_improvement is not None:
+                on_improvement(x, val)
+        if verbose:
+            elapsed = time.perf_counter() - state["t0"]
+            energy = (1 - val) / 2
+            best_energy = (1 - state["best"]) / 2
+            print(
+                f"  eval {state['n_evals']:>4d} [line a={alpha:.4e}]: "
+                f"(1-<Z^{k}>)/2 = {energy:>.10f}"
+                f"  best = {best_energy:>.10f}  ({elapsed:.1f}s)",
+                file=sys.stderr,
+            )
+        return val
+
+    # Find bracket: start small, double until function stops improving
+    alpha = min(0.01, h * 100)
+    best_alpha, best_f = 0.0, f0
+    for _ in range(10):
+        f_cur = eval_alpha(alpha)
+        if state["n_evals"] >= maxiter:
+            break
+        if f_cur < best_f:
+            best_alpha = alpha
+            best_f = f_cur
+            alpha *= 2.0
+        else:
+            break
+
+    # Golden section search within [0, alpha]
+    gr = (1 + 5**0.5) / 2
+    a_lo, a_hi = 0.0, alpha
+    for _ in range(min(maxiter - state["n_evals"], 6)):
+        if a_hi - a_lo < alpha * 0.01:
+            break
+        a1 = a_hi - (a_hi - a_lo) / gr
+        a2 = a_lo + (a_hi - a_lo) / gr
+        f1 = eval_alpha(a1)
+        if state["n_evals"] >= maxiter:
+            break
+        f2 = eval_alpha(a2)
+        if state["n_evals"] >= maxiter:
+            break
+        if f1 < f2:
+            a_hi = a2
+        else:
+            a_lo = a1
+
+
 # ── Main entry point ────────────────────────────────────────────
 
 
 def optimize_angles(k, D, p, maxiter=200, n_cheb=None, output_file=None, verbose=False, precision="float64", optimizer="bobyqa", seed_fn=None):
     """Optimize QAOA angles to maximize (1 - <Z^k>)/2.
 
-    Single-stage optimization using either BOBYQA (gradient-free) or
-    L-BFGS-B (gradient-based with analytic gradients).
+    Single-stage optimization using either BOBYQA (gradient-free),
+    L-BFGS-B (gradient-based with analytic gradients), or steepest
+    descent (FD gradient + line search, forward-only memory).
 
     Parameters
     ----------
@@ -233,7 +347,10 @@ def optimize_angles(k, D, p, maxiter=200, n_cheb=None, output_file=None, verbose
     precision : str
         'float64' (default) or 'dd' (double-double, ~32 digits).
     optimizer : str
-        'bobyqa' (gradient-free, default) or 'lbfgs' (gradient-based).
+        'bobyqa' (gradient-free, default), 'lbfgs' (gradient-based
+        via reverse-mode adjoint), or 'steepest' (single FD gradient
+        + line search, forward-only memory — for high-p DD where the
+        adjoint doesn't fit).
     seed_fn : callable, optional
         Custom seed loader: ``(k, D, p) -> (gammas, betas, source_str)``.
 
@@ -293,7 +410,7 @@ def optimize_angles(k, D, p, maxiter=200, n_cheb=None, output_file=None, verbose
         )
 
     if verbose:
-        names = {"lbfgs": "L-BFGS-B", "bobyqa": "BOBYQA"}
+        names = {"lbfgs": "L-BFGS-B", "bobyqa": "BOBYQA", "steepest": "Steepest descent"}
         method_name = names.get(optimizer, optimizer)
         use_cheb_bobyqa = n_cheb is not None and p > 1 and optimizer == "bobyqa"
         n_c = min(n_cheb, p) if use_cheb_bobyqa else None
@@ -313,6 +430,22 @@ def optimize_angles(k, D, p, maxiter=200, n_cheb=None, output_file=None, verbose
             state,
             precision=precision,
             on_improvement=_checkpoint_angles,
+        )
+
+    # ── Steepest descent path (FD gradient + line search) ──
+    elif optimizer == "steepest":
+        _run_steepest(
+            gammas0,
+            betas0,
+            p,
+            k,
+            D,
+            maxiter,
+            verbose,
+            state,
+            precision=precision,
+            on_improvement=_checkpoint_angles,
+            n_cheb=n_cheb,
         )
 
     # ── BOBYQA path ──
