@@ -89,6 +89,11 @@ omit = [
     "qokit/fur/mpi_nbcuda/*",
     "qokit/fur/mpi_custatevec/*",
     "qokit/fur/diagonal_precomputation/gpu_numba.py",
+    "qokit/max_k_xor_sat/cpp_backend.py",
+    "qokit/max_k_xor_sat/contract.py",
+    "qokit/max_k_xor_sat/jax/*",
+    "qokit/max_k_xor_sat/optimize/core.py",
+    "qokit/max_k_xor_sat/optimize/seed.py",
     ]
 [tool.setuptools.packages.find]
 where = ["."]
