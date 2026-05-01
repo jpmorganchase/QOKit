@@ -277,9 +277,7 @@ def _run_steepest(gammas, betas, p, k, D, maxiter, verbose, state, precision="fl
             energy = (1 - val) / 2
             best_energy = (1 - state["best"]) / 2
             print(
-                f"  eval {state['n_evals']:>4d} [line a={alpha:.4e}]: "
-                f"(1-<Z^{k}>)/2 = {energy:>.10f}"
-                f"  best = {best_energy:>.10f}  ({elapsed:.1f}s)",
+                f"  eval {state['n_evals']:>4d} [line a={alpha:.4e}]: " f"(1-<Z^{k}>)/2 = {energy:>.10f}" f"  best = {best_energy:>.10f}  ({elapsed:.1f}s)",
                 file=sys.stderr,
             )
         return val
@@ -372,6 +370,7 @@ def optimize_angles(k, D, p, maxiter=200, n_cheb=None, output_file=None, verbose
         contract_fn = partial(_contract, backend=backend)
         # Patch the grad function for this call too
         import qokit.max_k_xor_sat.optimize as _pkg
+
         _pkg._contract_with_grad = partial(_contract_grad, backend=backend)
 
     # Load seed
