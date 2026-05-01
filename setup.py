@@ -44,6 +44,17 @@ class SimulatorBuild(build_ext):
         except Exception as e:
             print("No C/C++ enviroment setup to compile the C simulator. Installing Python Simulator")
 
+        # Attempt to build the max-k-xor-sat C++ backend via cmake (optional)
+        if not QOKIT_PYTHON_ONLY and not QOKIT_NO_C_ENV:
+            try:
+                xorsat_cpp = os.path.join(".", "qokit", "max_k_xor_sat", "cpp")
+                xorsat_build = os.path.join(xorsat_cpp, "build")
+                os.makedirs(xorsat_build, exist_ok=True)
+                subprocess.call(["cmake", "-DBUILD_SHARED_LIBS=ON", ".."], cwd=xorsat_build)
+                subprocess.call(["make", "-j"], cwd=xorsat_build)
+            except Exception:
+                print("Optional: max-k-xor-sat C++ backend not built. Install cmake to enable.")
+
 
 with open("README.md", "r") as f:
     long_description = f.read()
