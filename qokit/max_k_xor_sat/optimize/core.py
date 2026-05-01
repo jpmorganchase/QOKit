@@ -321,7 +321,7 @@ def _run_steepest(gammas, betas, p, k, D, maxiter, verbose, state, precision="fl
 # ── Main entry point ────────────────────────────────────────────
 
 
-def optimize_angles(k, D, p, maxiter=200, n_cheb=None, output_file=None, verbose=False, precision="float64", optimizer="bobyqa", seed_fn=None):
+def optimize_angles(k, D, p, maxiter=200, n_cheb=None, output_file=None, verbose=False, precision="float64", optimizer="bobyqa", seed_fn=None, backend="auto"):
     """Optimize QAOA angles to maximize (1 - <Z^k>)/2.
 
     Single-stage optimization using either BOBYQA (gradient-free),
@@ -353,6 +353,8 @@ def optimize_angles(k, D, p, maxiter=200, n_cheb=None, output_file=None, verbose
         adjoint doesn't fit).
     seed_fn : callable, optional
         Custom seed loader: ``(k, D, p) -> (gammas, betas, source_str)``.
+    backend : str
+        'auto' (default), 'cpp', or 'jax'. Selects the contraction backend.
 
     Returns
     -------
@@ -360,7 +362,17 @@ def optimize_angles(k, D, p, maxiter=200, n_cheb=None, output_file=None, verbose
         Keys: gammas, betas, expectation (<Z^k>), objective ((1-<Z^k>)/2),
         num_evals, converged, seed_source.
     """
-    contract_fn = _get_contract_fn()
+    from functools import partial
+    from qokit.max_k_xor_sat.contract import contract_symmetric_tree as _contract
+    from qokit.max_k_xor_sat.contract import contract_with_grad as _contract_grad
+
+    if backend == "auto":
+        contract_fn = _get_contract_fn()
+    else:
+        contract_fn = partial(_contract, backend=backend)
+        # Patch the grad function for this call too
+        import qokit.max_k_xor_sat.optimize as _pkg
+        _pkg._contract_with_grad = partial(_contract_grad, backend=backend)
 
     # Load seed
     if seed_fn is not None:
