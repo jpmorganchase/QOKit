@@ -308,3 +308,229 @@ def test_seed_loading():
     assert len(gammas) == 5
     assert len(betas) == 5
     assert "results" in source
+
+
+# ============================================================
+# FD helper for gradient accuracy tests
+# ============================================================
+
+_GRAD_CASES = [(2, 3, 1), (2, 3, 2), (3, 2, 1), (3, 3, 1)]
+
+
+def _fd_grad(contract_fn, gammas, betas, p, D, k=2, h=1e-5):
+    """Numerical central finite-difference gradient of contract_fn."""
+    gammas = np.asarray(gammas, dtype=float)
+    betas = np.asarray(betas, dtype=float)
+    grad_g = np.empty(p)
+    grad_b = np.empty(p)
+    for i in range(p):
+        g_p = gammas.copy()
+        g_p[i] += h
+        g_m = gammas.copy()
+        g_m[i] -= h
+        grad_g[i] = (contract_fn(g_p, betas, p, D, k) - contract_fn(g_m, betas, p, D, k)) / (2 * h)
+    for i in range(p):
+        b_p = betas.copy()
+        b_p[i] += h
+        b_m = betas.copy()
+        b_m[i] -= h
+        grad_b[i] = (contract_fn(gammas, b_p, p, D, k) - contract_fn(gammas, b_m, p, D, k)) / (2 * h)
+    return grad_g, grad_b
+
+
+# ============================================================
+# contract.py dispatcher tests
+# ============================================================
+
+
+@pytest.mark.skipif(not (HAS_CPP or HAS_JAX), reason="No backend available")
+@pytest.mark.parametrize("k,D,p", CASES[:6])
+def test_dispatcher_contract_symmetric_tree(k, D, p):
+    """Dispatcher contract_symmetric_tree auto-selects a backend and returns a valid float."""
+    from qokit.max_k_xor_sat.contract import contract_symmetric_tree as disp_contract
+
+    gammas, betas = _params(p)
+    val = disp_contract(gammas, betas, p, D, k)
+    assert isinstance(val, float)
+    assert -1.0 <= val <= 1.0
+
+
+@pytest.mark.skipif(not HAS_CPP, reason="C++ backend not built")
+def test_dispatcher_contract_symmetric_tree_cpp():
+    """Dispatcher backend='cpp' matches cpp_backend directly."""
+    from qokit.max_k_xor_sat.contract import contract_symmetric_tree as disp_contract
+
+    gammas, betas = _params(2)
+    val_disp = disp_contract(gammas, betas, 2, 3, k=2, backend="cpp")
+    val_cpp = cpp_contract(gammas, betas, 2, 3, 2)
+    assert abs(val_disp - val_cpp) < 1e-12
+
+
+@pytest.mark.skipif(not HAS_JAX, reason="JAX not installed")
+def test_dispatcher_contract_symmetric_tree_jax():
+    """Dispatcher backend='jax' matches jax backend directly."""
+    from qokit.max_k_xor_sat.contract import contract_symmetric_tree as disp_contract
+
+    gammas, betas = _params(2)
+    val_disp = disp_contract(gammas, betas, 2, 3, k=2, backend="jax")
+    val_jax = jax_contract(gammas, betas, 2, 3, 2)
+    assert abs(val_disp - val_jax) < 1e-12
+
+
+def test_dispatcher_jax_dd_raises():
+    """Dispatcher raises ValueError when backend='jax' + precision='dd' requested."""
+    from qokit.max_k_xor_sat.contract import contract_symmetric_tree as disp_contract
+
+    gammas, betas = _params(2)
+    with pytest.raises(ValueError, match="double-double"):
+        disp_contract(gammas, betas, 2, 3, k=2, precision="dd", backend="jax")
+
+
+@pytest.mark.skipif(not (HAS_CPP or HAS_JAX), reason="No backend available")
+@pytest.mark.parametrize("k,D,p", _GRAD_CASES)
+def test_dispatcher_contract_with_grad_shape(k, D, p):
+    """Dispatcher contract_with_grad returns (float, array(p,), array(p,))."""
+    from qokit.max_k_xor_sat.contract import contract_with_grad as disp_grad
+
+    gammas, betas = _params(p)
+    val, dg, db = disp_grad(gammas, betas, p, D, k)
+    assert isinstance(val, float)
+    assert np.asarray(dg).shape == (p,)
+    assert np.asarray(db).shape == (p,)
+
+
+@pytest.mark.skipif(not (HAS_CPP or HAS_JAX), reason="No backend available")
+@pytest.mark.parametrize("k,D,p", _GRAD_CASES)
+def test_dispatcher_contract_with_grad_value(k, D, p):
+    """Dispatcher contract_with_grad value matches contract_symmetric_tree."""
+    from qokit.max_k_xor_sat.contract import (
+        contract_symmetric_tree as disp_contract,
+        contract_with_grad as disp_grad,
+    )
+
+    gammas, betas = _params(p)
+    val_tree = disp_contract(gammas, betas, p, D, k)
+    val_grad, _, _ = disp_grad(gammas, betas, p, D, k)
+    assert abs(val_tree - val_grad) < 1e-8, f"k={k} D={D} p={p}: tree={val_tree} grad={val_grad}"
+
+
+@pytest.mark.skipif(not (HAS_CPP or HAS_JAX), reason="No backend available")
+@pytest.mark.parametrize("k,D,p", _GRAD_CASES)
+def test_dispatcher_contract_with_grad_accuracy(k, D, p):
+    """Dispatcher contract_with_grad gradient matches finite differences."""
+    from qokit.max_k_xor_sat.contract import (
+        contract_symmetric_tree as disp_contract,
+        contract_with_grad as disp_grad,
+    )
+
+    gammas, betas = _params(p)
+    _, dg, db = disp_grad(gammas, betas, p, D, k)
+    ref_dg, ref_db = _fd_grad(disp_contract, gammas, betas, p, D, k)
+    np.testing.assert_allclose(dg, ref_dg, atol=1e-4, rtol=1e-4, err_msg=f"gamma grad k={k} D={D} p={p}")
+    np.testing.assert_allclose(db, ref_db, atol=1e-4, rtol=1e-4, err_msg=f"beta grad k={k} D={D} p={p}")
+
+
+# ============================================================
+# cpp_backend.py additional tests
+# ============================================================
+
+
+@pytest.mark.skipif(not HAS_CPP, reason="C++ backend not built")
+@pytest.mark.parametrize("k,D,p", [(2, 3, 1), (2, 3, 2), (3, 2, 1), (2, 2, 3)])
+def test_cpp_light_cone_size(k, D, p):
+    """cpp_backend light_cone_size matches reference formula."""
+    from qokit.max_k_xor_sat.cpp_backend import light_cone_size as cpp_lcs
+    from qokit.max_k_xor_sat.contract import light_cone_size as ref_lcs
+
+    assert cpp_lcs(p, D, k) == ref_lcs(p, D, k), f"k={k} D={D} p={p}"
+
+
+@pytest.mark.skipif(not HAS_CPP, reason="C++ backend not built")
+@pytest.mark.parametrize("k,D,p", _GRAD_CASES)
+def test_cpp_contract_with_grad_shape(k, D, p):
+    """cpp_backend contract_with_grad returns (float, array(p,), array(p,))."""
+    from qokit.max_k_xor_sat.cpp_backend import contract_with_grad as cpp_grad
+
+    gammas, betas = _params(p)
+    val, dg, db = cpp_grad(gammas, betas, p, D, k)
+    assert isinstance(val, float)
+    assert np.asarray(dg).shape == (p,)
+    assert np.asarray(db).shape == (p,)
+
+
+@pytest.mark.skipif(not HAS_CPP, reason="C++ backend not built")
+@pytest.mark.parametrize("k,D,p", _GRAD_CASES)
+def test_cpp_contract_with_grad_value(k, D, p):
+    """cpp_backend contract_with_grad value matches contract_symmetric_tree."""
+    from qokit.max_k_xor_sat.cpp_backend import contract_with_grad as cpp_grad
+
+    gammas, betas = _params(p)
+    val_tree = cpp_contract(gammas, betas, p, D, k)
+    val_grad, _, _ = cpp_grad(gammas, betas, p, D, k)
+    assert abs(val_tree - val_grad) < 1e-8, f"k={k} D={D} p={p}: tree={val_tree} grad={val_grad}"
+
+
+@pytest.mark.skipif(not HAS_CPP, reason="C++ backend not built")
+@pytest.mark.parametrize("k,D,p", _GRAD_CASES)
+def test_cpp_grad_accuracy(k, D, p):
+    """cpp_backend gradient matches finite differences."""
+    from qokit.max_k_xor_sat.cpp_backend import contract_with_grad as cpp_grad
+
+    gammas, betas = _params(p)
+    _, dg, db = cpp_grad(gammas, betas, p, D, k)
+    ref_dg, ref_db = _fd_grad(cpp_contract, gammas, betas, p, D, k)
+    np.testing.assert_allclose(dg, ref_dg, atol=1e-4, rtol=1e-4, err_msg=f"gamma grad k={k} D={D} p={p}")
+    np.testing.assert_allclose(db, ref_db, atol=1e-4, rtol=1e-4, err_msg=f"beta grad k={k} D={D} p={p}")
+
+
+# ============================================================
+# JAX backend additional tests
+# ============================================================
+
+
+@pytest.mark.skipif(not HAS_JAX, reason="JAX not installed")
+@pytest.mark.parametrize("k,D,p", [(2, 3, 1), (2, 3, 2), (3, 2, 1), (2, 2, 3)])
+def test_jax_light_cone_size(k, D, p):
+    """JAX backend light_cone_size matches reference formula."""
+    from qokit.max_k_xor_sat.jax.contract import light_cone_size as jax_lcs
+    from qokit.max_k_xor_sat.contract import light_cone_size as ref_lcs
+
+    assert jax_lcs(p, D, k) == ref_lcs(p, D, k), f"k={k} D={D} p={p}"
+
+
+@pytest.mark.skipif(not HAS_JAX, reason="JAX not installed")
+@pytest.mark.parametrize("k,D,p", _GRAD_CASES)
+def test_jax_contract_with_grad_shape(k, D, p):
+    """JAX backend contract_with_grad returns (float, array(p,), array(p,))."""
+    from qokit.max_k_xor_sat.jax import contract_with_grad as jax_grad
+
+    gammas, betas = _params(p)
+    val, dg, db = jax_grad(gammas, betas, p, D, k)
+    assert isinstance(val, float)
+    assert np.asarray(dg).shape == (p,)
+    assert np.asarray(db).shape == (p,)
+
+
+@pytest.mark.skipif(not HAS_JAX, reason="JAX not installed")
+@pytest.mark.parametrize("k,D,p", _GRAD_CASES)
+def test_jax_contract_with_grad_value(k, D, p):
+    """JAX backend contract_with_grad value matches contract_symmetric_tree."""
+    from qokit.max_k_xor_sat.jax import contract_with_grad as jax_grad
+
+    gammas, betas = _params(p)
+    val_tree = jax_contract(gammas, betas, p, D, k)
+    val_grad, _, _ = jax_grad(gammas, betas, p, D, k)
+    assert abs(val_tree - val_grad) < 1e-8, f"k={k} D={D} p={p}: tree={val_tree} grad={val_grad}"
+
+
+@pytest.mark.skipif(not HAS_JAX, reason="JAX not installed")
+@pytest.mark.parametrize("k,D,p", _GRAD_CASES)
+def test_jax_grad_accuracy(k, D, p):
+    """JAX backend gradient matches finite differences."""
+    from qokit.max_k_xor_sat.jax import contract_with_grad as jax_grad
+
+    gammas, betas = _params(p)
+    _, dg, db = jax_grad(gammas, betas, p, D, k)
+    ref_dg, ref_db = _fd_grad(jax_contract, gammas, betas, p, D, k)
+    np.testing.assert_allclose(dg, ref_dg, atol=1e-4, rtol=1e-4, err_msg=f"gamma grad k={k} D={D} p={p}")
+    np.testing.assert_allclose(db, ref_db, atol=1e-4, rtol=1e-4, err_msg=f"beta grad k={k} D={D} p={p}")
