@@ -47,6 +47,9 @@ solvers = [
   'docplex>=2.18.200',
   'gurobipy>=9.1.2'
 ]
+xorsat-jax = [
+    'jax'
+]
 xorsat-gpu = [
     'jax[cuda12]'
 ]
