@@ -6,3 +6,4 @@ Welcome to QOKit examples. We show how to use QOKit for two combinatorial proble
 - [`QAOA_portfolio_optimization.ipynb`](./QAOA_portfolio_optimization.ipynb) - Optimize parameters of QAOA for financial portfolio optimization problem.
 - [`advanced`](./advanced/) folder gives hands-on examples for particular experimental purpose.
 - [`QOKit_general_simulation.ipynb`](./QOKit_general_simulation.ipynb) - Example of using QOKit for arbitary QAOA problem of your preference and more details on simulation.
+- [`QAOA_max_k_xor_sat.ipynb`](./QAOA_max_k_xor_sat.ipynb) - Demo of the max-k-XOR-SAT module: computing QAOA expectation values, loading precomputed optimal angles, and comparing backends.

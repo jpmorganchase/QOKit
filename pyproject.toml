@@ -47,6 +47,16 @@ solvers = [
   'docplex>=2.18.200',
   'gurobipy>=9.1.2'
 ]
+xorsat-jax = [
+    'jax'
+]
+xorsat-gpu = [
+    'jax[cuda12]'
+]
+xorsat-optimize = [
+    'pybobyqa',
+    'scipy>=1.10.1'
+]
 
 [build-system]
 requires = ["setuptools>=45",
@@ -82,14 +92,19 @@ omit = [
     "qokit/fur/mpi_nbcuda/*",
     "qokit/fur/mpi_custatevec/*",
     "qokit/fur/diagonal_precomputation/gpu_numba.py",
+    "qokit/max_k_xor_sat/cpp_backend.py",
+    "qokit/max_k_xor_sat/contract.py",
+    "qokit/max_k_xor_sat/jax/*",
+    "qokit/max_k_xor_sat/optimize/core.py",
+    "qokit/max_k_xor_sat/optimize/seed.py",
     ]
 [tool.setuptools.packages.find]
 where = ["."]
-exclude = ["tests*"]    
+exclude = ["tests*", "qokit.max_k_xor_sat.cpp.build*"]
 
 
 [tool.setuptools.package-data]
-"*" = ["*.json", "*.npy"]
+"*" = ["*.json", "*.npy", "*.cpp", "*.h", "CMakeLists.txt"]
 
 
 [tool.setuptools.dynamic]

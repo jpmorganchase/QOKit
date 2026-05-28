@@ -29,6 +29,9 @@ pip install -e .
 Some optional parts of the package require additional dependencies. 
 - GPU simulation: `pip install -e .[GPU-CUDA12]`
 - Generating LP files to solve LABS using commercial IP solvers (`qokit/classical_methods` and `examples/advanced/classical_solvers_for_LABS/`): `pip install -e .[solvers]`
+- Max-k-XOR-SAT with JAX (CPU-only): `pip install -e .[xorsat-jax]`
+- Max-k-XOR-SAT with JAX + CUDA GPU: `pip install -e .[xorsat-gpu]`
+- Max-k-XOR-SAT angle optimization (requires BOBYQA): `pip install -e .[xorsat-optimize]`
 
 Please note that the GPU dependency is specified for CUDA 12x. For other versions of CUDA, please follow cupy installation instructions.
 
@@ -39,6 +42,24 @@ Installation can be verified by running tests using `pytest`.
 #### MaxCut
 
 For MaxCut, the datasets in `qokit/assets/maxcut_datasets` must be inflated
+
+#### Max-k-XOR-SAT
+
+The max-k-XOR-SAT module (`qokit.max_k_xor_sat`) computes QAOA expectation values for D-regular, k-uniform hypergraph instances via symmetric tensor contraction with cost O(p · 4^p), independent of instance size.
+
+It ships two backends (at least one must be available):
+
+- **C++** (default, recommended): float64 and double-double precision, reverse-mode adjoint gradient, optional OpenMP parallelism. Built automatically by `pip install -e .` when `cmake` and a C++17 compiler are present. To build manually:
+  ```
+  cd qokit/max_k_xor_sat/cpp
+  mkdir -p build && cd build
+  cmake ..
+  make -j
+  ```
+  If `cmake` is not installed, the C++ backend is silently skipped.
+- **JAX**: float64 only, forward-mode JVP gradient, JIT-compiled. Install with `pip install -e .[xorsat-jax]` (CPU) or `pip install -e .[xorsat-gpu]` (CUDA GPU).
+
+See [`examples/QAOA_max_k_xor_sat.ipynb`](./examples/QAOA_max_k_xor_sat.ipynb) for a usage demo.
 
 ### Cite
 
