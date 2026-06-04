@@ -3,6 +3,7 @@
 # // Copyright : JP Morgan Chase & Co
 ###############################################################################
 """Tests for the max_k_xor_sat module."""
+import importlib.metadata
 import numpy as np
 import pytest
 
@@ -201,6 +202,21 @@ def test_load_nonexistent_config():
     """Verify FileNotFoundError for missing config."""
     with pytest.raises(FileNotFoundError):
         load_precomputed_results(99, 99)
+
+
+def test_xorsat_optimize_dep_name():
+    """xorsat-optimize must declare 'Py-BOBYQA' """
+    requires = importlib.metadata.requires("qokit") or []
+    bobyqa_deps = [r for r in requires if "bobyqa" in r.lower()]
+    assert bobyqa_deps, "No bobyqa dependency found in qokit metadata"
+    for dep in bobyqa_deps:
+        pkg = dep.split(";")[0].strip().split()[0].lower()
+        assert pkg != "pybobyqa", (
+            f"Dependency '{dep}' uses the typo'd name 'pybobyqa' — use 'Py-BOBYQA' instead"
+        )
+        assert pkg in ("py-bobyqa", "py_bobyqa"), (
+            f"Unexpected bobyqa dependency name '{pkg}' — expected 'py-bobyqa'"
+        )
 
 
 # ============================================================

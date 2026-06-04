@@ -18,7 +18,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         python-version: ["3.10", "3.11"]
-        
+
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -33,18 +33,22 @@ jobs:
     - name: black check
       run:  |
           black --check .
-          
-    - name: pip install   
+
+    - name: pip install
       run: |
-          pip install .  
-          
-    - name: Run tests 
+          pip install .
+
+    - name: Verify xorsat-optimize extra installs cleanly
       run: |
-         pytest --cov=qokit --cov-fail-under=75 -rs tests 
+          pip install '.[xorsat-optimize]'
+
+    - name: Run tests
+      run: |
+         pytest --cov=qokit --cov-fail-under=75 -rs tests
     - name: License check
       run: |
         pip-licenses --format=markdown --order=license
-        
+
     - name: SPDX check
       run: |
        addheader -t header.txt .
