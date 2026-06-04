@@ -151,7 +151,7 @@ def test_maxcut_precompute(simclass):
 def test_sk_ini_maxcut(simulator):
     N = 10
     for d, max_p in [(3, 5), (5, 5)]:
-        G = nx.random_regular_graph(d, N)
+        G = nx.random_regular_graph(d, N, seed=42)
         obj = partial(maxcut_obj, w=get_adjacency_matrix(G))
         optimal_cut, x = brute_force(obj, N, function_takes="bits")
         precomputed_energies = precompute_energies(obj, N)
