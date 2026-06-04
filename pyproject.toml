@@ -54,7 +54,7 @@ xorsat-gpu = [
     'jax[cuda12]'
 ]
 xorsat-optimize = [
-    'pybobyqa',
+    'py-bobyqa',
     'scipy>=1.10.1'
 ]
 
