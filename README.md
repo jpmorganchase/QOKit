@@ -27,11 +27,11 @@ pip install -e .
 ```
 
 Some optional parts of the package require additional dependencies. 
-- GPU simulation: `pip install -e .[GPU-CUDA12]`
-- Generating LP files to solve LABS using commercial IP solvers (`qokit/classical_methods` and `examples/advanced/classical_solvers_for_LABS/`): `pip install -e .[solvers]`
-- Max-k-XOR-SAT with JAX (CPU-only): `pip install -e .[xorsat-jax]`
-- Max-k-XOR-SAT with JAX + CUDA GPU: `pip install -e .[xorsat-gpu]`
-- Max-k-XOR-SAT angle optimization (requires BOBYQA): `pip install -e .[xorsat-optimize]`
+- GPU simulation: `pip install -e '.[GPU-CUDA12]'`
+- Generating LP files to solve LABS using commercial IP solvers (`qokit/classical_methods` and `examples/advanced/classical_solvers_for_LABS/`): `pip install -e '.[solvers]'`
+- Max-k-XOR-SAT with JAX (CPU-only): `pip install -e '.[xorsat-jax]'`
+- Max-k-XOR-SAT with JAX + CUDA GPU: `pip install -e '.[xorsat-gpu]'`
+- Max-k-XOR-SAT angle optimization (requires BOBYQA): `pip install -e '.[xorsat-optimize]'`
 
 Please note that the GPU dependency is specified for CUDA 12x. For other versions of CUDA, please follow cupy installation instructions.
 
@@ -57,7 +57,7 @@ It ships two backends (at least one must be available):
   make -j
   ```
   If `cmake` is not installed, the C++ backend is silently skipped.
-- **JAX**: float64 only, forward-mode JVP gradient, JIT-compiled. Install with `pip install -e .[xorsat-jax]` (CPU) or `pip install -e .[xorsat-gpu]` (CUDA GPU).
+- **JAX**: float64 only, forward-mode JVP gradient, JIT-compiled. Install with `pip install -e '.[xorsat-jax]'` (CPU) or `pip install -e '.[xorsat-gpu]'` (CUDA GPU).
 
 See [`examples/QAOA_max_k_xor_sat.ipynb`](./examples/QAOA_max_k_xor_sat.ipynb) for a usage demo.
 
