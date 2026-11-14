@@ -49,7 +49,7 @@ jobs:
       # numba-cuda 0.14.1 is pinned, so CUDA 12.6. Numba compiles the kernels
       # to PTX with the toolkit's libNVVM, which it finds through CUDA_HOME.
       - name: Set up the simulated H100 and CUDA toolkit
-        uses: pantheongpu/setup-pantheonsim@68edfd58c091361dd6baf060b63de412e544d858 # v0.1.7
+        uses: pantheongpu/setup-pantheonsim@656f502ef4782d94d34d8ddd368e333960609639 # v0.1.8
         with:
           gpu: nvidia/h100
           cuda-toolkit: "12.6"
