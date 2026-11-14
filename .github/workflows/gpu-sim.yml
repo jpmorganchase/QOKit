@@ -1,0 +1,98 @@
+name: GPU Simulator
+
+# The hosted runners have no GPU, so numba.cuda.is_available() is False in the
+# "Run tests" workflow and the GPU simulators are never added to the test
+# parametrisations. This runs the Numba CUDA kernels as PTX on a simulated
+# NVIDIA H100 (https://github.com/pantheongpu/pantheonsim) and checks them
+# against Qiskit and the CPU code paths. The X-mixer GPU simulator compiles its
+# kernel through CuPy, which links the CUDA runtime statically and cannot run
+# on the simulator yet, so only the tests below are run.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "qokit/fur/**"
+      - "qokit/portfolio_optimization.py"
+      - "qokit/qaoa_objective*.py"
+      - "tests/test_simulators_rxy.py"
+      - "tests/test_portfolio_optimization.py"
+      - "tests/test_qaoa_objective_maxcut.py"
+      - "tests/test_qaoa_objective_sk.py"
+      - "pyproject.toml"
+      - "setup.py"
+      - ".github/workflows/gpu-sim.yml"
+
+concurrency:
+  group: gpu-sim-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  numba-cuda:
+    name: Numba CUDA tests on a simulated H100
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # numba-cuda 0.14.1 is pinned, so CUDA 12.6. Numba compiles the kernels
+      # to PTX with the toolkit's libNVVM, which it finds through CUDA_HOME.
+      - name: Set up the simulated H100 and CUDA toolkit
+        uses: pantheongpu/setup-pantheonsim@656f502ef4782d94d34d8ddd368e333960609639 # v0.1.8
+        with:
+          gpu: nvidia/h100
+          cuda-toolkit: "12.6"
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Check that the GPU simulators are available
+        env:
+          CUDA_HOME: /usr/local/cuda-12.6
+        run: |
+          vgpu run python -c "
+          import numba.cuda
+          from qokit.fur import get_available_simulator_names
+          assert numba.cuda.is_available()
+          print(numba.cuda.get_current_device().name)
+          for t in ('x', 'xyring', 'xycomplete'):
+              assert 'gpu' in get_available_simulator_names(t), t
+          "
+
+      - name: Run the tests
+        env:
+          CUDA_HOME: /usr/local/cuda-12.6
+        run: |
+          vgpu run python -m pytest -rs --junitxml="$RUNNER_TEMP/junit.xml" \
+            tests/test_simulators_rxy.py \
+            tests/test_portfolio_optimization.py \
+            tests/test_qaoa_objective_maxcut.py::test_maxcut_precompute \
+            tests/test_qaoa_objective_sk.py::test_sk_precompute
+
+      # The GPU cases are only collected when a device is found, so a run
+      # without them would pass silently. Require all 16 to have run.
+      - name: Check that the GPU cases ran
+        run: |
+          python - "$RUNNER_TEMP/junit.xml" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+
+          gpu = [tc for tc in ET.parse(sys.argv[1]).getroot().iter("testcase") if "gpu" in tc.get("name").lower()]
+          ran = [tc for tc in gpu if not list(tc)]
+          print(f"{len(ran)} of {len(gpu)} GPU cases passed")
+          if len(gpu) < 16 or len(ran) != len(gpu):
+              sys.exit("GPU cases were missing, skipped or failed")
+          PY
